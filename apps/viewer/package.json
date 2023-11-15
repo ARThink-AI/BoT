@@ -11,6 +11,8 @@
     "test:report": "pnpm playwright show-report"
   },
   "dependencies": {
+    "qrcode":  "1.5.3",
+    "uuid":  "9.0.1",
     "@planetscale/database": "^1.8.0",
     "@sentry/nextjs": "7.73.0",
     "@trpc/server": "10.40.0",
