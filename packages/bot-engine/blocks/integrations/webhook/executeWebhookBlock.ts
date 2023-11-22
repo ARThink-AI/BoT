@@ -132,7 +132,8 @@ const parseWebhookAttributes =
       convertKeyValueTableToObject(webhook.queryParams, typebot.variables)
     )
     const bodyContent = await getBodyContent({
-      body:  block.type == "Flow Wise" ?  JSON.stringify({ question : state.typebotsQueue[0].answers[0].value  }): webhook.body,
+      // body:  block.type == "Flow Wise" ?  JSON.stringify({ question : state.typebotsQueue[0].answers[0].value  }): webhook.body,
+      body: webhook.body,
       answers,
       variables: typebot.variables,
     });

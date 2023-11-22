@@ -11,6 +11,7 @@
     "test:report": "pnpm playwright show-report"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech" : "^5.0.1",
     "qrcode":  "1.5.3",
     "uuid":  "9.0.1",
     "@planetscale/database": "^1.8.0",
