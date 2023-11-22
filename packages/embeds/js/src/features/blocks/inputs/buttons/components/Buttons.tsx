@@ -4,7 +4,7 @@ import { InputSubmitContent } from '@/types'
 import { isMobile } from '@/utils/isMobileSignal'
 import type { ChoiceInputBlock } from '@typebot.io/schemas'
 import { defaultChoiceInputOptions } from '@typebot.io/schemas/features/blocks/inputs/choice'
-import { For, Show, createSignal, onMount } from 'solid-js'
+import { For, Show, createSignal, onMount , onCleanup } from 'solid-js'
 
 type Props = {
   inputIndex: number
@@ -13,12 +13,131 @@ type Props = {
   onSubmit: (value: InputSubmitContent) => void
 }
 
+const AUDIO_PLAYING_KEY = 'audioPlaying';
+
 export const Buttons = (props: Props) => {
   let inputRef: HTMLInputElement | undefined
   const [filteredItems, setFilteredItems] = createSignal(props.defaultItems)
+  
+  const [ audioStarted , setAudioStarted ] = createSignal(false);
+  const [ audioInstance , setAudioInstance ] = createSignal(null);
+ 
+  // @ts-ignore
+  const  base64toBlob = (base64, type) => {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
 
-  onMount(() => {
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return new Blob([bytes], { type: type });
+}
+
+const fetchData = async (text: string ) => {
+  try {
+        const response = await fetch(`http://localhost:3006/data/${encodeURIComponent(text)}`);
+    const result = await response.json();
+    
+    if (result.audioData) {
+      const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      setAudioInstance(audio);
+      // setAudioData(audio)
+      checkAudioStart(audio);
+  } else {
+    console.error('Error in response:', result);
+  }
+  } catch(error) {
+    console.error('Error:', error);
+    // localStorage.setItem(AUDIO_PLAYING_KEY,  'false');
+    localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
+setAudioStarted(true);
+    // setIsAudioPlaying(false);
+  }
+} 
+const checkAudioStart = (audio) => {
+  try {
+    console.log("check audio start called",audio);
+    if (audioStarted()) {
+      console.log("audio already started");
+      // clearInterval(localStorageCheckInterval);
+    } else {
+      const localStorageValue = localStorage.getItem(AUDIO_PLAYING_KEY);
+      const currentIsAudioPlaying = localStorageValue ? JSON.parse(localStorageValue) : false;
+      if (!currentIsAudioPlaying) {
+        audio.addEventListener('ended', () => {
+          console.log("audio has ended");
+          localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
+          setAudioStarted(true);
+          // Reset the flag when audio playback is finished
+          // setIsAudioPlaying(false);
+        });
+
+        audio.play().then( result => {
+          console.log("play successfull");
+        } ).catch( err => {
+          console.log("error",err);
+          localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
+    // clearInterval(localStorageCheckInterval);
+
+        } );
+        localStorage.setItem(AUDIO_PLAYING_KEY, 'true'); // Set the flag to true
+        // setIsAudioPlaying(true);
+      } else {
+        console.log('Audio is currently playing. Wait for it to finish.');
+        setTimeout( () => {
+          checkAudioStart(audio);
+        }, 500 );
+      }
+    }
+  } catch (err) {
+    console.log("error inside check Audio start", err);
+    // clearInterval(localStorageCheckInterval);
+  }
+};
+
+  onMount( async  () => {
     if (!isMobile() && inputRef) inputRef.focus()
+    try {
+      let finalText = "";
+   if ( props.defaultItems.length == 1 ) {
+     finalText = props?.defaultItems[0]?.content ? props.defaultItems[0].content :  "";
+   } else {
+    finalText = "Choose from " +
+    props.defaultItems.map((item, index) => {
+      if (index === props.defaultItems.length - 1) {
+        return "and " + item.content;
+      } else {
+        return item.content;
+      }
+    }).join(", ")
+   }
+   const response = await fetch(`http://localhost:3006/data/${encodeURIComponent(finalText)}`);
+   const result = await response.json();
+   
+   if (result.audioData) {
+     const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
+     const audioUrl = URL.createObjectURL(audioBlob);
+
+     const audio = new Audio(audioUrl);
+     setAudioInstance(audio);
+     // setAudioData(audio)
+     checkAudioStart(audio);
+ } else {
+   console.error('Error in response:', result);
+ }
+
+    } catch(error) {
+      console.error('Error:', error);
+      // localStorage.setItem(AUDIO_PLAYING_KEY,  'false');
+      localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
+  setAudioStarted(true);
+      // setIsAudioPlaying(false);
+    } 
   })
 
   const handleClick = (itemIndex: number) =>
@@ -31,7 +150,30 @@ export const Buttons = (props: Props) => {
       )
     )
   }
+  console.log("filtered items", props.defaultItems );
+  // const localStorageCheckInterval = setInterval(() => checkAudioStart(audioInstance()), 500);
+  // const localStorageCheckInterval = setInterval(() => checkAudioStart(audioInstance), 500);
+  // let finalText = "";
+  //  if ( props.defaultItems.length == 1 ) {
+  //    finalText = props?.defaultItems[0]?.content ? props.defaultItems[0].content :  "";
+  //  } else {
+  //   finalText = "Choose from " +
+  //   props.defaultItems.map((item, index) => {
+  //     if (index === props.defaultItems.length - 1) {
+  //       return "and " + item.content;
+  //     } else {
+  //       return item.content;
+  //     }
+  //   }).join(", ")
+  //  }
+  
 
+  // fetchData(finalText);
+  onCleanup(() => {
+    console.log("clean up");
+    // clearInterval(localStorageCheckInterval);
+    
+  })
   return (
     <div class="flex flex-col gap-2 w-full">
       <Show when={props.options.isSearchable}>

@@ -48,6 +48,7 @@ export const TypebotViewer = ({
   onCompleted,
   onVariablesUpdated,
 }: TypebotViewerProps) => {
+  console.log("typebot viewer callledddd");
   const containerBgColor = useMemo(
     () =>
       typebot?.theme?.general?.background?.type === BackgroundType.COLOR
@@ -112,7 +113,9 @@ export const TypebotViewer = ({
                 startGroupId={startGroupId}
               />
             </div>
+            {/* <button> Record </button> */}
             {typebot.settings.general.isBrandingEnabled && <LiteBadge />}
+           
           </div>
         </AnswersProvider>
       </TypebotProvider>

@@ -37,6 +37,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [error, setError] = createSignal<Error | undefined>()
 
   const initializeBot = async () => {
+    console.log("initialize bot");
     setIsInitialized(true)
     const urlParams = new URLSearchParams(location.search)
     props.onInit?.()
@@ -108,7 +109,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   onCleanup(() => {
     setIsInitialized(false)
   })
-
+  
   return (
     <>
       <style>{customCss()}</style>
@@ -192,6 +193,8 @@ const BotContent = (props: BotContentProps) => {
   onMount(() => {
     if (!botContainer) return
     resizeObserver.observe(botContainer)
+    console.log("Bot mounted")
+    // navigator.mediaDevices.getUserMedia({ audio: true });
   })
 
   createEffect(() => {
@@ -231,7 +234,12 @@ const BotContent = (props: BotContentProps) => {
         
       </Show>
     </div>
+    {/*<div style={{ "margin-left" : "40%" }} > 
+       <p> Recording </p>
+    </div> */}
+
     <div style={ { "margin-left" : "70%" } } >
+      
     <LiteBadge botContainer={botContainer} />
     </div>
     </>
