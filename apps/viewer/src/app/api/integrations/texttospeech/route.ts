@@ -29,11 +29,17 @@ export async function POST(req: Request) {
        // @ts-ignore
        credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
     });
-    const request = {
-      input: { text },
-      voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
-      audioConfig: { audioEncoding: 'MP3' }
-  };
+  //   const request = {
+  //     input: { text },
+  //     voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
+  //     audioConfig: { audioEncoding: 'MP3' }
+  // };
+  const request = {
+    input: { text },
+    voice: { languageCode: 'en-IN', ssmlGender: 'FEMALE'  },
+    audioConfig: { audioEncoding: 'MP3' }
+};
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
        // @ts-ignore
   const [response] = await client.synthesizeSpeech(request);
