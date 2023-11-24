@@ -212,7 +212,7 @@ let queueInterval: NodeJS.Timeout;
          console.log("text to speech text",textToSpeechText);
         //  await pushAudioInstanceInQueue(textToSpeechText);
         textQueue.enqueue(textToSpeechText);
-        await pushAudioInstanceInQueue();
+        // await pushAudioInstanceInQueue();
         // console.log('Text node added:', node.textContent);
         // const textToSpeechText = node.textContent.trim();
         // audioQueue.enqueue(textToSpeechText); // Enqueue the text to play as audio
@@ -487,15 +487,36 @@ let queueInterval: NodeJS.Timeout;
   const playAudio = async () => {
    try {
      let audioPlaying = localStorage.getItem(AUDIO_PLAYING_KEY) ? JSON.parse(localStorage.getItem(AUDIO_PLAYING_KEY)) : false;
-     if ( !audioPlaying ) {
-       let audio = audioQueue.dequeue();
-          audio.addEventListener('ended', () => {
-            localStorage.setItem(AUDIO_PLAYING_KEY,"false");
-       // Play the next audio when the current one ends
-     });
-     audio.play().catch( err => {
-      console.log("Error playing audio",err);
-     } );
+     if ( !audioPlaying && !textQueue.isEmpty() ) {
+      let text = textQueue.dequeue();
+      const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
+        const audioUrl = URL.createObjectURL(audioBlob);
+  
+        const audio = new Audio(audioUrl);
+        audio.addEventListener('ended', () => {
+          localStorage.setItem(AUDIO_PLAYING_KEY,"false");
+     // Play the next audio when the current one ends
+   });
+   audio.play().catch( err => {
+    console.log("Error playing audio",err);
+   } );
+        // audioQueue.enqueue(audio);
+      } else {
+       console.log("response error in google request");
+        // playNextAudio("response error");
+      }
+      //  let audio = audioQueue.dequeue();
+         
      }
    } catch(err) {
 
@@ -504,11 +525,11 @@ let queueInterval: NodeJS.Timeout;
   const startQueueMonitoring = () => {
 
     queueInterval = setInterval(() => {
-      console.log("set interval called");
+      // console.log("set interval called");
       playAudio();
       // console.log("set interval being callled");
       // playNextAudio("monitoring");
-    },3000); // Adjust the interval as needed
+    },1000); // Adjust the interval as needed
   };
   onMount(() => {
     if (!botContainer) return
