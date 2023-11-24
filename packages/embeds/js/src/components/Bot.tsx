@@ -13,6 +13,9 @@ import {
 import { setCssVariablesValue } from '@/utils/setCssVariablesValue'
 import immutableCss from '../assets/immutable.css'
 
+import { env  } from "@typebot.io/env";
+import Queue from "@/utils/queue";
+export const AUDIO_PLAYING_KEY = "audio_playing";
 export type BotProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typebot: string | any
@@ -106,6 +109,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     setCustomCss(props.typebot.theme.customCss ?? '')
   })
 
+
   onCleanup(() => {
     setIsInitialized(false)
   })
@@ -165,11 +169,148 @@ type BotContentProps = {
 }
 
 const BotContent = (props: BotContentProps) => {
+ 
   let botContainer: HTMLDivElement | undefined
-
+  let conversationContainer : HTMLDivElement | undefined
+  let audioQueue : Queue
+  let textQueue : Queue
+  // let currentAudio: HTMLAudioElement | undefined;
+let queueInterval: NodeJS.Timeout;
   const resizeObserver = new ResizeObserver((entries) => {
     return setIsMobile(entries[0].target.clientWidth < 400)
   })
+  const [currentAudio, setCurrentAudio] = createSignal<HTMLAudioElement | undefined>(undefined)
+  // function logTextNodes(node) {
+  //   if (node.nodeType === Node.TEXT_NODE) {
+  //     // console.log('Text node added:', node.textContent);
+  //     if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled  && node.textContent.trim() != "" ) {
+  //        const textToSpeechText = node.textContent.trim();
+  //        console.log("text to speech text",textToSpeechText);
+  //        pushAudioInstanceInQueue(textToSpeechText);
+
+  //       // console.log('Text node added:', node.textContent);
+  //       // const textToSpeechText = node.textContent.trim();
+  //       // audioQueue.enqueue(textToSpeechText); // Enqueue the text to play as audio
+  //       // // console.log("audio queueeee",audioQueue);
+  //       // playNextAudio("logTextNode"); // Start playing the next audio in the queue
+  //     }
+     
+    
+  //   } else if (node.nodeType === Node.ELEMENT_NODE) {
+  //     // Recursively check child nodes
+  //     node.childNodes.forEach((childNode) => {
+  //       logTextNodes(childNode);
+  //     });
+  //   }
+  // }
+
+  const  logTextNodes = async (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      // console.log('Text node added:', node.textContent);
+      if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled  && node.textContent.trim() != "" ) {
+         const textToSpeechText = node.textContent.trim();
+         console.log("text to speech text",textToSpeechText);
+        //  await pushAudioInstanceInQueue(textToSpeechText);
+        textQueue.enqueue(textToSpeechText);
+        await pushAudioInstanceInQueue();
+        // console.log('Text node added:', node.textContent);
+        // const textToSpeechText = node.textContent.trim();
+        // audioQueue.enqueue(textToSpeechText); // Enqueue the text to play as audio
+        // // console.log("audio queueeee",audioQueue);
+        // playNextAudio("logTextNode"); // Start playing the next audio in the queue
+      }
+     
+    
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      // Recursively check child nodes
+      node.childNodes.forEach(async (childNode) => {
+       await  logTextNodes(childNode);
+      });
+    }
+  }
+  const pushAudioInstanceInQueue = async ( ) => {
+   try {
+    let text = textQueue.dequeue();
+    const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      audioQueue.enqueue(audio);
+    } else {
+     console.log("response error in google request");
+      // playNextAudio("response error");
+    }
+   } catch(err) {
+    console.log("error inside pushAudioInstance",err);
+   }
+  }
+  // ...
+  createEffect(() => {
+    console.log("current audio", currentAudio())
+  })
+  const observer = new MutationObserver((mutationsList) => {
+    // console.log("mutation observer triggered", mutationsList);
+    mutationsList.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach( async  (addedNode) => {
+          // Log text nodes of the added node
+          await logTextNodes(addedNode);
+        });
+      }
+    });
+  });
+  // const observer = new MutationObserver((mutationsList: MutationRecord[]) => {
+  //   console.log("mutation observer triggered", mutationsList);
+  //   mutationsList.forEach((mutation) => {
+  //     if (mutation.type === 'childList') {
+  //       mutation.addedNodes.forEach((addedNode) => {
+  //         logTextNodes(addedNode);
+  //       });
+  //     }
+  //   });
+  // });
+  
+  // function logTextNodes(node: Node) {
+  //   if (node.nodeType === Node.TEXT_NODE) {
+  //     console.log('Text node added:', node.textContent);
+  //   } else if (node.nodeType === Node.ELEMENT_NODE) {
+  //     node.childNodes.forEach((childNode) => {
+  //       logTextNodes(childNode);
+  //     });
+  //   }
+  // }
+  // const observer = new MutationObserver( (mutationsList: MutationRecord[]) => {
+  //   console.log("mutation observer triggered", mutationsList );
+  //   mutationsList.forEach((mutation) => {
+  //     if (mutation.type === 'childList') {
+  //       mutation.addedNodes.forEach((addedNode) => {
+  //         if (addedNode.nodeType === Node.TEXT_NODE) {
+  //           console.log('Text node added:', addedNode.textContent);
+            
+  //         } else if (addedNode.nodeType === Node.ELEMENT_NODE) {
+           
+  //           addedNode.childNodes.forEach((childNode) => {
+  //             if (childNode.nodeType === Node.TEXT_NODE) {
+  //               console.log('Text node added:', childNode.textContent);
+              
+  //             }
+  //           });
+  //         }
+  //       });
+  //     }
+  //   });
+  // } );
+
 
   const injectCustomFont = () => {
     const existingFont = document.getElementById('bot-font')
@@ -189,11 +330,207 @@ const BotContent = (props: BotContentProps) => {
     font.id = 'bot-font'
     document.head.appendChild(font)
   }
+ // @ts-ignore
+ const  base64toBlob = (base64, type) => {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
 
+  for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return new Blob([bytes], { type: type });
+}
+// const playAudio = async (text: string) => {
+//   try {
+//     const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ text }),
+//     });
+
+//     if (response.ok) {
+//       const result = await response.json();
+//       const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
+//       const audioUrl = URL.createObjectURL(audioBlob);
+
+//       const audio = new Audio(audioUrl);
+//       audio.addEventListener('ended', () => {
+//         //  let text = audioQueue.dequeue();
+//         // setTimeout( () => {
+//         //   playNextAudio();
+//         //   currentAudio = undefined;
+//         // } ,50000);
+//         playNextAudio("audio ended");
+//         // setCurrentAudio(text);
+//       });
+//        // Trigger the audio play within a user interaction (e.g., button click)
+//       //  document.addEventListener('click', () => {
+//         if ( !currentAudio() ) {
+//           setCurrentAudio(audio);
+//         audio.play().catch(error => {
+         
+//           playNextAudio("audio play error");
+//           setCurrentAudio(undefined);
+//         });
+//         }
+      
+
+//       // });
+//       // audio.play();
+//       // currentAudio = audio;
+//       localStorage.setItem(AUDIO_PLAYING_KEY, "true");
+//     } else {
+    
+//       playNextAudio("response error");
+//     }
+//   } catch (err) {
+
+//     playNextAudio("code ft gya");
+//   }
+// };
+
+// const playNextAudio = (source:string) => {
+// console.log("running=>1", source);
+//   if (audioQueue.isEmpty()) {
+//     console.log("running=2", "isEmpty working")
+//     clearInterval(queueInterval);
+//     return;
+//   }
+//   console.log("running=>2", source);
+//   console.log("running", "consition", currentAudio(), currentAudio()?.ended)
+//   if (!currentAudio() || currentAudio().ended) {
+//     console.log("running===>", 5)
+//     const nextText = audioQueue.dequeue();
+//     if (nextText) {
+//      console.log("running", "playing next trigger");
+//       playAudio(nextText);
+//     }
+//   }
+// };
+
+
+
+
+  // const playAudio = async (text: string ) => {
+  //   try {
+  //           const response = await fetch(`${ env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE }/api/integrations/texttospeech`,{
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json', // Set the appropriate content type
+  //         // Add any other headers as needed
+  //       },
+  //       body: JSON.stringify({ text }),
+  //     });
+  //     let result = await response.json();
+  //     result = result.message
+  //     // console.log("resulttt",result);
+  //     if (result.audioData) {
+  //       const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
+  //       const audioUrl = URL.createObjectURL(audioBlob);
+
+  //       const audio = new Audio(audioUrl);
+  //          audio.addEventListener('ended', () => {
+  //         playNextAudio(); // Play the next audio when the current one ends
+  //       });
+  //       audio.play();
+  //       currentAudio = audio;
+  //       localStorage.setItem(AUDIO_PLAYING_KEY, "true");
+        
+  //     } else {
+  //       console.error('Error in response:', result);
+  //          playNextAudio();
+  //     }
+
+  //     // const response = await fetch('YOUR_TTS_API_ENDPOINT', {
+  //     //   method: 'POST',
+  //     //   headers: {
+  //     //     'Content-Type': 'application/json',
+  //     //   },
+  //     //   body: JSON.stringify({ text }),
+  //     // });
+  
+  //     // if (response.ok) {
+  //     //   const audioUrl = await response.json();
+  //     //   const audio = new Audio(audioUrl);
+  //     //   audio.addEventListener('ended', () => {
+  //     //     playNextAudio(); // Play the next audio when the current one ends
+  //     //   });
+  //     //   audio.play();
+  //     //   currentAudio = audio;
+  //     //   localStorage.setItem(AUDIO_PLAYING_KEY, "true");
+  //     // } else {
+  //     //   console.error('Error in text-to-speech API:', response.statusText);
+  //     //   playNextAudio(); // Move to the next audio even if there is an error
+  //     // }
+  //   } catch (err) {
+  //     console.error('Error in text-to-speech API:', err);
+  //     playNextAudio(); // Move to the next audio even if there is an error
+  //   }
+  // }
+  // const playNextAudio = () => {
+  //   if (audioQueue.isEmpty()) {
+  //     clearInterval(queueInterval); // Stop checking the queue if it's empty
+  //     return;
+  //   }
+  
+  //   if (!currentAudio || currentAudio.ended) {
+  //     const nextText = audioQueue.dequeue();
+  //     if (nextText) {
+  //       playAudio(nextText);
+  //     }
+  //   }
+  // }    playAudio(nextText);
+  const playAudio = async () => {
+   try {
+     let audioPlaying = localStorage.getItem(AUDIO_PLAYING_KEY) ? JSON.parse(localStorage.getItem(AUDIO_PLAYING_KEY)) : false;
+     if ( !audioPlaying ) {
+       let audio = audioQueue.dequeue();
+          audio.addEventListener('ended', () => {
+            localStorage.setItem(AUDIO_PLAYING_KEY,"false");
+       // Play the next audio when the current one ends
+     });
+     audio.play().catch( err => {
+      console.log("Error playing audio",err);
+     } );
+     }
+   } catch(err) {
+
+   }
+  }
+  const startQueueMonitoring = () => {
+
+    queueInterval = setInterval(() => {
+      console.log("set interval called");
+      playAudio();
+      // console.log("set interval being callled");
+      // playNextAudio("monitoring");
+    },3000); // Adjust the interval as needed
+  };
   onMount(() => {
     if (!botContainer) return
     resizeObserver.observe(botContainer)
-    console.log("Bot mounted")
+    if ( !conversationContainer  ) return 
+    observer.observe(conversationContainer, { childList: true, subtree: true });
+    // observer.observe(conversationContainer,  { childList: true, subtree: true , characterData: true  } )
+    // localStorage.setItem(AUDIO_PLAYING_KEY,"false");
+    if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled  ) {
+      localStorage.setItem(AUDIO_PLAYING_KEY,"false");
+       startQueueMonitoring();
+       audioQueue = new Queue();
+       textQueue = new Queue();
+    }
+    // if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled ) {
+    //   audioQueue = new Queue()
+    //   // currentAudio = undefined;
+    //   // setCurrentAudio(undefined);
+    //   // console.log("Bot mountedd")
+    //   startQueueMonitoring();
+    // } 
+
     // navigator.mediaDevices.getUserMedia({ audio: true });
   })
 
@@ -205,9 +542,13 @@ const BotContent = (props: BotContentProps) => {
 
   onCleanup(() => {
     if (!botContainer) return
+    if (!conversationContainer) return 
     resizeObserver.unobserve(botContainer)
+    observer.disconnect()
+    clearInterval(queueInterval);
+    
   })
-
+  // console.log("props.initialChatReply",props.initialChatReply.typebot.settings);
   return (
     <>
     <div
@@ -217,7 +558,7 @@ const BotContent = (props: BotContentProps) => {
         props.class
       }
     >
-      <div class="flex w-full h-full justify-center">
+      <div  ref={conversationContainer} class="flex w-full h-full justify-center">
         <ConversationContainer
           context={props.context}
           initialChatReply={props.initialChatReply}
@@ -237,7 +578,10 @@ const BotContent = (props: BotContentProps) => {
     {/*<div style={{ "margin-left" : "40%" }} > 
        <p> Recording </p>
     </div> */}
-
+    {/* <div> 
+      <p> Voice Settings </p>
+       </div> */}
+    
     <div style={ { "margin-left" : "70%" } } >
       
     <LiteBadge botContainer={botContainer} />

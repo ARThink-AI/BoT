@@ -102,51 +102,51 @@ const checkAudioStart = (audio) => {
 
   onMount( async  () => {
     if (!isMobile() && inputRef) inputRef.focus()
-    try {
-      let finalText = "";
-   if ( props.defaultItems.length == 1 ) {
-     finalText = props?.defaultItems[0]?.content ? props.defaultItems[0].content :  "";
-   } else {
-    finalText = "Choose from " +
-    props.defaultItems.map((item, index) => {
-      if (index === props.defaultItems.length - 1) {
-        return "and " + item.content;
-      } else {
-        return item.content;
-      }
-    }).join(", ")
-   }
-  //  const response = await fetch(`http://localhost:3006/data/${encodeURIComponent(finalText)}`);
-  //  const result = await response.json();
-  const response = await fetch(`${ env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE }/api/integrations/texttospeech`,{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json', // Set the appropriate content type
-      // Add any other headers as needed
-    },
-    body: JSON.stringify({ text: finalText }),
-  });
-  let result = await response.json();
-  result = result.message
-   if (result.audioData) {
-     const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
-     const audioUrl = URL.createObjectURL(audioBlob);
+//     try {
+//       let finalText = "";
+//    if ( props.defaultItems.length == 1 ) {
+//      finalText = props?.defaultItems[0]?.content ? props.defaultItems[0].content :  "";
+//    } else {
+//     finalText = "Choose from " +
+//     props.defaultItems.map((item, index) => {
+//       if (index === props.defaultItems.length - 1) {
+//         return "and " + item.content;
+//       } else {
+//         return item.content;
+//       }
+//     }).join(", ")
+//    }
+//   //  const response = await fetch(`http://localhost:3006/data/${encodeURIComponent(finalText)}`);
+//   //  const result = await response.json();
+//   const response = await fetch(`${ env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE }/api/integrations/texttospeech`,{
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json', // Set the appropriate content type
+//       // Add any other headers as needed
+//     },
+//     body: JSON.stringify({ text: finalText }),
+//   });
+//   let result = await response.json();
+//   result = result.message
+//    if (result.audioData) {
+//      const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
+//      const audioUrl = URL.createObjectURL(audioBlob);
 
-     const audio = new Audio(audioUrl);
-     setAudioInstance(audio);
-     // setAudioData(audio)
-     checkAudioStart(audio);
- } else {
-   console.error('Error in response:', result);
- }
+//      const audio = new Audio(audioUrl);
+//      setAudioInstance(audio);
+//      // setAudioData(audio)
+//      checkAudioStart(audio);
+//  } else {
+//    console.error('Error in response:', result);
+//  }
 
-    } catch(error) {
-      console.error('Error:', error);
-      // localStorage.setItem(AUDIO_PLAYING_KEY,  'false');
-      localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
-  setAudioStarted(true);
-      // setIsAudioPlaying(false);
-    } 
+//     } catch(error) {
+//       console.error('Error:', error);
+//       // localStorage.setItem(AUDIO_PLAYING_KEY,  'false');
+//       localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
+//   setAudioStarted(true);
+//       // setIsAudioPlaying(false);
+//     } 
   })
 
   const handleClick = (itemIndex: number) =>

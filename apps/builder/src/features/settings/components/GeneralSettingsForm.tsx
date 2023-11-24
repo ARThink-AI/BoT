@@ -43,7 +43,11 @@ export const GeneralSettingsForm = ({
       ...generalSettings,
       isHideQueryParamsEnabled,
     })
-
+    const handleVoiceChange = (isVoiceEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isVoiceEnabled,
+    })
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
   ) =>
@@ -68,6 +72,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isHideQueryParamsEnabled ?? true}
         onCheckChange={handleHideQueryParamsChange}
         moreInfoContent="If your URL contains query params, they will be automatically hidden when the bot starts."
+      />
+      <SwitchWithLabel
+        label="Voice Enabled on bot start"
+        initialValue={generalSettings.isVoiceEnabled ?? true}
+        onCheckChange={handleVoiceChange}
+        moreInfoContent="Toggle for voice"
       />
       <SwitchWithRelatedSettings
         label={'Remember user'}
