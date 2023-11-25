@@ -16,6 +16,9 @@ import immutableCss from '../assets/immutable.css'
 import { env  } from "@typebot.io/env";
 import Queue from "@/utils/queue";
 export const AUDIO_PLAYING_KEY = "audio_playing";
+
+
+
 export type BotProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typebot: string | any
@@ -174,12 +177,20 @@ const BotContent = (props: BotContentProps) => {
   let conversationContainer : HTMLDivElement | undefined
   let audioQueue : Queue
   let textQueue : Queue
+  const  [audioInstance, setAudioInstance] = createSignal<HTMLAudioElement | undefined>(undefined);
+  const [audioRef , setAudioRef ] = createSignal();
+  const [audioText, setAudioText] = createSignal('');
+  const [nodeText, setNodeText] = createSignal('');
   // let currentAudio: HTMLAudioElement | undefined;
 let queueInterval: NodeJS.Timeout;
   const resizeObserver = new ResizeObserver((entries) => {
     return setIsMobile(entries[0].target.clientWidth < 400)
   })
   const [currentAudio, setCurrentAudio] = createSignal<HTMLAudioElement | undefined>(undefined)
+  // const [selectedLanguage, setSelectedLanguage] = createSignal(
+  //   localStorage.getItem('selectedLanguage') || 'en-IN-Neural2-D'
+  // );
+  // const [ voices , setVoices ] = createSignal([]);
   // function logTextNodes(node) {
   //   if (node.nodeType === Node.TEXT_NODE) {
   //     // console.log('Text node added:', node.textContent);
@@ -203,7 +214,12 @@ let queueInterval: NodeJS.Timeout;
   //     });
   //   }
   // }
-
+  // const handleLanguageChange = (event) => {
+  //   const newLanguage = event.target.value;
+  //   setSelectedLanguage(newLanguage);
+  //   localStorage.setItem('selectedLanguage', newLanguage);
+  //   location.reload(); // Refresh the page after changing the language
+  // };
   const  logTextNodes = async (node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       // console.log('Text node added:', node.textContent);
@@ -211,7 +227,11 @@ let queueInterval: NodeJS.Timeout;
          const textToSpeechText = node.textContent.trim();
          console.log("text to speech text",textToSpeechText);
         //  await pushAudioInstanceInQueue(textToSpeechText);
-        textQueue.enqueue(textToSpeechText);
+        // textQueue.enqueue(textToSpeechText);
+        let finalText = nodeText() + " " + textToSpeechText;
+        setNodeText(finalText);
+        
+        console.log("final Text",finalText);
         // await pushAudioInstanceInQueue();
         // console.log('Text node added:', node.textContent);
         // const textToSpeechText = node.textContent.trim();
@@ -484,52 +504,89 @@ let queueInterval: NodeJS.Timeout;
   //     }
   //   }
   // }    playAudio(nextText);
+  // const getVoices = async () => {
+  //   try {
+  //    const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ text : "abc" , type : "listvoices" }),
+  //    })
+  //    if ( response.ok ) {
+  //     const result = await response.json();
+  //     setVoices( result.message.voices );
+  //    } else {
+  //     console.log("Error in response");
+  //    }
+  //   } catch(err) {
+  //     console.log("error",err);
+  //   }
+  // }
   const playAudio = async () => {
    try {
-     let audioPlaying = localStorage.getItem(AUDIO_PLAYING_KEY) ? JSON.parse(localStorage.getItem(AUDIO_PLAYING_KEY)) : false;
-     if ( !audioPlaying && !textQueue.isEmpty() ) {
-      let text = textQueue.dequeue();
+    const currentAudio = audioRef();
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    //  let audioPlaying = localStorage.getItem(AUDIO_PLAYING_KEY) ? JSON.parse(localStorage.getItem(AUDIO_PLAYING_KEY)) : false;
+    //  if ( !audioPlaying && !textQueue.isEmpty() ) {
+      // let text = textQueue.dequeue();
+      let text = nodeText();
       const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text , type : "translate" }),
       });
   
       if (response.ok) {
         const result = await response.json();
         const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
         const audioUrl = URL.createObjectURL(audioBlob);
-  
-        const audio = new Audio(audioUrl);
-        audio.addEventListener('ended', () => {
-          localStorage.setItem(AUDIO_PLAYING_KEY,"false");
-     // Play the next audio when the current one ends
-   });
-   audio.play().catch( err => {
+        // let audio = audioInstance(); 
+        // audio?.pause();
+        // audio?.currentTime = 0;
+        currentAudio.src = audioUrl;
+  //       const audio = new Audio(audioUrl);
+  //       audio.addEventListener('ended', () => {
+  //         localStorage.setItem(AUDIO_PLAYING_KEY,"false");
+  //    // Play the next audio when the current one ends
+  //  });
+  currentAudio.play().catch( err => {
     console.log("Error playing audio",err);
+    setNodeText("");
    } );
         // audioQueue.enqueue(audio);
       } else {
        console.log("response error in google request");
+       setNodeText("");
         // playNextAudio("response error");
       }
       //  let audio = audioQueue.dequeue();
          
-     }
+    //  }
    } catch(err) {
-
+    setNodeText("");
    }
   }
-  const startQueueMonitoring = () => {
+  // const startQueueMonitoring = () => {
 
-    queueInterval = setInterval(() => {
-      // console.log("set interval called");
-      playAudio();
-      // console.log("set interval being callled");
-      // playNextAudio("monitoring");
-    },1000); // Adjust the interval as needed
+  //   queueInterval = setInterval(() => {
+  //     // console.log("set interval called");
+  //     playAudio();
+  //     // console.log("set interval being callled");
+  //     // playNextAudio("monitoring");
+  //   },1000); // Adjust the interval as needed
+  // };
+  const handleDocumentClick = (event) => {
+    // Do something with the click event
+    console.log('Document clicked!', event);
+    setNodeText("");
+    setTimeout( () => {
+     playAudio();
+    }, 5000 );
+
   };
   onMount(() => {
     if (!botContainer) return
@@ -540,10 +597,36 @@ let queueInterval: NodeJS.Timeout;
     // localStorage.setItem(AUDIO_PLAYING_KEY,"false");
     if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled  ) {
       localStorage.setItem(AUDIO_PLAYING_KEY,"false");
-       startQueueMonitoring();
+      document.addEventListener('click', handleDocumentClick);
+      //  startQueueMonitoring();
+       
        audioQueue = new Queue();
        textQueue = new Queue();
+       const audio = new Audio();
+    setAudioRef(audio);
+      //  audioInstance = new Audio();
+      // setAudioInstance(new Audio());
+      
+      const invisibleButton = document.createElement('button');
+    invisibleButton.style.position = 'absolute';
+    invisibleButton.style.width = '0';
+    invisibleButton.style.height = '0';
+    invisibleButton.style.opacity = '0';
+    invisibleButton.style.pointerEvents = 'none';
+    invisibleButton.click();
+    setNodeText("");
+    setTimeout( () => {
+       playAudio()
+    } ,5000);
     }
+    return () => {
+      if (audioRef()) {
+        let audio = audioRef();
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      
+    };
     // if ( props.initialChatReply.typebot.settings.general.isVoiceEnabled ) {
     //   audioQueue = new Queue()
     //   // currentAudio = undefined;
@@ -567,6 +650,7 @@ let queueInterval: NodeJS.Timeout;
     resizeObserver.unobserve(botContainer)
     observer.disconnect()
     clearInterval(queueInterval);
+    document.removeEventListener('click', handleDocumentClick);
     
   })
   // console.log("props.initialChatReply",props.initialChatReply.typebot.settings);
@@ -599,13 +683,19 @@ let queueInterval: NodeJS.Timeout;
     {/*<div style={{ "margin-left" : "40%" }} > 
        <p> Recording </p>
     </div> */}
-    {/* <div> 
-      <p> Voice Settings </p>
-       </div> */}
+  
     
-    <div style={ { "margin-left" : "70%" } } >
-      
+    <div style={ { "margin-left" : "70%", position: "relative" } } >
+   
     <LiteBadge botContainer={botContainer} />
+
+      {/* <select value={selectedLanguage()} style={{ position : "absolute" , top : "-80px" }} onChange={handleLanguageChange} > 
+      {  voices().map( (v) => {
+        return <option value={v.name} id={v.name} > {`${v.languageName} ${v.ssmlGender}`} </option>
+      } )  }
+       <option>English</option>
+      <option>Hindi</option> 
+       </select> */}
     </div>
     </>
   )

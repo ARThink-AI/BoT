@@ -8,12 +8,13 @@ const responseHeaders = {
 }
 
 export async function POST(req: Request) {
-  const { text  } = (await req.json()) as {
+  const { text , type  } = (await req.json()) as {
     text : string;
+    type: string;
    
   }
 
-  if (!text) {
+  if (!text || !type ) {
     return NextResponse.json(
       { message: 'Missing required fields in request body' },
       { status: 400, headers: responseHeaders }
@@ -29,28 +30,49 @@ export async function POST(req: Request) {
        // @ts-ignore
        credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
     });
-  //   const request = {
-  //     input: { text },
-  //     voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
-  //     audioConfig: { audioEncoding: 'MP3' }
-  // };
-  const request = {
-    input: { text },
-    voice: { languageCode: 'en-IN', ssmlGender: 'FEMALE'  },
-    audioConfig: { audioEncoding: 'MP3' }
-};
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-       // @ts-ignore
-  const [response] = await client.synthesizeSpeech(request);
-  const audioBuffer = response.audioContent;
-  const base64Audio = Buffer.from(audioBuffer).toString('base64');
-  console.log("base64 audio", base64Audio );
-    const  obj = {  audioData : base64Audio  };
+   if ( type == "translate" ) {
+    const request = {
+      input: { text },
+      voice: { languageCode: 'en-IN', ssmlGender: 'FEMALE'  },
+      audioConfig: { audioEncoding: 'MP3' }
+  };
+  
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+         // @ts-ignore
+    const [response] = await client.synthesizeSpeech(request);
+    const audioBuffer = response.audioContent;
+    const base64Audio = Buffer.from(audioBuffer).toString('base64');
+    console.log("base64 audio", base64Audio );
+      const  obj = {  audioData : base64Audio  };
+      return NextResponse.json(
+        { message: obj },
+        { status: 200, headers: responseHeaders }
+      )
+   } else if ( type == "listvoices" ) {
+    const [response] = await client.listVoices({});
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const  voices = response.voices?.map( v => {
+      return {
+        ...v ,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+        languageName : new Intl.DisplayNames([v?.languageCodes[0].split("-")[0]], { type: 'region' }).of(v?.languageCodes[0].split("-")[1])
+      }
+    } )
+    const  obj = { voices :voices };
     return NextResponse.json(
       { message: obj },
       { status: 200, headers: responseHeaders }
     )
+   } else {
+    return NextResponse.json(
+      { message: "No Type Found" },
+      { status: 200, headers: responseHeaders }
+    )
+   }
+   
+
 
 
 
