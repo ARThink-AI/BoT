@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const [response] = await client.synthesizeSpeech(request);
     const audioBuffer = response.audioContent;
     const base64Audio = Buffer.from(audioBuffer).toString('base64');
-    console.log("base64 audio", base64Audio );
+    // console.log("base64 audio", base64Audio );
       const  obj = {  audioData : base64Audio  };
       return NextResponse.json(
         { message: obj },
