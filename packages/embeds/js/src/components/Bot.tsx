@@ -213,52 +213,6 @@ const BotContent = (props: BotContentProps) => {
       });
     }
   }
-  // const logTextNodes = async (node) => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       if (node.nodeType === Node.TEXT_NODE) {
-  //         if (props.initialChatReply.typebot.settings.general.isVoiceEnabled && node.textContent.trim() !== "") {
-  //           const textToSpeechText = node.textContent.trim();
-  //           console.log("text to speech text", textToSpeechText);
-  //           const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
-  //             method: 'POST',
-  //             headers: {
-  //               'Content-Type': 'application/json',
-  //             },
-  //             body: JSON.stringify({ text: textToSpeechText, type: "translate" }),
-  //           });
-
-  //           if (response.ok) {
-  //             const result = await response.json();
-  //             const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
-  //             const audioUrl = URL.createObjectURL(audioBlob);
-  //             console.log(`audio Url for text ${textToSpeechText}`, audioUrl);
-  //             audioUrlQueue.enqueue(audioUrl);
-  //             console.log("hey text to speech before play audio", textToSpeechText);
-  //             await playAudio();
-  //             console.log("hey text to speech after play audio", textToSpeechText);
-  //             resolve();
-  //             // if (!audioPlaying()) {
-  //             //   await playAudio();
-  //             // }
-  //           } else {
-  //             resolve();
-  //             console.log("response not right");
-  //           }
-  //         }
-  //       } else if (node.nodeType === Node.ELEMENT_NODE) {
-  //         // Recursively check child nodes
-  //         for (const childNode of node.childNodes) {
-  //           await logTextNodes(childNode);
-  //         }
-  //       }
-
-  //       resolve(); // Resolve the Promise when done with processing the node
-  //     } catch (error) {
-  //       reject(error); // Reject the Promise if an error occurs
-  //     }
-  //   });
-  // };
   const waitForAudioNotPlaying = async () => {
     // Check if audio is currently playing
     while (audioPlaying()) {
@@ -280,22 +234,6 @@ const BotContent = (props: BotContentProps) => {
       }
     });
   });
-
-  // const observer = new MutationObserver(async (mutationsList) => {
-  //   for (const mutation of mutationsList) {
-  //     if (mutation.type === 'childList') {
-  //       for (const addedNode of mutation.addedNodes) {
-  //         // Log text nodes of the added node
-  //         try {
-  //           await logTextNodes(addedNode);
-  //         } catch (error) {
-  //           console.error('Error in logTextNodes:', error);
-  //         }
-  //         // await logTextNodes(addedNode);
-  //       }
-  //     }
-  //   }
-  // });
 
 
 
@@ -394,110 +332,6 @@ const BotContent = (props: BotContentProps) => {
     }
   }
 
-  // const playAudio = async () => {
-  //   try {
-  //     console.log("play audio called");
-  //     if (audioUrlQueue.isEmpty()) {
-
-  //       return
-  //     }
-  //     if (audioPlaying()) {
-  //       console.log("audio already playing");
-  //       await new Promise(resolve => setTimeout(resolve, 2000));
-  //       return await playAudio()
-  //     }
-  //     const currentAudio = audioRef();
-
-
-  //     const audioUrl = audioUrlQueue.dequeue();
-
-  //     const onCanPlayThrough = () => {
-
-  //       setAudioPlaying(true);
-  //       currentAudio.addEventListener('ended', () => {
-
-  //         setAudioPlaying(false);
-  //         return await playAudio();
-  //       });
-  //       setAudioPlaying(true);
-  //       currentAudio.play().catch((err) => {
-
-
-  //         setAudioPlaying(false);
-  //         return await playAudio();
-
-  //       });
-
-  //       // Remove the event listener after it's triggered
-  //       currentAudio.removeEventListener('canplaythrough', onCanPlayThrough);
-  //     };
-  //     currentAudio.addEventListener('canplaythrough', onCanPlayThrough);
-  //     currentAudio.src = audioUrl;
-
-
-
-
-  //   } catch (err) {
-  //     console.log("Error playing play audio function", err);
-  //     setAudioPlaying(false);
-  //     return await playAudio();
-
-  //   }
-  // }
-  // const playAudio = async () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       console.log("play audio called");
-  //       if (audioUrlQueue.isEmpty()) {
-  //         resolve(); // Resolve the promise if the queue is empty
-  //         return;
-  //       }
-
-  //       if (audioPlaying()) {
-  //         console.log("audio already playing should never be called");
-  //         await new Promise(resolve => setTimeout(resolve, 2000));
-  //         await playAudio(); // Continue trying to play audio after a delay
-  //         resolve(); // Resolve the promise
-  //         return;
-  //       }
-
-  //       const currentAudio = audioRef();
-  //       const audioUrl = audioUrlQueue.dequeue();
-
-  //       const onCanPlayThrough = () => {
-  //         setAudioPlaying(true);
-
-  //         currentAudio.addEventListener('ended', async () => {
-  //           console.log("audio playing ended");
-  //           setAudioPlaying(false);
-  //           currentAudio.removeEventListener('ended', onCanPlayThrough);
-  //           await playAudio(); // Continue playing the next audio
-  //           resolve(); // Resolve the promise
-  //         });
-
-  //         currentAudio.play().catch(async (err) => {
-  //           console.log("cant play audio", err);
-  //           setAudioPlaying(false);
-  //           // await playAudio(); // Continue trying to play audio
-  //           resolve(); // Resolve the promise
-  //         });
-
-  //         // Remove the event listener after it's triggered
-  //         currentAudio.removeEventListener('canplaythrough', onCanPlayThrough);
-  //       };
-
-  //       currentAudio.addEventListener('canplaythrough', onCanPlayThrough);
-  //       currentAudio.src = audioUrl;
-
-  //     } catch (err) {
-  //       console.log("Error playing play audio function", err);
-  //       setAudioPlaying(false);
-  //       // await playAudio(); // Continue trying to play audio
-  //       resolve(); // Resolve the promise
-  //     }
-  //   });
-  // };
-
 
 
 
@@ -533,8 +367,8 @@ const BotContent = (props: BotContentProps) => {
 
     if (props.initialChatReply.typebot.settings.general.isVoiceEnabled) {
 
-      document.addEventListener('click', handleDocumentClick);
-
+      // document.addEventListener('click', handleDocumentClick);
+      document.addEventListener('mousedown', handleDocumentClick);
       textQueue = new Queue();
       const audio = new Audio();
       audio.addEventListener('ended', ended);
@@ -569,7 +403,8 @@ const BotContent = (props: BotContentProps) => {
     resizeObserver.unobserve(botContainer)
     observer.disconnect()
 
-    document.removeEventListener('click', handleDocumentClick);
+    // document.removeEventListener('click', handleDocumentClick);
+    document.removeEventListener('mousedown', handleDocumentClick);
     let audio = audioRef()
     audio.removeEventListener("ended", ended);
     const id = intervalId();
