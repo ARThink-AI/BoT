@@ -332,18 +332,18 @@ const BotContent = (props: BotContentProps) => {
 
   const playAudio = async () => {
     try {
+      const currentAudio = audioRef();
 
       if (textQueue.isEmpty()) {
 
         return
       }
-      if (audioPlaying()) {
+      if (!currentAudio.paused) {
         console.log("audio already playing");
         return
       }
-      const currentAudio = audioRef();
 
-      let text = textQueue.dequeue();
+      let text = textQueue.front();
 
       const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
         method: 'POST',
@@ -353,49 +353,44 @@ const BotContent = (props: BotContentProps) => {
         body: JSON.stringify({ text, type: "translate" }),
       });
 
-      if (response.ok) {
+      if (response.ok && currentAudio.paused) {
         const result = await response.json();
         const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
         const audioUrl = URL.createObjectURL(audioBlob);
-        // let audio = audioInstance(); 
-        // audio?.pause();
-        // audio?.currentTime = 0;
-        const onCanPlayThrough = () => {
 
-          setAudioPlaying(true);
-          currentAudio.addEventListener('ended', () => {
-            console.log("audio ended for text", text);
-            setAudioPlaying(false);
-            // playAudio();
-            // localStorage.setItem(AUDIO_PLAYING_KEY,"false");
-            // Play the next audio when the current one ends
-          });
-          currentAudio.play().catch((err) => {
-            console.log("error playing", text);
-            // setNodeText('');
-            setAudioPlaying(false);
-            // playAudio();
-          });
+        setAudioPlaying(true);
 
-          // Remove the event listener after it's triggered
-          currentAudio.removeEventListener('canplaythrough', onCanPlayThrough);
-        };
-        currentAudio.addEventListener('canplaythrough', onCanPlayThrough);
+
+
+
+        // }
+        // currentAudio.addEventListener('ended', ended);
         currentAudio.src = audioUrl;
+        currentAudio.play().catch((err) => {
+          console.log("error playing", textQueue.printQueue());
+          if (!textQueue.isEmpty()) {
+            let dequeued = textQueue.dequeue();
+            console.log("dequeuued", dequeued);
+          }
 
-        // audioQueue.enqueue(audio);
+
+        });
+
+
+        // currentAudio.addEventListener('canplaythrough', onCanPlayThrough);
+
+
+
       } else {
+        console.log("audio already playing else");
 
-        setAudioPlaying(false);
-        //  setNodeText("");
-        // playNextAudio("response error");
       }
-      //  let audio = audioQueue.dequeue();
 
-      //  }
+
+
     } catch (err) {
-      setAudioPlaying(false);
-      // setNodeText("");
+      console.log("enteredd error", err);
+
     }
   }
 
@@ -507,24 +502,29 @@ const BotContent = (props: BotContentProps) => {
 
 
   const handleDocumentClick = (event) => {
-    // Do something with the click event
-
-    // setNodeText("");
-
+    console.log("handle click trigered");
+    while (!textQueue.isEmpty()) {
+      textQueue.dequeue();
+    }
     const currentAudio = audioRef();
     currentAudio.pause();
     currentAudio.currentTime = 0;
     setAudioPlaying(false);
 
-    while (!textQueue.isEmpty()) {
-      textQueue.dequeue();
-    }
-    // while (!audioUrlQueue.isEmpty()) {
-    //   audioUrlQueue.dequeue();
-    // }
+
 
 
   };
+  const ended = () => {
+    console.log("audio ended for text");
+    if (!textQueue.isEmpty()) {
+      let dequeuedEnded = textQueue.dequeue();
+      console.log("dequeuued endned", dequeuedEnded);
+    }
+
+
+    // currentAudio.removeEventListener("ended", ended);
+  }
   onMount(() => {
     if (!botContainer) return
     resizeObserver.observe(botContainer)
@@ -537,13 +537,14 @@ const BotContent = (props: BotContentProps) => {
 
       textQueue = new Queue();
       const audio = new Audio();
+      audio.addEventListener('ended', ended);
       audioUrlQueue = new Queue();
       setAudioRef(audio);
       const id = setInterval(() => {
-        if (!audioPlaying() && !textQueue.isEmpty()) {
-          playAudio();
-        }
-      }, 800); // Adjust the interval time as needed
+
+        playAudio();
+
+      }, 500);
       setIntervalId(id);
       const invisibleButton = document.createElement('button');
       invisibleButton.style.position = 'absolute';
@@ -567,10 +568,13 @@ const BotContent = (props: BotContentProps) => {
     if (!conversationContainer) return
     resizeObserver.unobserve(botContainer)
     observer.disconnect()
-    // clearInterval(queueInterval);
+
     document.removeEventListener('click', handleDocumentClick);
+    let audio = audioRef()
+    audio.removeEventListener("ended", ended);
     const id = intervalId();
     if (id !== null) {
+      console.log("clearing interval with id", id);
       clearInterval(id);
     }
   })
