@@ -38,6 +38,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [initialChatReply, setInitialChatReply] = createSignal<
     InitialChatReply | undefined
   >()
+  const [selectedLanguage, setSelectedLanguage] = createSignal('en-IN');
   const [customCss, setCustomCss] = createSignal('')
   const [isInitialized, setIsInitialized] = createSignal(false)
   const [error, setError] = createSignal<Error | undefined>()
@@ -125,7 +126,9 @@ export const Bot = (props: BotProps & { class?: string }) => {
         {(error) => <ErrorMessage error={error} />}
       </Show>
       <Show when={initialChatReply()} keyed>
+        
         {(initialChatReply) => (
+          <>
           <BotContent
             class={props.class}
             initialChatReply={{
@@ -143,6 +146,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
               },
             }}
             context={{
+              selectedLanguage : selectedLanguage(),
               apiHost: props.apiHost,
               isPreview:
                 typeof props.typebot !== 'string' || (props.isPreview ?? false),
@@ -155,7 +159,29 @@ export const Bot = (props: BotProps & { class?: string }) => {
             onAnswer={props.onAnswer}
             onEnd={props.onEnd}
           />
+          <Show when={ initialChatReply.typebot.settings.general.isVoiceEnabled } >
+          <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+      <select value={ selectedLanguage() } onchange={ (evt) => {
+        console.log("vall", evt?.target?.value );
+        setSelectedLanguage(evt?.target?.value);
+        initializeBot();
+      }  } >
+        <option value="en-IN" > English  </option>
+        <option value="hi-IN" > Hindi  </option>
+        <option value="te-IN" > Telugu  </option>
+      </select>
+    </div>
+    </Show>
+    </>
         )}
+         {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+      <select>
+        <option> English  </option>
+        <option> Hindi  </option>
+        <option> Telugu  </option>
+      </select>
+    </div> */}
+    
       </Show>
     </>
   )
@@ -172,7 +198,7 @@ type BotContentProps = {
 }
 
 const BotContent = (props: BotContentProps) => {
-
+  console.log("props context language", props.context.selectedLanguage )
   let botContainer: HTMLDivElement | undefined
   let conversationContainer: HTMLDivElement | undefined
   let audioQueue: Queue
@@ -182,6 +208,7 @@ const BotContent = (props: BotContentProps) => {
   const [intervalId, setIntervalId] = createSignal<number | null>(null);
   const [audioRef, setAudioRef] = createSignal();
   const [audioPlaying, setAudioPlaying] = createSignal(false);
+  const [audioPermission, setAudioPermission] = createSignal(false);
   // const [audioUrlQueue, setAudioUrlQueue] = createSignal<string[]>([]);
   const [textList, setTextList] = createSignal<string[]>([])
 
@@ -288,7 +315,7 @@ const BotContent = (props: BotContentProps) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text, type: "translate" }),
+        body: JSON.stringify({ text, type: "translate" , langCode  : props.context.selectedLanguage  }),
       });
 
       if (response.ok && currentAudio.paused) {
@@ -359,6 +386,17 @@ const BotContent = (props: BotContentProps) => {
 
     // currentAudio.removeEventListener("ended", ended);
   }
+  const requestUserMedia = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioContext = new AudioContext();
+      const audioSource = audioContext.createMediaStreamSource(stream);
+      // Do something with the audio source if needed
+      setAudioPermission(true);
+    } catch (error) {
+      console.error('Error accessing user media:', error);
+    }
+  };
   onMount(() => {
     if (!botContainer) return
     resizeObserver.observe(botContainer)
@@ -388,7 +426,7 @@ const BotContent = (props: BotContentProps) => {
       invisibleButton.style.pointerEvents = 'none';
       invisibleButton.click();
     }
-
+    requestUserMedia();
   })
 
   createEffect(() => {
@@ -402,7 +440,7 @@ const BotContent = (props: BotContentProps) => {
     if (!conversationContainer) return
     resizeObserver.unobserve(botContainer)
     observer.disconnect()
-
+    if (props.initialChatReply.typebot.settings.general.isVoiceEnabled) {
     // document.removeEventListener('click', handleDocumentClick);
     document.removeEventListener('mousedown', handleDocumentClick);
     let audio = audioRef()
@@ -412,6 +450,8 @@ const BotContent = (props: BotContentProps) => {
       console.log("clearing interval with id", id);
       clearInterval(id);
     }
+  }
+
   })
 
   return (
@@ -441,7 +481,22 @@ const BotContent = (props: BotContentProps) => {
         </Show>
       </div>
 
-
+      <Show when={audioPermission() && props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
+    <div style={{ position : "relative" , top  : "-60%" , left : "77%", width : "250px" }} >
+    <video loop muted={ audioRef().paused ? true : false }   autoplay  poster="background.jpg">
+      <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </source>
+    </video>
+    </div>
+    {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+      <select>
+        <option> English  </option>
+        <option> Hindi  </option>
+        <option> Telugu  </option>
+      </select>
+    </div> */}
+    </Show>
 
       <div style={{ "margin-left": "70%", position: "relative" }} >
 

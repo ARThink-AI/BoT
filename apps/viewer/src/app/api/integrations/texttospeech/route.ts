@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/dist/server/web/spec-extension/response';
 import { TextToSpeechClient  } from "@google-cloud/text-to-speech";
+import { TranslationServiceClient }  from "@google-cloud/translate";
+import {  SpeechClient } from "@google-cloud/speech";
 import { env  } from "@typebot.io/env";
 const responseHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,10 +10,11 @@ const responseHeaders = {
 }
 
 export async function POST(req: Request) {
-  const { text , type  } = (await req.json()) as {
+  const { text , type , audio , langCode } = (await req.json()) as {
     text : string;
     type: string;
-   
+    audio : string;
+    langCode : string;
   }
 
   if (!text || !type ) {
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    console.log("textt", text );
+    console.log("textt", text , langCode );
    
     const client = new TextToSpeechClient({
        projectId : env.GOOGLE_PROJECT_ID ,
@@ -31,23 +34,103 @@ export async function POST(req: Request) {
        credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
     });
    if ( type == "translate" ) {
-    const request = {
-      input: { text },
-      voice: { languageCode: 'en-IN', ssmlGender: 'FEMALE'  },
-      audioConfig: { audioEncoding: 'MP3' }
-  };
-  
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-         // @ts-ignore
-    const [response] = await client.synthesizeSpeech(request);
-    const audioBuffer = response.audioContent;
-    const base64Audio = Buffer.from(audioBuffer).toString('base64');
-    // console.log("base64 audio", base64Audio );
-      const  obj = {  audioData : base64Audio  };
-      return NextResponse.json(
-        { message: obj },
-        { status: 200, headers: responseHeaders }
-      )
+    // const translate = new Translate();
+    const translationClient = new TranslationServiceClient({
+      projectId : env.GOOGLE_PROJECT_ID ,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
+   });
+    if ( langCode == "hi-IN" ) {
+      const [resp] = await translationClient.translateText({
+        parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
+        contents: [text],
+        targetLanguageCode: "hi",
+      } );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const translation = resp.translations[0].translatedText;
+      console.log("translation", translation );
+      const request = {
+        input: { text:   translation },
+        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
+        audioConfig: { audioEncoding: 'MP3' }
+    };
+      console.log("request input", JSON.stringify(request));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+           // @ts-ignore
+      const [response] = await client.synthesizeSpeech(request);
+      const audioBuffer = response.audioContent;
+      const base64Audio = Buffer.from(audioBuffer).toString('base64');
+      // console.log("base64 audio", base64Audio );
+        const  obj = {  audioData : base64Audio  };
+        return NextResponse.json(
+          { message: obj },
+          { status: 200, headers: responseHeaders }
+        )
+    } else if ( langCode == "te-IN" ) {
+      const [resp] = await translationClient.translateText({
+        parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
+        contents: [text],
+        targetLanguageCode: "te",
+      } );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const translation = resp.translations[0].translatedText;
+      const request = {
+        input: { text:   translation },
+        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
+        audioConfig: { audioEncoding: 'MP3' }
+    };
+      console.log("request input", JSON.stringify(request));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+           // @ts-ignore
+      const [response] = await client.synthesizeSpeech(request);
+      const audioBuffer = response.audioContent;
+      const base64Audio = Buffer.from(audioBuffer).toString('base64');
+      // console.log("base64 audio", base64Audio );
+        const  obj = {  audioData : base64Audio  };
+        return NextResponse.json(
+          { message: obj },
+          { status: 200, headers: responseHeaders }
+        )
+
+    } else {
+      const request = {
+        input: { text },
+        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
+        audioConfig: { audioEncoding: 'MP3' }
+    };
+      console.log("request input", JSON.stringify(request));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+           // @ts-ignore
+      const [response] = await client.synthesizeSpeech(request);
+      const audioBuffer = response.audioContent;
+      const base64Audio = Buffer.from(audioBuffer).toString('base64');
+      // console.log("base64 audio", base64Audio );
+        const  obj = {  audioData : base64Audio  };
+        return NextResponse.json(
+          { message: obj },
+          { status: 200, headers: responseHeaders }
+        )
+    }
+  //   const request = {
+  //     input: { text },
+  //     voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
+  //     audioConfig: { audioEncoding: 'MP3' }
+  // };
+  //   console.log("request input", JSON.stringify(request));
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //        // @ts-ignore
+  //   const [response] = await client.synthesizeSpeech(request);
+  //   const audioBuffer = response.audioContent;
+  //   const base64Audio = Buffer.from(audioBuffer).toString('base64');
+  //   // console.log("base64 audio", base64Audio );
+  //     const  obj = {  audioData : base64Audio  };
+  //     return NextResponse.json(
+  //       { message: obj },
+  //       { status: 200, headers: responseHeaders }
+  //     )
    } else if ( type == "listvoices" ) {
     const [response] = await client.listVoices({});
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -65,6 +148,43 @@ export async function POST(req: Request) {
       { message: obj },
       { status: 200, headers: responseHeaders }
     )
+   } else if ( type == "speechtotext" ) {
+    const speechClient = new SpeechClient({
+      projectId : env.GOOGLE_PROJECT_ID ,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
+  });
+  const audioBytes = Buffer.from(audio , 'base64');
+  const [response] = await speechClient.recognize({
+      
+    audio: {
+      // content: audioBytes,
+      content : audioBytes
+    },
+    config: {
+      // encoding: 'LINEAR16',
+      encoding : "WEBM_OPUS",
+      sampleRateHertz: 48000,
+      languageCode: 'en-IN',
+      alternativeLanguageCodes: ['es-ES', 'en-US','en-IN'],
+      
+    },
+  });
+  // console.log('Speech-to-Text API response:', response);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+  const transcription = response.results
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+    .map(result => result.alternatives[0].transcript)
+    .join('\n');
+    const  obj = {  transcription  };
+      return NextResponse.json(
+        { message: obj },
+        { status: 200, headers: responseHeaders }
+      )
+
    } else {
     return NextResponse.json(
       { message: "No Type Found" },
