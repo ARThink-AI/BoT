@@ -431,7 +431,10 @@ const BotContent = (props: BotContentProps) => {
       invisibleButton.click();
     }
     // console.log("video ref",videoRef);
-    videoRef?.pause()
+    if (videoRef) {
+      videoRef?.pause()
+    }
+    
 
     // requestUserMedia();
   })
