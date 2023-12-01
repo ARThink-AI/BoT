@@ -481,7 +481,7 @@ const BotContent = (props: BotContentProps) => {
         </Show>
       </div>
 
-      <Show when={audioPermission() && props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
+      <Show when={ props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
     <div style={{ position : "relative" , top  : "-60%" , left : "77%", width : "250px" }} >
     <video loop 
     // muted={ audioRef().paused ? true : false }   
