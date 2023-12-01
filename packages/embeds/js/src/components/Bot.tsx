@@ -201,6 +201,7 @@ const BotContent = (props: BotContentProps) => {
   console.log("props context language", props.context.selectedLanguage )
   let botContainer: HTMLDivElement | undefined
   let conversationContainer: HTMLDivElement | undefined
+  let videoRef : HTMLVideoElement | undefined
   let audioQueue: Queue
   let textQueue: Queue
   let audioUrlQueue: Queue
@@ -324,7 +325,7 @@ const BotContent = (props: BotContentProps) => {
         const audioUrl = URL.createObjectURL(audioBlob);
 
         setAudioPlaying(true);
-
+        videoRef?.play()
 
 
 
@@ -337,6 +338,7 @@ const BotContent = (props: BotContentProps) => {
             let dequeued = textQueue.dequeue();
             console.log("dequeuued", dequeued);
           }
+          videoRef?.pause()
 
 
         });
@@ -371,6 +373,7 @@ const BotContent = (props: BotContentProps) => {
     currentAudio.pause();
     currentAudio.currentTime = 0;
     setAudioPlaying(false);
+    videoRef?.pause()
 
 
 
@@ -382,6 +385,7 @@ const BotContent = (props: BotContentProps) => {
       let dequeuedEnded = textQueue.dequeue();
       console.log("dequeuued endned", dequeuedEnded);
     }
+    videoRef?.pause()
 
 
     // currentAudio.removeEventListener("ended", ended);
@@ -426,6 +430,9 @@ const BotContent = (props: BotContentProps) => {
       invisibleButton.style.pointerEvents = 'none';
       invisibleButton.click();
     }
+    // console.log("video ref",videoRef);
+    videoRef?.pause()
+
     // requestUserMedia();
   })
 
@@ -481,12 +488,15 @@ const BotContent = (props: BotContentProps) => {
         </Show>
       </div>
 
-      <Show when={ props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
+      <Show when={  props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
     <div style={{ position : "relative" , top  : "-60%" , left : "77%", width : "250px" }} >
-    <video loop 
+    <video 
+    ref={videoRef} 
+    loop 
+    // autoplay
     // muted={ audioRef().paused ? true : false }   
     muted={true}
-    autoplay  poster="background.jpg">
+      poster="background.jpg">
       <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
                 Your browser does not support the video tag.
                 </source>
