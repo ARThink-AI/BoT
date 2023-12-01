@@ -426,7 +426,7 @@ const BotContent = (props: BotContentProps) => {
       invisibleButton.style.pointerEvents = 'none';
       invisibleButton.click();
     }
-    requestUserMedia();
+    // requestUserMedia();
   })
 
   createEffect(() => {
@@ -483,7 +483,10 @@ const BotContent = (props: BotContentProps) => {
 
       <Show when={audioPermission() && props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
     <div style={{ position : "relative" , top  : "-60%" , left : "77%", width : "250px" }} >
-    <video loop muted={ audioRef().paused ? true : false }   autoplay  poster="background.jpg">
+    <video loop 
+    // muted={ audioRef().paused ? true : false }   
+    muted={true}
+    autoplay  poster="background.jpg">
       <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
                 Your browser does not support the video tag.
                 </source>
