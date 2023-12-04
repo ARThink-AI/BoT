@@ -169,6 +169,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
         <option value="en-IN" > English  </option>
         <option value="hi-IN" > Hindi  </option>
         <option value="te-IN" > Telugu  </option>
+        <option value="ta-IN">  Tamil </option>
+        <option value="mr-IN" > Marathi  </option>
+        <option value="kn-IN" > Kannada  </option>
+        <option value="ml-IN" > Malayalam  </option>
+        <option value="bn-IN" > Bengali </option>
       </select>
     </div>
     </Show>

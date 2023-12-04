@@ -41,11 +41,13 @@ export async function POST(req: Request) {
       // @ts-ignore
       credentials : JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
    });
-    if ( langCode == "hi-IN" ) {
+    // if ( langCode == "hi-IN" ) {
+      if ( langCode != "en-IN" ) {
       const [resp] = await translationClient.translateText({
         parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
         contents: [text],
-        targetLanguageCode: "hi",
+        // targetLanguageCode: "hi",
+        targetLanguageCode : langCode.split("-")[0]
       } );
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -68,34 +70,8 @@ export async function POST(req: Request) {
           { message: obj },
           { status: 200, headers: responseHeaders }
         )
-    } else if ( langCode == "te-IN" ) {
-      const [resp] = await translationClient.translateText({
-        parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
-        contents: [text],
-        targetLanguageCode: "te",
-      } );
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const translation = resp.translations[0].translatedText;
-      const request = {
-        input: { text:   translation },
-        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
-        audioConfig: { audioEncoding: 'MP3' }
-    };
-      console.log("request input", JSON.stringify(request));
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-           // @ts-ignore
-      const [response] = await client.synthesizeSpeech(request);
-      const audioBuffer = response.audioContent;
-      const base64Audio = Buffer.from(audioBuffer).toString('base64');
-      // console.log("base64 audio", base64Audio );
-        const  obj = {  audioData : base64Audio  };
-        return NextResponse.json(
-          { message: obj },
-          { status: 200, headers: responseHeaders }
-        )
-
     } else {
+
       const request = {
         input: { text },
         voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
