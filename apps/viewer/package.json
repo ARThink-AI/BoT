@@ -11,6 +11,7 @@
     "test:report": "pnpm playwright show-report"
   },
   "dependencies": {
+    "socket.io-client":"4.7.2",
     "@google-cloud/translate" : "8.0.2",
     "@google-cloud/speech": "^6.1.0",
     "@google-cloud/text-to-speech" : "^5.0.1",
@@ -46,6 +47,7 @@
     "@typebot.io/lib": "workspace:*",
     "@typebot.io/schemas": "workspace:*",
     "@typebot.io/tsconfig": "workspace:*",
+    
     "@types/cors": "2.8.13",
     "@types/node": "20.4.2",
     "@types/nodemailer": "6.4.8",

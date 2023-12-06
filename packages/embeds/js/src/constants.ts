@@ -3,6 +3,7 @@ import type { PopupProps } from './features/popup'
 import type { BotProps } from './components/Bot'
 
 export const defaultBotProps: BotProps = {
+  socket : undefined,
   typebot: undefined,
   onNewInputBlock: undefined,
   onAnswer: undefined,

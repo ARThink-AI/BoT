@@ -20,6 +20,7 @@ export const AUDIO_PLAYING_KEY = "audio_playing";
 
 
 export type BotProps = {
+  socket? : any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typebot: string | any
   isPreview?: boolean
@@ -130,6 +131,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
         {(initialChatReply) => (
           <>
           <BotContent
+            socket={props.socket}
             class={props.class}
             initialChatReply={{
               ...initialChatReply,
@@ -200,6 +202,7 @@ type BotContentProps = {
   onAnswer?: (answer: { message: string; blockId: string }) => void
   onEnd?: () => void
   onNewLogs?: (logs: OutgoingLog[]) => void
+  socket : any
 }
 
 const BotContent = (props: BotContentProps) => {
@@ -480,6 +483,7 @@ const BotContent = (props: BotContentProps) => {
       >
         <div ref={conversationContainer} class="flex w-full h-full justify-center">
           <ConversationContainer
+             socket={props.socket}
             context={props.context}
             initialChatReply={props.initialChatReply}
             onNewInputBlock={props.onNewInputBlock}

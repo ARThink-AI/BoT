@@ -57,6 +57,7 @@ type Props = {
   onAnswer?: (answer: { message: string; blockId: string }) => void
   onEnd?: () => void
   onNewLogs?: (logs: OutgoingLog[]) => void
+  socket : any
 }
 
 export const ConversationContainer = (props: Props) => {
@@ -91,6 +92,7 @@ export const ConversationContainer = (props: Props) => {
           )
             setIsSending(true)
           const response = await executeClientSideAction({
+            socket : props.socket,
             clientSideAction: action,
             context: {
               apiHost: props.context.apiHost,
@@ -197,6 +199,7 @@ export const ConversationContainer = (props: Props) => {
         )
           setIsSending(true)
         const response = await executeClientSideAction({
+          socket : props.socket,
           clientSideAction: action,
           context: {
             apiHost: props.context.apiHost,
@@ -254,6 +257,7 @@ export const ConversationContainer = (props: Props) => {
         )
           setIsSending(true)
         const response = await executeClientSideAction({
+          socket : props.socket,
           clientSideAction: action,
           context: {
             apiHost: props.context.apiHost,

@@ -75,10 +75,12 @@ export const continueBotFlow = async (
       }
       newSessionState = updateVariablesInSession(state)([newVariable])
     }
-  } else if (reply && block.type === IntegrationBlockType.WEBHOOK) {
+  } else if (reply && block.type === IntegrationBlockType.WEBHOOK || block.type === IntegrationBlockType.FLOWWISE ) {
     const result = resumeWebhookExecution({
       state,
       block,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
       response: JSON.parse(reply),
     })
     if (result.newSessionState) newSessionState = result.newSessionState

@@ -42,7 +42,7 @@ export const executeGroup = async (
     firstBubbleWasStreamed,
   }: ContextProps
 ): Promise<ChatReply & { newSessionState: SessionState }> => {
-  console.log("entered execute group");
+  console.log("entered execute group", currentLastBubbleId );
   const messages: ChatReply['messages'] = currentReply?.messages ?? []
   let clientSideActions: ChatReply['clientSideActions'] =
     currentReply?.clientSideActions

@@ -16,7 +16,7 @@ const indexConfig = {
     format: 'es',
   },
   plugins: [
-    resolve({ extensions }),
+    resolve({ extensions ,  }),
     babel({
       babelHelpers: 'bundled',
       exclude: 'node_modules/**',
