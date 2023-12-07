@@ -6,6 +6,7 @@ import { isMobile } from '@/utils/isMobileSignal'
 import type { TextInputBlock } from '@typebot.io/schemas'
 import { createSignal, onCleanup, onMount } from 'solid-js'
 import { env  } from "@typebot.io/env";
+import TimerComponent from './Timer';
 type Props = {
   block: TextInputBlock
   defaultValue?: string
@@ -175,8 +176,17 @@ export const TextInput = (props: Props) => {
           }
         />
       )}
-       { !isRecording() && <button disabled={ isRecording() } onClick={ () => startRecordingUserVoice() } ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
-      { isRecording() && <button disabled={ !isRecording() } onClick={ () => stopRecordingUserVoice() } ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic-mute-fill.svg"} /></button> }
+      
+       {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> }
+       { !isRecording() && <button disabled={ isRecording() } 
+      //  onClick={ () => startRecordingUserVoice() } 
+      onMouseDown={startRecordingUserVoice}
+       ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
+      { isRecording() && <button disabled={ !isRecording() } 
+      
+      // onClick={ () => stopRecordingUserVoice() }
+      onMouseUp={stopRecordingUserVoice}
+      ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic-mute-fill.svg"} /></button> }
       <SendButton
         type="button"
         isDisabled={inputValue() === ''}
