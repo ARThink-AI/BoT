@@ -177,16 +177,26 @@ export const TextInput = (props: Props) => {
         />
       )}
       
-       {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> }
+       {/* {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> } */}
        { !isRecording() && <button disabled={ isRecording() } 
-      //  onClick={ () => startRecordingUserVoice() } 
-      onMouseDown={startRecordingUserVoice}
+        onClick={ () => startRecordingUserVoice() }
+        style={{ cursor : "pointer" }}  
+      // onMouseDown={startRecordingUserVoice} 
        ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
-      { isRecording() && <button disabled={ !isRecording() } 
+       {/* { isRecording() && <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "30px" , "margin-bottom" : "12px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button> } */}
+       { isRecording() && (
+           <div style={{ display : "flex" , "flex-direction" : "column" , "align-items" : "center" , "justify-content" : "center" }} >
+            <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "25px"  }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
+          <div style={{ "font-size" : "8px" }} > Listening... </div> 
+         </div>
+       ) }
+
+       {/* </div> */}
+      {/* { isRecording() && <button disabled={ !isRecording() } 
       
       // onClick={ () => stopRecordingUserVoice() }
       onMouseUp={stopRecordingUserVoice}
-      ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic-mute-fill.svg"} /></button> }
+      ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic-mute-fill.svg"} /></button> } */}
       <SendButton
         type="button"
         isDisabled={inputValue() === ''}
