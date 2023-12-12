@@ -3,7 +3,7 @@ import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 import { isNotDefined, isNotEmpty } from '@typebot.io/lib'
 import { getInitialChatReplyQuery } from '@/queries/getInitialChatReplyQuery'
 import { ConversationContainer } from './ConversationContainer'
-import { setIsMobile } from '@/utils/isMobileSignal'
+import { setIsMobile , isMobile } from '@/utils/isMobileSignal'
 import { BotContext, InitialChatReply, OutgoingLog } from '@/types'
 import { ErrorMessage } from './ErrorMessage'
 import {
@@ -162,7 +162,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             onEnd={props.onEnd}
           />
           <Show when={ initialChatReply.typebot.settings.general.isVoiceEnabled } >
-          <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+          <div style={ !isMobile() ? { position : "relative" , top  :"-50%" , left : "80%" , width : "100px" } : { position : "relative" , top : "-20%" , left : "5%" , width : "20px" } } >
       <select value={ selectedLanguage() } onchange={ (evt) => {
         console.log("vall", evt?.target?.value );
         setSelectedLanguage(evt?.target?.value);
@@ -226,7 +226,7 @@ const BotContent = (props: BotContentProps) => {
 
   let queueInterval: NodeJS.Timeout;
   const resizeObserver = new ResizeObserver((entries) => {
-    return setIsMobile(entries[0].target.clientWidth < 400)
+    return setIsMobile(entries[0].target.clientWidth < 500)
   })
   const [currentAudio, setCurrentAudio] = createSignal<HTMLAudioElement | undefined>(undefined)
 
@@ -501,7 +501,7 @@ const BotContent = (props: BotContentProps) => {
       </div>
 
       <Show when={  props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
-    <div style={{ position : "relative" , top  : "-60%" , left : "77%", width : "250px" }} >
+    <div style={ !isMobile() ? { position : "relative" , top  : "-60%" , left : "77%", width : "250px" } : { position : "relative" , top:  "-99%", left : "77%" , width : "60px"  } } >
     <video 
     ref={videoRef} 
     loop 
