@@ -15,7 +15,8 @@ import { isMobile } from '@/utils/isMobileSignal'
 // import { BrowserMultiFormatReader } from '@zxing/library';
 import { BrowserMultiFormatReader } from '@zxing/library/esm/browser/BrowserMultiFormatReader.js';
 
-
+const codeReader = new BrowserMultiFormatReader();
+let barcodeListener;
 export const BarCodeInput = (props) => {
   console.log("bar code input props", JSON.stringify(props) );
   const [mediaStream, setMediaStream] = createSignal(null);
@@ -38,8 +39,38 @@ export const BarCodeInput = (props) => {
       if (mediaStream()) {
         mediaStream().getTracks().forEach(track => track.stop());
       }
+      if (barcodeListener) {
+        barcodeListener.unsubscribe();
+      }
     };
   });
+  // const startBarCodeCamera = async () => {
+  //   try {
+  //     const facingMode = isFrontCamera() ? 'user' : 'environment';
+  //     const stream = await navigator.mediaDevices.getUserMedia({
+  //       video: { facingMode },
+  //     });
+
+  //     setMediaStream(stream);
+  //     videoRef.srcObject = stream;
+
+  //     // Initialize the barcode reader
+  //     const codeReader = new BrowserMultiFormatReader();
+
+  //     // Start barcode scanning
+  //     codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+  //       if (result) {
+  //         // Barcode detected, stop the camera and submit the barcode info
+  //         mediaStream().getTracks().forEach(track => track.stop());
+  //         submitBarcode(result.getText());
+  //       } else if (error) {
+  //         console.error('Barcode scanning error:', error);
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Error accessing camera:', error);
+  //   }
+  // }
   const startBarCodeCamera = async () => {
     try {
       const facingMode = isFrontCamera() ? 'user' : 'environment';
@@ -50,15 +81,13 @@ export const BarCodeInput = (props) => {
       setMediaStream(stream);
       videoRef.srcObject = stream;
 
-      // Initialize the barcode reader
-      const codeReader = new BrowserMultiFormatReader();
-
       // Start barcode scanning
-      codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+      barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
         if (result) {
-          // Barcode detected, stop the camera and submit the barcode info
           mediaStream().getTracks().forEach(track => track.stop());
           submitBarcode(result.getText());
+          // Unsubscribe after detecting the barcode
+          barcodeListener.unsubscribe();
         } else if (error) {
           console.error('Barcode scanning error:', error);
         }
@@ -99,6 +128,10 @@ export const BarCodeInput = (props) => {
     setIsFrontCamera((prev) => !prev);
     startCamera();
   };
+  const toggleBarCodeCamera = () => {
+    setIsFrontCamera((prev) => !prev);
+    startBarCodeCamera();
+  }
 
   const takePicture = () => {
     const video = videoRef;
@@ -211,7 +244,7 @@ export const BarCodeInput = (props) => {
   <div>
     <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
     <div style={{ textAlign: "center", marginTop: "10px" }}>
-    { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
+    { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleBarCodeCamera}>Switch Camera</button> }
     </div>
   </div>
 ) }
