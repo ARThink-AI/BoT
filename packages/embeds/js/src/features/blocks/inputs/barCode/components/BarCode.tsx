@@ -11,11 +11,13 @@
 // }
 import { createSignal, createEffect, onCleanup } from "solid-js";
 import { env } from "@typebot.io/env";
+import { isMobile } from '@/utils/isMobileSignal'
 export const BarCodeInput = (props) => {
   console.log("bar code input props", JSON.stringify(props) );
   const [mediaStream, setMediaStream] = createSignal(null);
   const [ uploaded , setUploaded ] = createSignal(false);
   const [imageDataUrl, setImageDataUrl] = createSignal(null);
+  const [isFrontCamera, setIsFrontCamera] = createSignal(false);
   // const videoRef = createRef();
   let videoRef : HTMLVideoElement | undefined
 
@@ -35,12 +37,27 @@ export const BarCodeInput = (props) => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const facingMode = isFrontCamera() ? "user" : "environment";
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode },
+      });
       setMediaStream(stream);
       videoRef.srcObject = stream;
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
+    // try {
+    //   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    //   setMediaStream(stream);
+    //   videoRef.srcObject = stream;
+    // } catch (error) {
+    //   console.error("Error accessing camera:", error);
+    // }
+  };
+  const toggleCamera = () => {
+    setIsFrontCamera((prev) => !prev);
+    startCamera();
   };
 
   const takePicture = () => {
@@ -132,7 +149,8 @@ export const BarCodeInput = (props) => {
         <div>
           <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
           <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <button onClick={takePicture}>Capture</button>
+          { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
+            <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={takePicture}>Capture</button>
           </div>
         </div>
       )}
@@ -141,8 +159,8 @@ export const BarCodeInput = (props) => {
         <div>
           <img src={imageDataUrl()} alt="Captured" style={{ width: "100%", marginTop: "10px" }} />
           <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <button onClick={retakePicture}>Retake</button>
-            <button onClick={uploadToAzure}>Upload</button>
+            <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={retakePicture}>Retake</button>
+            <button  style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={uploadToAzure}>Upload</button>
           </div>
         </div>
       )}
