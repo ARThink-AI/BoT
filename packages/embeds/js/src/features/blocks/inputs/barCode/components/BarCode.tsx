@@ -12,6 +12,10 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
 import { env } from "@typebot.io/env";
 import { isMobile } from '@/utils/isMobileSignal'
+// import { BrowserMultiFormatReader } from '@zxing/library';
+import { BrowserMultiFormatReader } from '@zxing/library/esm/browser/BrowserMultiFormatReader.js';
+
+
 export const BarCodeInput = (props) => {
   console.log("bar code input props", JSON.stringify(props) );
   const [mediaStream, setMediaStream] = createSignal(null);
@@ -25,6 +29,8 @@ export const BarCodeInput = (props) => {
   createEffect(() => {
     if ( props?.block?.options?.mode == "camera" ) {
       startCamera();
+    } else if ( props?.block?.options?.mode == "barCode" ) {
+       startBarCodeCamera(); 
     }
     
     return () => {
@@ -34,7 +40,41 @@ export const BarCodeInput = (props) => {
       }
     };
   });
+  const startBarCodeCamera = async () => {
+    try {
+      const facingMode = isFrontCamera() ? 'user' : 'environment';
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode },
+      });
 
+      setMediaStream(stream);
+      videoRef.srcObject = stream;
+
+      // Initialize the barcode reader
+      const codeReader = new BrowserMultiFormatReader();
+
+      // Start barcode scanning
+      codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+        if (result) {
+          // Barcode detected, stop the camera and submit the barcode info
+          mediaStream().getTracks().forEach(track => track.stop());
+          submitBarcode(result.getText());
+        } else if (error) {
+          console.error('Barcode scanning error:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+    }
+  }
+  const submitBarcode = (barcode) => {
+    // Perform actions with the scanned barcode
+    console.log('Scanned Barcode:', barcode);
+    // ... (additional actions)
+
+    // Example: Submitting barcode information
+    props.onSubmit({ value: barcode, label: 'Scanned' });
+  };
   const startCamera = async () => {
     try {
       const facingMode = isFrontCamera() ? "user" : "environment";
@@ -143,7 +183,7 @@ export const BarCodeInput = (props) => {
   
   return (
     <>
-    { props?.block?.options?.mode != "camera" && <div> Bar Code Component { props?.block?.options?.mode }  </div> }
+    { props?.block?.options?.mode == "qrCode" && <div> Bar Code Component { props?.block?.options?.mode }  </div> }
     {  props?.block?.options?.mode == "camera" &&  <div>
       {mediaStream() && !imageDataUrl() && !uploaded() && (
         <div>
@@ -167,6 +207,14 @@ export const BarCodeInput = (props) => {
       { uploaded() && <div> Uploaded  </div>}
     </div>
 }
+{ props?.block?.options?.mode == "barCode" && (
+  <div>
+    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+    <div style={{ textAlign: "center", marginTop: "10px" }}>
+    { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
+    </div>
+  </div>
+) }
     </>
   );
 };
