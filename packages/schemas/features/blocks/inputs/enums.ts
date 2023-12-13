@@ -10,4 +10,5 @@ export enum InputBlockType {
   PAYMENT = 'payment input',
   RATING = 'rating input',
   FILE = 'file input',
+  BARCODE_READER= 'bar code reader',
 }

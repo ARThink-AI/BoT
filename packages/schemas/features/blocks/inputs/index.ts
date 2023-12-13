@@ -11,3 +11,4 @@ export * from './rating'
 export * from './text'
 export * from './url'
 export * from './pictureChoice'
+export * from "./barCode";

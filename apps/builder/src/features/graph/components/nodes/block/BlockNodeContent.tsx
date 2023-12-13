@@ -23,6 +23,7 @@ import { EmailInputNodeContent } from '@/features/blocks/inputs/emailInput/compo
 import { FileInputContent } from '@/features/blocks/inputs/fileUpload/components/FileInputContent'
 import { NumberNodeContent } from '@/features/blocks/inputs/number/components/NumberNodeContent'
 import { PaymentInputContent } from '@/features/blocks/inputs/payment/components/PaymentInputContent'
+import { BarCodeInputContent } from '@/features/blocks/inputs/barCodeReader/components/BarCodeReaderContent';
 import { PhoneNodeContent } from '@/features/blocks/inputs/phone/components/PhoneNodeContent'
 import { RatingInputContent } from '@/features/blocks/inputs/rating/components/RatingInputContent'
 import { TextInputNodeContent } from '@/features/blocks/inputs/textInput/components/TextInputNodeContent'
@@ -106,6 +107,9 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     }
     case InputBlockType.PICTURE_CHOICE: {
       return <PictureChoiceNode block={block} indices={indices} />
+    }
+    case InputBlockType.BARCODE_READER:  {
+      return <BarCodeInputContent block={block} />
     }
     case InputBlockType.PHONE: {
       return (

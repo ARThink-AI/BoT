@@ -46,6 +46,7 @@ import { GoogleSheetsSettings } from '@/features/blocks/integrations/googleSheet
 import { ChatwootSettings } from '@/features/blocks/integrations/chatwoot/components/ChatwootSettings'
 import { AbTestSettings } from '@/features/blocks/logic/abTest/components/AbTestSettings'
 import { PictureChoiceSettings } from '@/features/blocks/inputs/pictureChoice/components/PictureChoiceSettings'
+import { BarCodeInputSettings } from '@/features/blocks/inputs/barCodeReader/components/BarCodeReaderSettings';
 import { SettingsHoverBar } from './SettingsHoverBar'
 import { PixelSettings } from '@/features/blocks/integrations/pixel/components/PixelSettings'
 import { ZemanticAiSettings } from '@/features/blocks/integrations/zemanticAi/ZemanticAiSettings'
@@ -180,6 +181,15 @@ export const BlockSettings = ({
         />
       )
     }
+    case InputBlockType.BARCODE_READER: {
+      return (
+       <BarCodeInputSettings
+       options={block.options}
+          onOptionsChange={updateOptions}
+       />
+      )
+    }
+    
     case InputBlockType.PAYMENT: {
       return (
         <PaymentSettings

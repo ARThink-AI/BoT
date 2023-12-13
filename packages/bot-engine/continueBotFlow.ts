@@ -391,6 +391,12 @@ const parseReply =
         return { status: 'success', reply: inputValue }
         // return { status : 'success' , reply : inputValue.includes("payload") ?  inputValue.split("payload")[0] : inputValue }
       }
+      case InputBlockType.BARCODE_READER: {
+        if (!inputValue) return { status: 'fail' }
+        if (inputValue === 'fail') return { status: 'fail' }
+        return { status: 'success', reply: inputValue }
+        // return { status : 'success' , reply : inputValue.includes("payload") ?  inputValue.split("payload")[0] : inputValue }
+      }
       case InputBlockType.RATING: {
         if (!inputValue) return { status: 'fail' }
         const isValid = validateRatingReply(inputValue, block)

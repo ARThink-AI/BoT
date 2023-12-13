@@ -18,6 +18,7 @@ import { InputBlockType } from '@typebot.io/schemas/features/blocks/inputs/enums
 import { GuestBubble } from './bubbles/GuestBubble'
 import { BotContext, InputSubmitContent } from '@/types'
 import { TextInput } from '@/features/blocks/inputs/textInput'
+import {  BarCodeInput  } from '@/features/blocks/inputs/barCode/components/BarCode';
 import { NumberInput } from '@/features/blocks/inputs/number'
 import { EmailInput } from '@/features/blocks/inputs/email'
 import { UrlInput } from '@/features/blocks/inputs/url'
@@ -53,8 +54,17 @@ export const InputChatBlock = (props: Props) => {
   const [formattedMessage, setFormattedMessage] = createSignal<string>()
 
   const handleSubmit = async ({ label, value }: InputSubmitContent) => {
-    setAnswer(label ?? value)
-    props.onSubmit(value ?? label)
+    console.log("label",label);
+    console.log("value",value);
+    if ( label || value ) {
+      setAnswer(label ?? value)
+      props.onSubmit(value ?? label)
+    } else {
+      setAnswer("Hi there")
+      props.onSubmit("Hi there")
+    }
+    
+
   }
 
   const handleSkip = (label: string) => {
@@ -151,6 +161,13 @@ const Input = (props: {
     <Switch>
       <Match when={props.block.type === InputBlockType.TEXT}>
         <TextInput
+          block={props.block as TextInputBlock}
+          defaultValue={getPrefilledValue()}
+          onSubmit={onSubmit}
+        />
+      </Match>
+      <Match when={props.block.type === InputBlockType.BARCODE_READER}>
+        <BarCodeInput
           block={props.block as TextInputBlock}
           defaultValue={getPrefilledValue()}
           onSubmit={onSubmit}

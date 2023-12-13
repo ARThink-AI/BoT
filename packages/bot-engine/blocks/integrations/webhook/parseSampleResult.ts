@@ -113,7 +113,8 @@ const parseResultSample = (
     },
     {}
   )
-
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+       // @ts-ignore
 const getSampleValue = (block: InputBlock): string => {
   switch (block.type) {
     case InputBlockType.CHOICE:

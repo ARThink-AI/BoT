@@ -77,6 +77,8 @@ export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
       return <ButtonsInputIcon color={orange} {...props} />
     case InputBlockType.PICTURE_CHOICE:
       return <PictureChoiceIcon color={orange} {...props} />
+    case InputBlockType.BARCODE_READER:
+      return <img style={{ height:  "1em" , width : "1em" }} src="https://quadz.blob.core.windows.net/demo1/camera_1105083.png" />  
     case InputBlockType.PAYMENT:
       return <PaymentInputIcon color={orange} {...props} />
     case InputBlockType.RATING:

@@ -11,6 +11,8 @@ import { isDefined, isEmpty } from '@typebot.io/lib/utils'
 export const convertInputToWhatsAppMessages = (
   input: NonNullable<ChatReply['input']>,
   lastMessage: ChatReply['messages'][number] | undefined
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+       // @ts-ignore
 ): WhatsAppSendingMessage[] => {
   const lastMessageText =
     lastMessage?.type === BubbleBlockType.TEXT

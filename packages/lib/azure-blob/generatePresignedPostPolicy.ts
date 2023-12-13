@@ -58,9 +58,7 @@ export const generatePresignedPostPolicyBlob = async ({
 
   // Generate a SAS token
   let sasToken = await blobClient.generateSasUrl(options)
-  // console.log("sas token",sasToken);
-  // sasToken = `https://quadz.blob.core.windows.net/demo1/${filePath}?sp=racwdli&st=2023-10-27T07:05:54Z&se=2023-11-11T15:05:54Z&sv=2022-11-02&sr=c&sig=1muEgcvMyFAv2Ru%2BYiztH%2ByKi5FxVq3wUDtvg0bVf1U%3D`;
-  // console.log("modified sas token", sasToken );
+ 
   const fileUrl = env.AZURE_BLOB_PUBLIC_CUSTOM_DOMAIN
     ? `${env.AZURE_BLOB_PUBLIC_CUSTOM_DOMAIN}/${filePath}`
     : sasToken
