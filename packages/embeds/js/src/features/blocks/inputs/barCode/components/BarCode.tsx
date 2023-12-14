@@ -25,7 +25,10 @@ export const BarCodeInput = (props) => {
   const [isFrontCamera, setIsFrontCamera] = createSignal(false);
   // const videoRef = createRef();
   let videoRef : HTMLVideoElement | undefined
-
+  const  isAndroid =() => {
+    return /Android/i.test(navigator.userAgent);
+  }
+  
   // Start the camera when the component mounts
   createEffect(() => {
     if ( props?.block?.options?.mode == "camera" ) {
@@ -44,38 +47,14 @@ export const BarCodeInput = (props) => {
       }
     };
   });
-  // const startBarCodeCamera = async () => {
-  //   try {
-  //     const facingMode = isFrontCamera() ? 'user' : 'environment';
-  //     const stream = await navigator.mediaDevices.getUserMedia({
-  //       video: { facingMode },
-  //     });
-
-  //     setMediaStream(stream);
-  //     videoRef.srcObject = stream;
-
-  //     // Initialize the barcode reader
-  //     const codeReader = new BrowserMultiFormatReader();
-
-  //     // Start barcode scanning
-  //     codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
-  //       if (result) {
-  //         // Barcode detected, stop the camera and submit the barcode info
-  //         mediaStream().getTracks().forEach(track => track.stop());
-  //         submitBarcode(result.getText());
-  //       } else if (error) {
-  //         console.error('Barcode scanning error:', error);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error('Error accessing camera:', error);
-  //   }
-  // }
+  
   const startBarCodeCamera = async () => {
     try {
+    
       const facingMode = isFrontCamera() ? 'user' : 'environment';
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode },
+        audio : false
       });
 
       setMediaStream(stream);
@@ -109,10 +88,12 @@ export const BarCodeInput = (props) => {
       const facingMode = isFrontCamera() ? "user" : "environment";
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
+        video: { facingMode  },
+        audio : false 
       });
       setMediaStream(stream);
       videoRef.srcObject = stream;
+    
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
@@ -125,10 +106,18 @@ export const BarCodeInput = (props) => {
     // }
   };
   const toggleCamera = () => {
+    console.log("type of stream",  typeof mediaStream());
+    if ( typeof mediaStream() !== 'undefined') {
+      console.log("stream not undefined");
+      mediaStream().getTracks().forEach(track => track.stop());
+    }
     setIsFrontCamera((prev) => !prev);
     startCamera();
   };
   const toggleBarCodeCamera = () => {
+    if ( typeof mediaStream() !== 'undefined') {
+      mediaStream().getTracks().forEach(track => track.stop());
+    }
     setIsFrontCamera((prev) => !prev);
     startBarCodeCamera();
   }
@@ -151,14 +140,6 @@ export const BarCodeInput = (props) => {
     startCamera();
   };
 
-  
-  
-
-  // const uploadToAzure = async () =>{
-  //   console.log("upload to azure");
-
-  // }
-  
   const uploadToAzure = async () => {
     if (imageDataUrl()) {
       try {
