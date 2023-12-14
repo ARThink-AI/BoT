@@ -24,6 +24,7 @@ export const BarCodeInput = (props) => {
   const [imageDataUrl, setImageDataUrl] = createSignal(null);
   const [isFrontCamera, setIsFrontCamera] = createSignal(false);
   const [cameraMode, setCameraMode] = createSignal('user');
+  const [hasListener, setHasListener] = createSignal(false);
   // const videoRef = createRef();
   let videoRef : HTMLVideoElement | undefined
   const  isAndroid =() => {
@@ -104,6 +105,29 @@ export const BarCodeInput = (props) => {
       });
       setMediaStream(stream);
       videoRef.srcObject = stream;
+      if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
+        barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+        if (result) {
+          console.log("entered result");
+          if (mediaStream()) {
+            mediaStream().getTracks().forEach(track => track.stop());
+          }
+          // if ( barcodeListener && barcodeListener.subscription  ) {
+          //   barcodeListener?.unsubscribe();
+          // }
+          
+          // mediaStream().getTracks().forEach(track => track.stop());
+          submitBarcode(result.getText());
+          // Unsubscribe after detecting the barcode
+          
+        } else if (error) {
+          console.error('Barcode scanning error:', error);
+        }
+      });
+      setHasListener(true);
+    }
+
+
     
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -222,25 +246,26 @@ export const BarCodeInput = (props) => {
     if ( props?.block?.options?.mode == "camera" ) {
       startCamera();
     } else if ( props?.block?.options?.mode == "barCode" ) {
-       startBarCodeCamera(); 
-       barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
-        if (result) {
-          console.log("entered result");
-          if (mediaStream()) {
-            mediaStream().getTracks().forEach(track => track.stop());
-          }
-          // if ( barcodeListener && barcodeListener.subscription  ) {
-          //   barcodeListener?.unsubscribe();
-          // }
+      //  startBarCodeCamera(); 
+      startCamera();
+      //  barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+      //   if (result) {
+      //     console.log("entered result");
+      //     if (mediaStream()) {
+      //       mediaStream().getTracks().forEach(track => track.stop());
+      //     }
+      //     // if ( barcodeListener && barcodeListener.subscription  ) {
+      //     //   barcodeListener?.unsubscribe();
+      //     // }
           
-          // mediaStream().getTracks().forEach(track => track.stop());
-          submitBarcode(result.getText());
-          // Unsubscribe after detecting the barcode
+      //     // mediaStream().getTracks().forEach(track => track.stop());
+      //     submitBarcode(result.getText());
+      //     // Unsubscribe after detecting the barcode
           
-        } else if (error) {
-          console.error('Barcode scanning error:', error);
-        }
-      });
+      //   } else if (error) {
+      //     console.error('Barcode scanning error:', error);
+      //   }
+      // });
     }
     
 
