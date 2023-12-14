@@ -9,7 +9,7 @@
 //     </div>
 //   )
 // }
-import { createSignal, createEffect, onCleanup } from "solid-js";
+import { createSignal, createEffect, onCleanup , onMount } from "solid-js";
 import { env } from "@typebot.io/env";
 import { isMobile } from '@/utils/isMobileSignal'
 // import { BrowserMultiFormatReader } from '@zxing/library';
@@ -30,28 +30,31 @@ export const BarCodeInput = (props) => {
   }
   
   // Start the camera when the component mounts
-  createEffect(() => {
-    if ( props?.block?.options?.mode == "camera" ) {
-      startCamera();
-    } else if ( props?.block?.options?.mode == "barCode" ) {
-       startBarCodeCamera(); 
-    }
+  // createEffect(() => {
+  //   console.log("create effect called");
+  //   if ( props?.block?.options?.mode == "camera" ) {
+  //     startCamera();
+  //   } else if ( props?.block?.options?.mode == "barCode" ) {
+  //      startBarCodeCamera(); 
+  //   }
     
-    return () => {
-      // Clean up by stopping the camera stream if the component is unmounted
-      if (mediaStream()) {
-        mediaStream().getTracks().forEach(track => track.stop());
-      }
-      if (barcodeListener) {
-        barcodeListener.unsubscribe();
-      }
-    };
-  });
+  //   return () => {
+  //     // Clean up by stopping the camera stream if the component is unmounted
+  //     if (mediaStream()) {
+  //       mediaStream().getTracks().forEach(track => track.stop());
+  //     }
+  //     if (barcodeListener) {
+  //       barcodeListener.unsubscribe();
+  //     }
+  //   };
+  // } , []);
+  
   
   const startBarCodeCamera = async () => {
     try {
     
       const facingMode = isFrontCamera() ? 'user' : 'environment';
+      console.log("facing mode", facingMode );
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode },
         audio : false
@@ -193,7 +196,25 @@ export const BarCodeInput = (props) => {
       }
     }
   };
-  
+  onCleanup(() => {
+        if (mediaStream()) {
+        mediaStream().getTracks().forEach(track => track.stop());
+      }
+      if (barcodeListener) {
+        barcodeListener.unsubscribe();
+      }
+  })
+  onMount(() => {
+     console.log("on mount called");
+    if ( props?.block?.options?.mode == "camera" ) {
+      startCamera();
+    } else if ( props?.block?.options?.mode == "barCode" ) {
+       startBarCodeCamera(); 
+    }
+    
+
+    // requestUserMedia();
+  })
   
   return (
     <>
