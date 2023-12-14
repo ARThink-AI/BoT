@@ -23,6 +23,7 @@ export const BarCodeInput = (props) => {
   const [ uploaded , setUploaded ] = createSignal(false);
   const [imageDataUrl, setImageDataUrl] = createSignal(null);
   const [isFrontCamera, setIsFrontCamera] = createSignal(false);
+  const [cameraMode, setCameraMode] = createSignal('user');
   // const videoRef = createRef();
   let videoRef : HTMLVideoElement | undefined
   const  isAndroid =() => {
@@ -88,8 +89,8 @@ export const BarCodeInput = (props) => {
   };
   const startCamera = async () => {
     try {
-      const facingMode = isFrontCamera() ? "user" : "environment";
-
+      // const facingMode = isFrontCamera() ? "user" : "environment";
+      const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode  },
         audio : false 
@@ -114,7 +115,8 @@ export const BarCodeInput = (props) => {
       console.log("stream not undefined");
       mediaStream().getTracks().forEach(track => track.stop());
     }
-    setIsFrontCamera((prev) => !prev);
+    // setIsFrontCamera((prev) => !prev);
+    setCameraMode((prev) => (prev === 'user' ? 'environment' : 'user'));
     startCamera();
   };
   const toggleBarCodeCamera = () => {
