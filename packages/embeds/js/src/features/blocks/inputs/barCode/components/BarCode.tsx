@@ -1,14 +1,4 @@
-// export const BarCodeInput = (props) => {
-//   console.log(JSON.stringify(props));
-//   return (
-//     <div style={{ cursor : "pointer" }} onClick={ () => {
-//       console.log("Bar Code component clicked");
-//       props.onSubmit("scannned");
-//     }  } >
-//       Bar Code Component { props?.block?.options?.mode }
-//     </div>
-//   )
-// }
+
 import { createSignal, createEffect, onCleanup , onMount } from "solid-js";
 import { env } from "@typebot.io/env";
 import { isMobile } from '@/utils/isMobileSignal'
@@ -16,7 +6,7 @@ import { isMobile } from '@/utils/isMobileSignal'
 import { BrowserMultiFormatReader } from '@zxing/library/esm/browser/BrowserMultiFormatReader.js';
 
 const codeReader = new BrowserMultiFormatReader();
-let barcodeListener;
+// let barcodeListener;
 export const BarCodeInput = (props) => {
   console.log("bar code input props", JSON.stringify(props) );
   const [mediaStream, setMediaStream] = createSignal(null);
@@ -25,31 +15,15 @@ export const BarCodeInput = (props) => {
   const [isFrontCamera, setIsFrontCamera] = createSignal(false);
   const [cameraMode, setCameraMode] = createSignal('user');
   const [hasListener, setHasListener] = createSignal(false);
+  const [barcodeListener, setBarcodeListener] = createSignal(null);
+
   // const videoRef = createRef();
   let videoRef : HTMLVideoElement | undefined
   const  isAndroid =() => {
     return /Android/i.test(navigator.userAgent);
   }
   
-  // Start the camera when the component mounts
-  // createEffect(() => {
-  //   console.log("create effect called");
-  //   if ( props?.block?.options?.mode == "camera" ) {
-  //     startCamera();
-  //   } else if ( props?.block?.options?.mode == "barCode" ) {
-  //      startBarCodeCamera(); 
-  //   }
-    
-  //   return () => {
-  //     // Clean up by stopping the camera stream if the component is unmounted
-  //     if (mediaStream()) {
-  //       mediaStream().getTracks().forEach(track => track.stop());
-  //     }
-  //     if (barcodeListener) {
-  //       barcodeListener.unsubscribe();
-  //     }
-  //   };
-  // } , []);
+  
   
   
   const startBarCodeCamera = async () => {
@@ -71,13 +45,9 @@ export const BarCodeInput = (props) => {
           if (mediaStream()) {
             mediaStream().getTracks().forEach(track => track.stop());
           }
-          // if ( barcodeListener && barcodeListener.subscription  ) {
-          //   barcodeListener?.unsubscribe();
-          // }
           
-          // mediaStream().getTracks().forEach(track => track.stop());
           submitBarcode(result.getText());
-          // Unsubscribe after detecting the barcode
+         
           
         } else if (error) {
           console.error('Barcode scanning error:', error);
@@ -106,24 +76,21 @@ export const BarCodeInput = (props) => {
       setMediaStream(stream);
       videoRef.srcObject = stream;
       if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
-        barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+        let val  = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
         if (result) {
           console.log("entered result");
           if (mediaStream()) {
             mediaStream().getTracks().forEach(track => track.stop());
           }
-          // if ( barcodeListener && barcodeListener.subscription  ) {
-          //   barcodeListener?.unsubscribe();
-          // }
           
-          // mediaStream().getTracks().forEach(track => track.stop());
           submitBarcode(result.getText());
-          // Unsubscribe after detecting the barcode
+        
           
         } else if (error) {
           console.error('Barcode scanning error:', error);
         }
       });
+      setBarcodeListener(val);
       setHasListener(true);
     }
 
@@ -132,13 +99,7 @@ export const BarCodeInput = (props) => {
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
-    // try {
-    //   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    //   setMediaStream(stream);
-    //   videoRef.srcObject = stream;
-    // } catch (error) {
-    //   console.error("Error accessing camera:", error);
-    // }
+    
   };
   const toggleCamera = () => {
     console.log("type of stream",  typeof mediaStream());
@@ -154,9 +115,9 @@ export const BarCodeInput = (props) => {
     if ( typeof mediaStream() !== 'undefined') {
       mediaStream().getTracks().forEach(track => track.stop());
     }
-    if (barcodeListener && barcodeListener.subscription ) {
-      barcodeListener.unsubscribe();
-    }
+    // if (barcodeListener && barcodeListener.subscription ) {
+    //   barcodeListener.unsubscribe();
+    // }
     // setIsFrontCamera((prev) => !prev);
     setCameraMode((prev) => (prev === 'user' ? 'environment' : 'user'));
     startBarCodeCamera();
@@ -237,39 +198,22 @@ export const BarCodeInput = (props) => {
         if (mediaStream()) {
         mediaStream().getTracks().forEach(track => track.stop());
       }
-      if (barcodeListener && barcodeListener.subscription  ) {
-        barcodeListener.unsubscribe();
+      if (barcodeListener() && barcodeListener().subscription  ) {
+        barcodeListener().unsubscribe();
       }
   })
   onMount(() => {
-     console.log("on mount called");
+     console.log("on mount called", JSON.stringify(props) );
     if ( props?.block?.options?.mode == "camera" ) {
       startCamera();
     } else if ( props?.block?.options?.mode == "barCode" ) {
-      //  startBarCodeCamera(); 
+      
       startCamera();
-      //  barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
-      //   if (result) {
-      //     console.log("entered result");
-      //     if (mediaStream()) {
-      //       mediaStream().getTracks().forEach(track => track.stop());
-      //     }
-      //     // if ( barcodeListener && barcodeListener.subscription  ) {
-      //     //   barcodeListener?.unsubscribe();
-      //     // }
-          
-      //     // mediaStream().getTracks().forEach(track => track.stop());
-      //     submitBarcode(result.getText());
-      //     // Unsubscribe after detecting the barcode
-          
-      //   } else if (error) {
-      //     console.error('Barcode scanning error:', error);
-      //   }
-      // });
+     
     }
     
 
-    // requestUserMedia();
+    
   })
   
   return (
