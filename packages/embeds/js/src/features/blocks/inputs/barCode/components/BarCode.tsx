@@ -65,44 +65,86 @@ export const BarCodeInput = (props) => {
     // Example: Submitting barcode information
     props.onSubmit({ value: barcode, label: 'Scanned' });
   };
+  // const startCamera = async () => {
+  //   try {
+  //     // const facingMode = isFrontCamera() ? "user" : "environment";
+  //     const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
+  //     const stream = await navigator.mediaDevices.getUserMedia({
+  //       video: { facingMode  },
+  //       audio : false 
+  //     });
+  //     setMediaStream(stream);
+  //     videoRef.srcObject = stream;
+  //     if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
+  //       console.log("entered has listener");
+  //       let val  = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
+  //       if (result) {
+  //         console.log("entered result");
+  //         if (mediaStream()) {
+  //           mediaStream().getTracks().forEach(track => track.stop());
+  //         }
+          
+  //         submitBarcode(result.getText());
+        
+          
+  //       } else if (error) {
+  //         console.error('Barcode scanning error:', error);
+  //       }
+  //     });
+  //     console.log("valll",val);
+  //     setBarcodeListener(val);
+  //     setHasListener(true);
+  //   }
+
+
+    
+  //   } catch (error) {
+  //     console.error("Error accessing camera:", error);
+  //   }
+    
+  // };
   const startCamera = async () => {
     try {
-      // const facingMode = isFrontCamera() ? "user" : "environment";
       const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode  },
-        audio : false 
+        video: { facingMode },
+        audio: false,
       });
+
       setMediaStream(stream);
       videoRef.srcObject = stream;
-      if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
+
+      if (!hasListener() && props?.block?.options?.mode === "barCode") {
         console.log("entered has listener");
-        let val  = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
-        if (result) {
+
+        // Check if there's an existing barcode listener and unsubscribe
+        if (barcodeListener() && barcodeListener().subscription) {
+          barcodeListener().unsubscribe();
+        }
+
+        // Wait for the promise to resolve
+        const val = await codeReader.decodeFromVideoDevice(undefined, videoRef);
+
+        console.log("valll", val);
+
+        setBarcodeListener(val);
+        setHasListener(true);
+
+        val.subscribe({ next: (result) => {
           console.log("entered result");
           if (mediaStream()) {
             mediaStream().getTracks().forEach(track => track.stop());
           }
-          
           submitBarcode(result.getText());
-        
-          
-        } else if (error) {
+        }, error: (error) => {
           console.error('Barcode scanning error:', error);
-        }
-      });
-      console.log("valll",val);
-      setBarcodeListener(val);
-      setHasListener(true);
-    }
-
-
-    
+        }});
+      }
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
-    
   };
+
   const toggleCamera = () => {
     console.log("type of stream",  typeof mediaStream());
     if ( typeof mediaStream() !== 'undefined') {
