@@ -67,10 +67,17 @@ export const BarCodeInput = (props) => {
       // Start barcode scanning
       barcodeListener = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
         if (result) {
-          mediaStream().getTracks().forEach(track => track.stop());
+          if (mediaStream()) {
+            mediaStream().getTracks().forEach(track => track.stop());
+          }
+          if ( barcodeListener && barcodeListener.subscription  ) {
+            barcodeListener?.unsubscribe();
+          }
+          
+          // mediaStream().getTracks().forEach(track => track.stop());
           submitBarcode(result.getText());
           // Unsubscribe after detecting the barcode
-          barcodeListener.unsubscribe();
+          
         } else if (error) {
           console.error('Barcode scanning error:', error);
         }
@@ -123,7 +130,7 @@ export const BarCodeInput = (props) => {
     if ( typeof mediaStream() !== 'undefined') {
       mediaStream().getTracks().forEach(track => track.stop());
     }
-    if (barcodeListener) {
+    if (barcodeListener && barcodeListener.subscription ) {
       barcodeListener.unsubscribe();
     }
     // setIsFrontCamera((prev) => !prev);
@@ -206,7 +213,7 @@ export const BarCodeInput = (props) => {
         if (mediaStream()) {
         mediaStream().getTracks().forEach(track => track.stop());
       }
-      if (barcodeListener) {
+      if (barcodeListener && barcodeListener.subscription  ) {
         barcodeListener.unsubscribe();
       }
   })
