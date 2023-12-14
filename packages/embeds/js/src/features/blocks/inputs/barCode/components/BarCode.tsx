@@ -54,7 +54,7 @@ export const BarCodeInput = (props) => {
   const startBarCodeCamera = async () => {
     try {
     
-      const facingMode = isFrontCamera() ? 'user' : 'environment';
+      const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
       console.log("facing mode", facingMode );
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode },
@@ -123,7 +123,11 @@ export const BarCodeInput = (props) => {
     if ( typeof mediaStream() !== 'undefined') {
       mediaStream().getTracks().forEach(track => track.stop());
     }
-    setIsFrontCamera((prev) => !prev);
+    if (barcodeListener) {
+      barcodeListener.unsubscribe();
+    }
+    // setIsFrontCamera((prev) => !prev);
+    setCameraMode((prev) => (prev === 'user' ? 'environment' : 'user'));
     startBarCodeCamera();
   }
 
