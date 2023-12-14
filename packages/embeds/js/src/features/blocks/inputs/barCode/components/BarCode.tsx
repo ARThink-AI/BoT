@@ -76,6 +76,7 @@ export const BarCodeInput = (props) => {
       setMediaStream(stream);
       videoRef.srcObject = stream;
       if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
+        console.log("entered has listener");
         let val  = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
         if (result) {
           console.log("entered result");
@@ -90,6 +91,7 @@ export const BarCodeInput = (props) => {
           console.error('Barcode scanning error:', error);
         }
       });
+      console.log("valll",val);
       setBarcodeListener(val);
       setHasListener(true);
     }
