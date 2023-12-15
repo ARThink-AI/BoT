@@ -114,31 +114,30 @@ export const BarCodeInput = (props) => {
       setMediaStream(stream);
       videoRef.srcObject = stream;
 
-      if (!hasListener() && props?.block?.options?.mode === "barCode") {
+      if (props?.block?.options?.mode === "barCode") {
         console.log("entered has listener");
-
-        // Check if there's an existing barcode listener and unsubscribe
-        if (barcodeListener() && barcodeListener().subscription) {
+        if (barcodeListener() && barcodeListener().subscription  ) {
           barcodeListener().unsubscribe();
         }
+       // Start listener and update state
+  const listener = codeReader.decodeFromVideoDevice(undefined, videoRef , (result, error) => {
+    if (result) {
+      if (mediaStream()) {
+        mediaStream().getTracks().forEach(track => track.stop());
+      }
+      
+      submitBarcode(result.getText());
+     
+      
+    } else if (error) {
+      console.error('Barcode scanning error:', error);
+    }
+  });
+  setBarcodeListener(listener);
+  // setHasListener(true);
 
-        // Wait for the promise to resolve
-        const val = await codeReader.decodeFromVideoDevice(undefined, videoRef);
-
-        console.log("valll", val);
-
-        setBarcodeListener(val);
-        setHasListener(true);
-
-        val.subscribe({ next: (result) => {
-          console.log("entered result");
-          if (mediaStream()) {
-            mediaStream().getTracks().forEach(track => track.stop());
-          }
-          submitBarcode(result.getText());
-        }, error: (error) => {
-          console.error('Barcode scanning error:', error);
-        }});
+  // Wait for listener to resolve
+  await listener.promise;
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
