@@ -32,7 +32,7 @@ export const BarCodeInput = (props) => {
       const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
       console.log("facing mode", facingMode );
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
+        video: { facingMode : "environment" },
         audio : false
       });
 
@@ -115,16 +115,21 @@ export const BarCodeInput = (props) => {
       videoRef.srcObject = stream;
 
       if (props?.block?.options?.mode === "barCode") {
-        console.log("entered has listener");
-        if (barcodeListener() && barcodeListener().subscription  ) {
-          barcodeListener().unsubscribe();
-        }
+        // console.log("entered has listener", barcodeListener() );
+        
+        console.log("code reader",codeReader);
+        codeReader.reset();
        // Start listener and update state
   const listener = codeReader.decodeFromVideoDevice(undefined, videoRef , (result, error) => {
     if (result) {
-      if (mediaStream()) {
-        mediaStream().getTracks().forEach(track => track.stop());
+      try {
+        if (mediaStream()) {
+          mediaStream().getTracks().forEach(track => track.stop());
+        }
+      } catch(err) {
+console.log("error removing mdia stream",err);
       }
+      
       
       submitBarcode(result.getText());
      
@@ -133,11 +138,11 @@ export const BarCodeInput = (props) => {
       console.error('Barcode scanning error:', error);
     }
   });
-  setBarcodeListener(listener);
+  // setBarcodeListener(listener);
   // setHasListener(true);
 
   // Wait for listener to resolve
-  await listener.promise;
+  // await listener.promise;
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -241,9 +246,7 @@ export const BarCodeInput = (props) => {
         if (mediaStream()) {
         mediaStream().getTracks().forEach(track => track.stop());
       }
-      if (barcodeListener() && barcodeListener().subscription  ) {
-        barcodeListener().unsubscribe();
-      }
+      codeReader.reset();
   })
   onMount(() => {
      console.log("on mount called", JSON.stringify(props) );
