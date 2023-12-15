@@ -65,44 +65,6 @@ export const BarCodeInput = (props) => {
     // Example: Submitting barcode information
     props.onSubmit({ value: barcode, label: 'Scanned' });
   };
-  // const startCamera = async () => {
-  //   try {
-  //     // const facingMode = isFrontCamera() ? "user" : "environment";
-  //     const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
-  //     const stream = await navigator.mediaDevices.getUserMedia({
-  //       video: { facingMode  },
-  //       audio : false 
-  //     });
-  //     setMediaStream(stream);
-  //     videoRef.srcObject = stream;
-  //     if (!hasListener() && props?.block?.options?.mode == "barCode" ) {
-  //       console.log("entered has listener");
-  //       let val  = codeReader.decodeFromVideoDevice(undefined, videoRef, (result, error) => {
-  //       if (result) {
-  //         console.log("entered result");
-  //         if (mediaStream()) {
-  //           mediaStream().getTracks().forEach(track => track.stop());
-  //         }
-          
-  //         submitBarcode(result.getText());
-        
-          
-  //       } else if (error) {
-  //         console.error('Barcode scanning error:', error);
-  //       }
-  //     });
-  //     console.log("valll",val);
-  //     setBarcodeListener(val);
-  //     setHasListener(true);
-  //   }
-
-
-    
-  //   } catch (error) {
-  //     console.error("Error accessing camera:", error);
-  //   }
-    
-  // };
   const startCamera = async () => {
     try {
       const facingMode = cameraMode() === 'user' ? 'user' : 'environment';
@@ -138,11 +100,7 @@ console.log("error removing mdia stream",err);
       console.error('Barcode scanning error:', error);
     }
   });
-  // setBarcodeListener(listener);
-  // setHasListener(true);
-
-  // Wait for listener to resolve
-  // await listener.promise;
+  
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -182,6 +140,7 @@ console.log("error removing mdia stream",err);
 
     const imageDataUrl = canvas.toDataURL("image/png");
     setImageDataUrl(imageDataUrl);
+    uploadToAzure();
   };
 
   const retakePicture = () => {
@@ -267,16 +226,60 @@ console.log("error removing mdia stream",err);
     { props?.block?.options?.mode == "qrCode" && <div> Bar Code Component { props?.block?.options?.mode }  </div> }
     {  props?.block?.options?.mode == "camera" &&  <div>
       {mediaStream() && !imageDataUrl() && !uploaded() && (
-        <div>
-          <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
-          <div style={{ textAlign: "center", marginTop: "10px" }}>
-          { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
-            <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={takePicture}>Capture</button>
-          </div>
-        </div>
+        // <div>
+        //   <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+        //   <div style={{ textAlign: "center", marginTop: "10px" }}>
+        //   { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
+        //     <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={takePicture}>Capture</button>
+        //   </div>
+        // </div>
+        <div style={{ position: "relative", textAlign: "center" }}>
+    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+    
+    {/* {isMobile() && ( */}
+      <button
+        style={{
+          width: "30px",
+          position: "absolute",
+          bottom: "10px", // You can adjust the distance from the bottom as needed
+          left: "50%",
+          transform: "translateX(-50%)",
+          // border: "1px solid #0042da",
+          // borderRadius: "4px",
+          cursor: "pointer",
+          // padding: "6px",
+          // background: "#0042da",
+          color: "white",
+        }}
+        onClick={takePicture}
+      >
+       <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(4).png" />
+      </button>
+      { isMobile() && (
+         <button
+         style={{
+           width: "30px",
+           position: "absolute",
+           bottom: "10px", // You can adjust the distance from the bottom as needed
+           left: "80%",
+           transform: "translateX(-50%)",
+           // border: "1px solid #0042da",
+           // borderRadius: "4px",
+           cursor: "pointer",
+           // padding: "6px",
+           // background: "#0042da",
+           color: "white",
+         }}
+         onClick={toggleCamera}
+       >
+        <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(3).png" />
+       </button>
+      ) }
+    {/* )} */}
+  </div>
       )}
 
-      {imageDataUrl() && !uploaded() && (
+      {/* {imageDataUrl() && !uploaded() && (
         <div>
           <img src={imageDataUrl()} alt="Captured" style={{ width: "100%", marginTop: "10px" }} />
           <div style={{ textAlign: "center", marginTop: "10px" }}>
@@ -284,18 +287,46 @@ console.log("error removing mdia stream",err);
             <button  style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={uploadToAzure}>Upload</button>
           </div>
         </div>
-      )}
+      )} */}
       { uploaded() && <div> Uploaded  </div>}
     </div>
 }
-{ props?.block?.options?.mode == "barCode" && (
+{/* { props?.block?.options?.mode == "barCode" && (
   <div>
     <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
     <div style={{ textAlign: "center", marginTop: "10px" }}>
     { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
     </div>
   </div>
-) }
+) } */}
+{props?.block?.options?.mode === "barCode" && (
+  <div style={{ position: "relative", textAlign: "center" }}>
+    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+    
+    {isMobile() && (
+      <button
+        style={{
+          width: "30px",
+          position: "absolute",
+          bottom: "10px", // You can adjust the distance from the bottom as needed
+          left: "50%",
+          transform: "translateX(-50%)",
+          // border: "1px solid #0042da",
+          // borderRadius: "4px",
+          cursor: "pointer",
+          // padding: "6px",
+          // background: "#0042da",
+          color: "white",
+        }}
+        onClick={toggleCamera}
+      >
+       <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(3).png" />
+      </button>
+    )}
+  </div>
+)}
+
+
     </>
   );
 };
