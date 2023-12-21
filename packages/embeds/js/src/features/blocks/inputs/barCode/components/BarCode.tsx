@@ -12,6 +12,7 @@ export const BarCodeInput = (props) => {
   const [mediaStream, setMediaStream] = createSignal(null);
   const [ uploaded , setUploaded ] = createSignal(false);
   const [imageDataUrl, setImageDataUrl] = createSignal(null);
+  const [ base64Image, setBase64Image ] = createSignal(null);
   const [isFrontCamera, setIsFrontCamera] = createSignal(false);
   const [cameraMode, setCameraMode] = createSignal('user');
   const [hasListener, setHasListener] = createSignal(false);
@@ -139,6 +140,8 @@ console.log("error removing mdia stream",err);
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const imageDataUrl = canvas.toDataURL("image/png");
+    const base64String = imageDataUrl.split(',')[1];
+    setBase64Image(base64String);
     setImageDataUrl(imageDataUrl);
     uploadToAzure();
   };
@@ -192,7 +195,7 @@ console.log("error removing mdia stream",err);
         if (uploadResponse.ok) {
           console.log("File uploaded successfully!");
           setUploaded(true);
-          props.onSubmit({ value : presignedUrl.split("?")[0] , label : "Uploaded" });
+          props.onSubmit({ value : JSON.stringify({  url :  presignedUrl.split("?")[0] , base64 : base64Image() }) , label : "Uploaded" });
         } else {
           console.error("Failed to upload file:", uploadResponse.statusText);
         }
