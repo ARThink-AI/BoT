@@ -62,8 +62,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           } else {
  request = {
             input: { text: translation },
-            voice: { languageCode: langCode,  name : "ta-IN-Wavenet-C", ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3' }
+            voice: { languageCode: langCode,  name : "te-IN-Standard-A", ssmlGender: 'FEMALE' },
+            audioConfig: { audioEncoding: 'MP3' } ,
+            ssml: `<speak><prosody pitch="7.0%">${translation}</prosody></speak>`
           };
           }
           // const request = {
