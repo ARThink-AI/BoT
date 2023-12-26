@@ -52,12 +52,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
           const translation = resp.translations[0].translatedText;
-
-          const request = {
+          let request ;
+          if ( langCode != "te-IN" ) {
+ request = {
             input: { text: translation },
             voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
             audioConfig: { audioEncoding: 'MP3' }
           };
+          } else {
+ request = {
+            input: { text: translation },
+            voice: { languageCode: langCode,  name : "ta-IN-Wavenet-C", ssmlGender: 'FEMALE' },
+            audioConfig: { audioEncoding: 'MP3' }
+          };
+          }
+          // const request = {
+          //   input: { text: translation },
+          //   voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
+          //   audioConfig: { audioEncoding: 'MP3' }
+          // };
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
           const [response] = await client.synthesizeSpeech(request);
