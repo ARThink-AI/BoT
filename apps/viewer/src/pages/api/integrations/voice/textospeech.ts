@@ -135,9 +135,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
           config: {
             encoding: "WEBM_OPUS",
-            sampleRateHertz: 48000,
+            // sampleRateHertz: 8000,
             languageCode: 'en-IN',
-            alternativeLanguageCodes: ['es-ES', 'en-US', 'en-IN'],
+            // alternativeLanguageCodes: ['es-ES', 'en-US', 'en-IN'],
           },
         });
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
