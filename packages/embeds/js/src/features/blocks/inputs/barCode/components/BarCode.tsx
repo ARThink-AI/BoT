@@ -122,10 +122,7 @@ console.log("error removing mdia stream",err);
     if ( typeof mediaStream() !== 'undefined') {
       mediaStream().getTracks().forEach(track => track.stop());
     }
-    // if (barcodeListener && barcodeListener.subscription ) {
-    //   barcodeListener.unsubscribe();
-    // }
-    // setIsFrontCamera((prev) => !prev);
+    
     setCameraMode((prev) => (prev === 'user' ? 'environment' : 'user'));
     startBarCodeCamera();
   }
@@ -227,15 +224,9 @@ console.log("error removing mdia stream",err);
   return (
     <>
     { props?.block?.options?.mode == "qrCode" && <div> Bar Code Component { props?.block?.options?.mode }  </div> }
-    {  props?.block?.options?.mode == "camera" &&  <div>
+    {  props?.block?.options?.mode == "camera" &&  <div style={{ position : "absolute" , top : "20%" , left : "10%" , "z-index" : "100" , width : "80%" }} >
       {mediaStream() && !imageDataUrl() && !uploaded() && (
-        // <div>
-        //   <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
-        //   <div style={{ textAlign: "center", marginTop: "10px" }}>
-        //   { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
-        //     <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={takePicture}>Capture</button>
-        //   </div>
-        // </div>
+       
         <div style={{ position: "relative", textAlign: "center" }}>
     <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
     
@@ -247,16 +238,14 @@ console.log("error removing mdia stream",err);
           bottom: "10px", // You can adjust the distance from the bottom as needed
           left: "50%",
           transform: "translateX(-50%)",
-          // border: "1px solid #0042da",
-          // borderRadius: "4px",
+          
           cursor: "pointer",
-          // padding: "6px",
-          // background: "#0042da",
+         
           color: "white",
         }}
         onClick={takePicture}
       >
-       <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(4).png" />
+       <img src="https://quadz.blob.core.windows.net/demo1/MicrosoftTeams-image%20(4).png" />
       </button>
       { isMobile() && (
          <button
@@ -266,42 +255,25 @@ console.log("error removing mdia stream",err);
            bottom: "10px", // You can adjust the distance from the bottom as needed
            left: "80%",
            transform: "translateX(-50%)",
-           // border: "1px solid #0042da",
-           // borderRadius: "4px",
+           
            cursor: "pointer",
-           // padding: "6px",
-           // background: "#0042da",
+          
            color: "white",
          }}
          onClick={toggleCamera}
        >
-        <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(3).png" />
+        <img src="https://quadz.blob.core.windows.net/demo1/MicrosoftTeams-image%20(3).png" />
        </button>
       ) }
     {/* )} */}
   </div>
       )}
 
-      {/* {imageDataUrl() && !uploaded() && (
-        <div>
-          <img src={imageDataUrl()} alt="Captured" style={{ width: "100%", marginTop: "10px" }} />
-          <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={retakePicture}>Retake</button>
-            <button  style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={uploadToAzure}>Upload</button>
-          </div>
-        </div>
-      )} */}
+     
       { uploaded() && <div> Uploaded  </div>}
     </div>
 }
-{/* { props?.block?.options?.mode == "barCode" && (
-  <div>
-    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
-    <div style={{ textAlign: "center", marginTop: "10px" }}>
-    { isMobile() && <button style={{ border : "1px solid #0042da", "border-radius":  "4px" , cursor : "pointer" , padding: "6px" , "margin-right":  "5px" , "margin-top":  "4px" , background:  "#0042da" , color : "white" }} onClick={toggleCamera}>Switch Camera</button> }
-    </div>
-  </div>
-) } */}
+
 {props?.block?.options?.mode === "barCode" && (
   <div style={{ position: "relative", textAlign: "center" }}>
     <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
@@ -314,16 +286,14 @@ console.log("error removing mdia stream",err);
           bottom: "10px", // You can adjust the distance from the bottom as needed
           left: "50%",
           transform: "translateX(-50%)",
-          // border: "1px solid #0042da",
-          // borderRadius: "4px",
+         
           cursor: "pointer",
-          // padding: "6px",
-          // background: "#0042da",
+         
           color: "white",
         }}
         onClick={toggleCamera}
       >
-       <img src="https://quadz.blob.core.windows.net/demo1/images/MicrosoftTeams-image%20(3).png" />
+       <img src="https://quadz.blob.core.windows.net/demo1/MicrosoftTeams-image%20(3).png" />
       </button>
     )}
   </div>

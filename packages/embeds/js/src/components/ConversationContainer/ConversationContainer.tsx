@@ -286,6 +286,7 @@ export const ConversationContainer = (props: Props) => {
     <div
       ref={chatContainer}
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
+      style={{ position: "relative" }}
     >
       <For each={chatChunks()}>
         {(chatChunk, index) => (
