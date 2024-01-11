@@ -9,7 +9,7 @@ import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { TranslationServiceClient } from "@google-cloud/translate";
 import { SpeechClient } from "@google-cloud/speech";
 import { env } from "@typebot.io/env";
-
+// import { generatePresignedUrlBlob } from '@typebot.io/lib/azure-blob/generatePresignedUrl';
 import Cors from 'cors'
 
 
@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await cors(req, res)
 
   if (req.method === 'POST') {
-    const { text, type, audio, langCode } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+    const { text, type, audio, langCode , inputFace } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
 
     if (!text || !type) {
       return badRequest(res)
@@ -52,56 +52,95 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
           const translation = resp.translations[0].translatedText;
-          let request ;
-          if ( langCode != "te-IN" ) {
- request = {
-            input: { text: translation },
-            voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3' }
-          };
-          } else {
- request = {
-            input: { text: translation },
-            voice: { languageCode: langCode,  name : "te-IN-Standard-A", ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3' } ,
-            ssml: `<speak><prosody pitch="7.0%">${translation}</prosody></speak>`
-          };
+          const  payload = {
+            input_face :  inputFace ,
+            text_prompt : translation 
           }
-          // const request = {
-          //   input: { text: translation },
-          //   voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
-          //   audioConfig: { audioEncoding: 'MP3' }
-          // };
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
-          const [response] = await client.synthesizeSpeech(request);
-          const audioBuffer = response.audioContent;
-          const base64Audio = Buffer.from(audioBuffer).toString('base64');
+          const response = await fetch("https://api.gooey.ai/v2/LipsyncTTS/", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${env.GOOEY_AI_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+        
+          if (!response.ok) {
+           return  res.status(500).send({
+              error : "Internal Server Error",
+            })
+          }
+        
+          const result = await response.json();
+          return res.json({ videoUrl : result["output"]["output_video"]  });
+          // return res.json({ message : translation  });
 
-          const obj = { audioData: base64Audio };
-          // return NextResponse.json(
-          //   { message: obj },
-          //   { status: 200, headers: responseHeaders }
-          // );
-          return res.json({ message : obj });
+
+
+//           let request ;
+//           if ( langCode != "te-IN" ) {
+//  request = {
+//             input: { text: translation },
+//             voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
+//             audioConfig: { audioEncoding: 'MP3' }
+//           };
+//           } else {
+//  request = {
+//             input: { text: translation },
+//             voice: { languageCode: langCode,  name : "te-IN-Standard-A", ssmlGender: 'FEMALE' },
+//             audioConfig: { audioEncoding: 'MP3' } ,
+//             ssml: `<speak><prosody pitch="7.0%">${translation}</prosody></speak>`
+//           };
+//           }
+          
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//   //@ts-ignore
+//           const [response] = await client.synthesizeSpeech(request);
+//           const audioBuffer = response.audioContent;
+//           const base64Audio = Buffer.from(audioBuffer).toString('base64');
+
+//           const obj = { audioData: base64Audio };
+          
+//           return res.json({ message : obj });
         } else {
-          const request = {
-            input: { text },
-            voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3' }
-          };
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
-          const [response] = await client.synthesizeSpeech(request);
-          const audioBuffer = response.audioContent;
-          const base64Audio = Buffer.from(audioBuffer).toString('base64');
+         
+          const  payload = {
+            input_face :  inputFace ,
+            text_prompt : text 
+          }
+          const response = await fetch("https://api.gooey.ai/v2/LipsyncTTS/", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${env.GOOEY_AI_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+        
+          if (!response.ok) {
+           return  res.status(500).send({
+              error : "Internal Server Error",
+            })
+          }
+        
+          const result = await response.json();
+          return res.json({ videoUrl : result["output"]["output_video"]  });
+//           const request = {
+//             input: { text },
+//             voice: { languageCode: langCode, ssmlGender: 'FEMALE' },
+//             audioConfig: { audioEncoding: 'MP3' }
+//           };
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//   //@ts-ignore
+//           const [response] = await client.synthesizeSpeech(request);
+//           const audioBuffer = response.audioContent;
+//           const base64Audio = Buffer.from(audioBuffer).toString('base64');
 
-          const obj = { audioData: base64Audio };
-          // return NextResponse.json(
-          //   { message: obj },
-          //   { status: 200, headers: responseHeaders }
-          // );
-          return res.json({ message : obj });
+//           const obj = { audioData: base64Audio };
+        
+//           return res.json({ message : obj });
+
+
         }
       } else if (type == "listvoices") {
         const [response] = await client.listVoices({});

@@ -151,6 +151,7 @@ const customOAuthEnv = {
 const googleEnv = {
   server: {
     GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOEY_AI_KEY : z.string().min(1).optional(),
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     GOOGLE_PROJECT_ID:   z.string().min(1).optional(),
     GOOGLE_PROJECT_CREDENTIALS : z.string().min(1).optional(),
