@@ -43,7 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           credentials: JSON.parse(env.GOOGLE_PROJECT_CREDENTIALS)
         });
 
-        if (langCode != "en-IN") {
+        if (langCode != "en-IN" && langCode != "te-IN" ) {
           const [resp] = await translationClient.translateText({
             parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
             contents: [text],
@@ -102,6 +102,65 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 //           const obj = { audioData: base64Audio };
           
 //           return res.json({ message : obj });
+        } else if ( langCode == "te-IN" ) {
+          const [resp] = await translationClient.translateText({
+            parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
+            contents: [text],
+            targetLanguageCode: langCode.split("-")[0]
+          });
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+          const translation = resp.translations[0].translatedText;
+          const  payload = {
+            input_face :  inputFace ,
+            text_prompt : translation ,
+            tts_provider : "GOOGLE_TTS",
+            google_voice_name : "te-IN-Standard-A",
+            google_speaking_rate: 1.4,
+  google_pitch: 0,
+          }
+          const response = await fetch("https://api.gooey.ai/v2/LipsyncTTS/", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${env.GOOEY_AI_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+        
+          if (!response.ok) {
+           return  res.status(500).send({
+              error : "Internal Server Error",
+            })
+          }
+        
+          const result = await response.json();
+          return res.json({ videoUrl : result["output"]["output_video"]  });
+
+//           const [resp] = await translationClient.translateText({
+//             parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
+//             contents: [text],
+//             targetLanguageCode: langCode.split("-")[0]
+//           });
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//   //@ts-ignore
+//           const translation = resp.translations[0].translatedText;
+//           let request ;
+//            request = {
+//             input: { text: translation },
+//             voice: { languageCode: langCode,  name : "te-IN-Standard-A", ssmlGender: 'FEMALE' },
+//             audioConfig: { audioEncoding: 'MP3' } ,
+//             // @ts-ignore
+//             ssml: `<speak><prosody pitch="7.0%">${translation}</prosody></speak>`
+//           };
+//           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//         //@ts-ignore
+//           const [response] = await client.synthesizeSpeech(request);
+//           const audioBuffer = response.audioContent;
+//           const base64Audio = Buffer.from(audioBuffer).toString('base64');
+
+
+          
         } else {
          
           const  payload = {
