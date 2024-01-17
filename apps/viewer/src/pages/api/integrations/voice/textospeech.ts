@@ -237,7 +237,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
           config: {
             encoding: "WEBM_OPUS",
-            audioChannelCount: 2,
+            // audioChannelCount: 2,
             sampleRateHertz : 48000,
             languageCode: 'en-IN',
            
