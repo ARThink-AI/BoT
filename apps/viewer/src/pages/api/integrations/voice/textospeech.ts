@@ -44,6 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         if (langCode != "en-IN" && langCode != "te-IN" ) {
+          
           const [resp] = await translationClient.translateText({
             parent: `projects/${env.GOOGLE_PROJECT_ID}/locations/global`,
             contents: [text],
@@ -162,11 +163,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           
         } else {
-         
+         console.log("else enteredd text to speech");
           const  payload = {
             input_face :  inputFace ,
             text_prompt : text 
           }
+          console.log("beforee requestt");
           const response = await fetch("https://api.gooey.ai/v2/LipsyncTTS/", {
             method: "POST",
             headers: {
@@ -175,6 +177,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
             body: JSON.stringify(payload),
           });
+          
         
           if (!response.ok) {
            return  res.status(500).send({
@@ -183,6 +186,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
         
           const result = await response.json();
+          console.log("after requesttt");
           return res.json({ videoUrl : result["output"]["output_video"]  });
 //           const request = {
 //             input: { text },
@@ -233,11 +237,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
           config: {
             encoding: "WEBM_OPUS",
-            // sampleRateHertz: 8000,
+            audioChannelCount: 2,
+            sampleRateHertz : 48000,
             languageCode: 'en-IN',
-            // alternativeLanguageCodes: ['es-ES', 'en-US', 'en-IN'],
+           
           },
         });
+// sampleRateHertz: 8000,
+         // audioChannelCount : 2,
+            // alternativeLanguageCodes: ['es-ES', 'en-US', 'en-IN'],
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
         const transcription = response.results
