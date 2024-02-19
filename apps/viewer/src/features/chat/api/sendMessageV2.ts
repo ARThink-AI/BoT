@@ -11,7 +11,7 @@ import { restartSession } from '@typebot.io/bot-engine/queries/restartSession'
 import { continueBotFlow } from '@typebot.io/bot-engine/continueBotFlow'
 import { parseDynamicTheme } from '@typebot.io/bot-engine/parseDynamicTheme'
 import { isDefined } from '@typebot.io/lib/utils'
-
+import crypto from "crypto";
 export const sendMessageV2 = publicProcedure
   .meta({
     openapi: {
@@ -166,7 +166,72 @@ export const sendMessageV2 = publicProcedure
               logs: allLogs,
               clientSideActions,
             })
+       console.log("restarting session");
+       if ( typebot?.settings?.general?.isTicketEnabled && startParams?.prefilledVariables?.TicketInfo ) {
+          try {
+          console.log("is Ticket enabled");
+          const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
+          const decipher = crypto.createDecipher('aes-256-cbc', key);
+          // @ts-ignore
+          let decryptedData = decipher.update(startParams?.prefilledVariables?.TicketInfo, 'hex', 'utf-8');
+          // @ts-ignore
+          decryptedData += decipher.final('utf-8');
+          console.log("decrypted data", decryptedData );
+          let resp1 = await fetch("https://quadz.arthink.ai/api/v1/login", {
+            method : "POST",
+            headers: {
+              "Content-type" : "application/json"
+            },
+            body : decryptedData
 
+          });
+          // @ts-ignore
+          
+          resp1=  await resp1.json();
+          // @ts-ignore
+          console.log("ticket login data", resp1.accessToken );
+          return {
+            // @ts-ignore
+            ticketAccessToken : resp1.accessToken,
+            // @ts-ignore
+            ticketOwnerId : resp1.user._id ,
+            sessionId: session.id,
+            typebot: typebot
+              ? {
+                  id: typebot.id,
+                  theme: typebot.theme,
+                  settings: typebot.settings,
+                }
+              : undefined,
+            messages,
+            input,
+            resultId,
+            dynamicTheme,
+            logs,
+            clientSideActions,
+          }
+
+        } catch(err) {
+          console.log("error happened while login");
+          return {
+            sessionId: session.id,
+            typebot: typebot
+              ? {
+                  id: typebot.id,
+                  theme: typebot.theme,
+                  settings: typebot.settings,
+                }
+              : undefined,
+            messages,
+            input,
+            resultId,
+            dynamicTheme,
+            logs,
+            clientSideActions,
+          }
+        } 
+
+       } else {
         return {
           sessionId: session.id,
           typebot: typebot
@@ -183,6 +248,23 @@ export const sendMessageV2 = publicProcedure
           logs,
           clientSideActions,
         }
+       }
+        // return {
+        //   sessionId: session.id,
+        //   typebot: typebot
+        //     ? {
+        //         id: typebot.id,
+        //         theme: typebot.theme,
+        //         settings: typebot.settings,
+        //       }
+        //     : undefined,
+        //   messages,
+        //   input,
+        //   resultId,
+        //   dynamicTheme,
+        //   logs,
+        //   clientSideActions,
+        // }
       } else {
         console.log("entered elsee after continue bot flow v2 send message start")
         const {

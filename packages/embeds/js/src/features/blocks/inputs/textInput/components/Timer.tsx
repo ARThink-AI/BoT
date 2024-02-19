@@ -69,7 +69,7 @@ const TimerComponent = (props) => {
   // );
   return (
     <div style={timerContainerStyle}>
-      <div style={timerStyle}></div>
+      <div style={timerStyle} />
       <span style={displayStyle}>{timerCount()}</span>
     </div>
   );

@@ -90,7 +90,7 @@ export const TextInput = (props: Props) => {
           //   let n = inputNode();
           //   n.value = result.transcription
           // }
-          let val = inputValue() + " " +result.message.transcription;
+          const val = inputValue() + " " +result.message.transcription;
           setInputValue(val);
           // node.value = result.transcription;
           // setRecordedText(result.transcription);

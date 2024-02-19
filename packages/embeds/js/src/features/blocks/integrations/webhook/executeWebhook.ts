@@ -12,7 +12,7 @@ export const executeWebhook = async (
     let txt = "";
     if ( url.includes("prediction") ) {
       console.log("bodyyy", JSON.stringify({...body, socketIOClientId : socket.id }) );
-      let id = createUniqueId();
+      const id = createUniqueId();
       console.log("id",id);
       socket.on("token" , (text) => {
         console.log("texttt",text);

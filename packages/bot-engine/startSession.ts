@@ -120,6 +120,8 @@ export const startSession = async ({
     isStreamEnabled: startParams.isStreamEnabled,
     typingEmulation: typebot.settings.typingEmulation,
     ...initialSessionState,
+    expiryTimeout : 1200000,
+    // expiryTimeout : 10000,
   }
 
   if (startParams.isOnlyRegistering) {

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { answerInputSchema, answerSchema } from './answer'
 import { InputBlockType } from './blocks'
-import { variableWithValueSchema } from './typebot/variable'
+import { variableWithValueSchema , liveChatMessageSchema } from './typebot/variable'
 import { Result as ResultPrisma, Log as LogPrisma } from '@typebot.io/prisma'
 
 export const resultSchema = z.object({
@@ -12,6 +12,7 @@ export const resultSchema = z.object({
   isCompleted: z.boolean(),
   hasStarted: z.boolean().nullable(),
   isArchived: z.boolean().nullable(),
+  livechat : z.array( liveChatMessageSchema ).nullable()
 }) satisfies z.ZodType<ResultPrisma>
 
 export const resultWithAnswersSchema = resultSchema.merge(

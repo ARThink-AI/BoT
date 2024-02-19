@@ -20,8 +20,8 @@ type Props = {
 const slotName = 'stripe-payment-form'
 
 let paymentElementSlot: HTMLSlotElement
-let stripe: Stripe | null = null
-let elements: StripeElements | null = null
+const stripe: Stripe | null = null
+const elements: StripeElements | null = null
 
 export const RazorpayPaymentForm = (props: Props) => {
   const [message, setMessage] = createSignal<string>()

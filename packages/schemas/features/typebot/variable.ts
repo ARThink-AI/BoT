@@ -26,8 +26,14 @@ const VariableWithUnknowValueSchema = z.object({
   value: z.unknown(),
 })
 
+export const liveChatMessageSchema = z.object( {
+   user : z.string(),
+   message : z.string()
+} );
+
 export type Variable = z.infer<typeof variableSchema>
 export type VariableWithValue = z.infer<typeof variableWithValueSchema>
 export type VariableWithUnknowValue = z.infer<
   typeof VariableWithUnknowValueSchema
 >
+export type liveChatMessage = z.infer< typeof liveChatMessageSchema >

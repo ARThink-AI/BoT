@@ -236,6 +236,7 @@ model Result {
   variables   Json
   isCompleted Boolean
   hasStarted  Boolean?
+  livechat    Json?
   isArchived  Boolean? @default(false)
   typebot     Typebot  @relation(fields: [typebotId], references: [id], onDelete: Cascade)
   answers     Answer[]

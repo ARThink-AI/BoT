@@ -17,10 +17,12 @@ import { env } from "@typebot.io/env";
 import Queue from "@/utils/queue";
 export const AUDIO_PLAYING_KEY = "audio_playing";
 
+import { computePlainText } from '@/features/blocks/bubbles/textBubble/helpers/convertRichTextToPlainText'
 
 
 export type BotProps = {
   socket? : any;
+  socket1? : any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typebot: string | any
   isPreview?: boolean
@@ -36,17 +38,35 @@ export type BotProps = {
 }
 
 export const Bot = (props: BotProps & { class?: string }) => {
+
+
+  console.log("bot socket1", props.socket1 );
+
+  
   const [initialChatReply, setInitialChatReply] = createSignal<
     InitialChatReply | undefined
-  >()
+    // @ts-ignore
+  >(  sessionStorage.getItem("intialize") ? JSON.parse( sessionStorage.getItem("intialize") )  : undefined )
   const [selectedLanguage, setSelectedLanguage] = createSignal('en-IN');
-  const [customCss, setCustomCss] = createSignal('')
+  // @ts-ignore
+  const [customCss, setCustomCss] = createSignal( sessionStorage.getItem("initialize_css") ? JSON.parse( sessionStorage.getItem("initialize_css") )  :  '' )
   const [isInitialized, setIsInitialized] = createSignal(false)
   const [error, setError] = createSignal<Error | undefined>()
 
   const initializeBot = async () => {
+    
+    // @ts-ignore  
+    if ( sessionStorage.getItem("bot_init") && JSON.parse( sessionStorage.getItem("bot_init") ) == true  ) {
+          return 
+    } else {
+      sessionStorage.setItem("bot_init", "true" );
+    }
     console.log("initialize bot");
-    setIsInitialized(true)
+    setIsInitialized(true);
+    sessionStorage.removeItem("answer");
+    sessionStorage.removeItem("live");
+    sessionStorage.removeItem("liveChat");
+
     const urlParams = new URLSearchParams(location.search)
     props.onInit?.()
     const prefilledVariables: { [key: string]: string } = {}
@@ -93,8 +113,72 @@ export const Bot = (props: BotProps & { class?: string }) => {
         typebotIdFromProps,
         data.resultId
       )
-    setInitialChatReply(data)
+    if ( data.ticketAccessToken && data.ticketOwnerId && data.resultId ) {
+      try {
+
+    console.log("data",data);
+    let text = ["BoT - /n"];
+    for ( let i=0; i < data.messages.length ; i++ ) {
+       if ( data.messages[i].type == "text" ) {
+        // @ts-ignore
+          let plainText = computePlainText(data.messages[i]?.content?.richText);
+          text.push(plainText);
+       }
+    }
+    console.log("final text array", text );
+    let finalText = text.reduce( ( a , curr ) => a + "/n" + curr  );
+     
+      sessionStorage.setItem("ticketaccess", data.ticketAccessToken );
+      sessionStorage.setItem("ticketOwnerId", data.ticketOwnerId );
+      console.log("intial chat reply", JSON.stringify(data) );
+      let resp2 = await fetch("https://quadz.arthink.ai/api/v1/tickets/create", {
+        method : "POST", 
+        headers : {
+          "Content-type" : "application/json",
+          "accessToken" : data.ticketAccessToken
+        }, 
+        body : JSON.stringify({
+          subject: `Quadz Bot Session ${data.resultId}`,
+                        group: "65c1cc159b1be8f60e7d58ef",
+                        type: "65c1cc159b1be8f60e7d58eb",
+                        
+                        priority: "65c1cc38bdc5617ff78a7ff6",
+                        issue: "New Conversation for Quadz Bot",
+                        owner : data.ticketOwnerId
+        })
+      } );
+      resp2 = await resp2.json();
+      console.log("resp22", resp2 );
+      // @ts-ignore
+      sessionStorage.setItem("ticketId", resp2.ticket._id );
+      fetch("https://quadz.arthink.ai/api/v1/tickets/addcomment", {
+         method : "POST" ,
+         headers:  {
+          "Content-type" : "application/json",
+          "accessToken" : data.ticketAccessToken
+         } ,
+         body : JSON.stringify( {
+          // @ts-ignore
+          _id : resp2.ticket._id ,
+          comment : [finalText],
+          note : false ,
+          ticketid : false 
+         } ) 
+      } ).then( result => {
+        console.log("got comment result", result );
+      } ).catch( err => {
+        console.log("error",err);
+      } )
+
+
+    } catch(err) {
+      console.log("ticket create error");
+    }
+    }  
+    setInitialChatReply(data);
+    sessionStorage.setItem("intialize", JSON.stringify(data) );
     setCustomCss(data.typebot.theme.customCss ?? '')
+    sessionStorage.setItem("initialize_css", JSON.stringify(data.typebot.theme.customCss ?? '') );
 
     if (data.input?.id && props.onNewInputBlock)
       props.onNewInputBlock({
@@ -104,8 +188,23 @@ export const Bot = (props: BotProps & { class?: string }) => {
     if (data.logs) props.onNewLogs?.(data.logs)
   }
 
+  // const getSessionCookie = () => {
+  //   const cookies = document.cookie.split("; ");
+  //   for (const cookie of cookies) {
+  //     const [name, value] = cookie.split("=");
+  //     if (name === "liveId") {
+  //       return value;
+  //     }
+  //   }
+  //   return null;
+  // };
+
   createEffect(() => {
+    console.log(" value to run intitalize bot or not  ", isNotDefined(props.typebot) || isInitialized() );
+    // console.log("session storage", sessionStorage.getItem("aaaa")  );
+    // console.log("live agent id", crypto.randomUUID() );
     if (isNotDefined(props.typebot) || isInitialized()) return
+    
     initializeBot().then()
   })
 
@@ -131,6 +230,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
         {(initialChatReply) => (
           <>
           <BotContent
+            initializeBot={initializeBot}
             socket={props.socket}
             class={props.class}
             initialChatReply={{
@@ -163,7 +263,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
           />
           <Show when={ initialChatReply.typebot.settings.general.isVoiceEnabled } >
           <div style={ !isMobile() ? { position : "relative" , top  :"-50%" , left : "80%" , width : "100px" } : { position : "relative" , top : "-20%" , left : "5%" , width : "20px" } } >
-      <select value={ selectedLanguage() } onchange={ (evt) => {
+      <select value={ selectedLanguage() } onChange={ (evt) => {
         console.log("vall", evt?.target?.value );
         setSelectedLanguage(evt?.target?.value);
         initializeBot();
@@ -195,6 +295,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 }
 
 type BotContentProps = {
+  initializeBot : any,
   initialChatReply: InitialChatReply
   context: BotContext
   class?: string
@@ -223,6 +324,7 @@ const BotContent = (props: BotContentProps) => {
 
   const [audioText, setAudioText] = createSignal('');
   const [nodeText, setNodeText] = createSignal('');
+  const [ liveAgent, setLiveAgent ] = createSignal(false);
 
   let queueInterval: NodeJS.Timeout;
   const resizeObserver = new ResizeObserver((entries) => {
@@ -317,7 +419,7 @@ const BotContent = (props: BotContentProps) => {
         return
       }
 
-      let text = textQueue.front();
+      const text = textQueue.front();
 
       const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
         method: 'POST',
@@ -343,7 +445,7 @@ const BotContent = (props: BotContentProps) => {
         currentAudio.play().catch((err) => {
           console.log("error playing", textQueue.printQueue());
           if (!textQueue.isEmpty()) {
-            let dequeued = textQueue.dequeue();
+            const dequeued = textQueue.dequeue();
             console.log("dequeuued", dequeued);
           }
           videoRef?.pause()
@@ -390,7 +492,7 @@ const BotContent = (props: BotContentProps) => {
   const ended = () => {
     console.log("audio ended for text");
     if (!textQueue.isEmpty()) {
-      let dequeuedEnded = textQueue.dequeue();
+      const dequeuedEnded = textQueue.dequeue();
       console.log("dequeuued endned", dequeuedEnded);
     }
     videoRef?.pause()
@@ -410,6 +512,7 @@ const BotContent = (props: BotContentProps) => {
     }
   };
   onMount(() => {
+    console.log("on mount calleddddd");
     if (!botContainer) return
     resizeObserver.observe(botContainer)
     if (!conversationContainer) return
@@ -461,7 +564,7 @@ const BotContent = (props: BotContentProps) => {
     if (props.initialChatReply.typebot.settings.general.isVoiceEnabled) {
     // document.removeEventListener('click', handleDocumentClick);
     document.removeEventListener('mousedown', handleDocumentClick);
-    let audio = audioRef()
+    const audio = audioRef()
     audio.removeEventListener("ended", ended);
     const id = intervalId();
     if (id !== null) {
@@ -481,8 +584,22 @@ const BotContent = (props: BotContentProps) => {
           props.class
         }
       >
+        {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
+       
+        <div style={{ display : "flex" , "flex-direction" : "row" , "align-items" : "center" , gap : "40" }} >
+          <button> <img style={{ height : "25px" , "margin-right":  "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
+          <button> <img style={{ height : "25px" ,  "margin-right":  "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
+          <button onClick={ () => {
+            let currentVal = liveAgent();
+            setLiveAgent( !currentVal );
+          } } > <img style={{ height : "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
+        </div>
+        </div> */}
         <div ref={conversationContainer} class="flex w-full h-full justify-center">
+          
           <ConversationContainer
+            // liveAgent={liveAgent()}
+            initializeBot={props.initializeBot}
              socket={props.socket}
             context={props.context}
             initialChatReply={props.initialChatReply}
@@ -494,10 +611,7 @@ const BotContent = (props: BotContentProps) => {
         </div>
         <Show
           when={props.initialChatReply.typebot.settings.general.isBrandingEnabled}
-        >
-
-
-        </Show>
+         />
       </div>
 
       <Show when={  props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
@@ -523,12 +637,12 @@ const BotContent = (props: BotContentProps) => {
     </div> */}
     </Show>
 
-      <div style={{ "margin-left": "70%", position: "relative" }} >
+      {/* <div style={{ "margin-left": "70%", position: "relative" }} > */}
 
         <LiteBadge botContainer={botContainer} />
 
 
-      </div>
+      {/* </div> */}
     </>
   )
 }

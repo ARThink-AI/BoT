@@ -227,8 +227,8 @@ console.log("error removing mdia stream",err);
     {  props?.block?.options?.mode == "camera" &&  <div style={{ position : "absolute" , top : "20%" , left : "10%" , "z-index" : "100" , width : "80%" }} >
       {mediaStream() && !imageDataUrl() && !uploaded() && (
        
-        <div style={{ position: "relative", textAlign: "center" }}>
-    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+        <div style={{ position: "relative", "text-align": "center" }}>
+    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }} />
     
     {/* {isMobile() && ( */}
       <button
@@ -275,8 +275,8 @@ console.log("error removing mdia stream",err);
 }
 
 {props?.block?.options?.mode === "barCode" && (
-  <div style={{ position: "relative", textAlign: "center" }}>
-    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }}></video>
+  <div style={{ position: "relative", "text-align": "center" }}>
+    <video ref={videoRef} autoPlay playsInline style={{ width: "100%" }} />
     
     {isMobile() && (
       <button

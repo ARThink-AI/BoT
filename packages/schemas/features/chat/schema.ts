@@ -251,6 +251,8 @@ export const chatReplySchema = z.object({
     .optional(),
   clientSideActions: z.array(clientSideActionSchema).optional(),
   sessionId: z.string().optional(),
+  ticketAccessToken : z.string().optional(),
+  ticketOwnerId : z.string().optional(),
   typebot: typebotSchema._def.schema
     .pick({ id: true, theme: true, settings: true })
     .optional(),

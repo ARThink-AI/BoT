@@ -6,17 +6,19 @@ import autoprefixer from 'autoprefixer'
 import tailwindcss from 'tailwindcss'
 import typescript from '@rollup/plugin-typescript'
 import { typescriptPaths } from 'rollup-plugin-typescript-paths'
-
+import commonjs from '@rollup/plugin-commonjs'; 
 const extensions = ['.ts', '.tsx']
 
 const indexConfig = {
   input: './src/index.ts',
+  
   output: {
     file: 'dist/index.js',
     format: 'es',
   },
   plugins: [
-    resolve({ extensions ,  }),
+    resolve({ extensions , browser : true   }),
+    commonjs(),
     babel({
       babelHelpers: 'bundled',
       exclude: 'node_modules/**',

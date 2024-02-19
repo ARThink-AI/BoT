@@ -50,10 +50,12 @@ type Props = {
 }
 
 export const InputChatBlock = (props: Props) => {
-  const [answer, setAnswer] = createSignal<string>()
+  // @ts-ignore
+  const [answer, setAnswer] = createSignal<string>( props?.block?.answer ? props?.block?.answer : null )
   const [formattedMessage, setFormattedMessage] = createSignal<string>()
 
   const handleSubmit = async ({ label, value }: InputSubmitContent) => {
+    console.log("entered input chat block", JSON.stringify(props) );
     console.log("label",label);
     console.log("value",value);
     if ( label || value ) {

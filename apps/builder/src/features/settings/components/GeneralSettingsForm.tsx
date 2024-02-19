@@ -48,6 +48,11 @@ export const GeneralSettingsForm = ({
       ...generalSettings,
       isVoiceEnabled,
     })
+    const handleTicketChange = ( isTicketEnabled : boolean ) => 
+    onGeneralSettingsChange({
+      ...generalSettings ,
+      isTicketEnabled,
+    })
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
   ) =>
@@ -78,6 +83,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isVoiceEnabled ?? true}
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
+      />
+       <SwitchWithLabel
+        label="Toggle for enable ticketing system"
+        initialValue={generalSettings.isTicketEnabled ?? false}
+        onCheckChange={handleTicketChange}
+        moreInfoContent="Toggle for enable ticketing system "
       />
       <SwitchWithRelatedSettings
         label={'Remember user'}

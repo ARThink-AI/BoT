@@ -5,7 +5,7 @@
   "i18n-ally.keystyle": "flat",
   "i18n-ally.displayLanguage": "en",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
