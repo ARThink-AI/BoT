@@ -172,8 +172,10 @@ export const sendMessageV2 = publicProcedure
           console.log("is Ticket enabled");
           const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
           const decipher = crypto.createDecipher('aes-256-cbc', key);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           let decryptedData = decipher.update(startParams?.prefilledVariables?.TicketInfo, 'hex', 'utf-8');
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           decryptedData += decipher.final('utf-8');
           console.log("decrypted data", decryptedData );
@@ -185,14 +187,18 @@ export const sendMessageV2 = publicProcedure
             body : decryptedData
 
           });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           
           resp1=  await resp1.json();
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           console.log("ticket login data", resp1.accessToken );
           return {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ticketAccessToken : resp1.accessToken,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ticketOwnerId : resp1.user._id ,
             sessionId: session.id,

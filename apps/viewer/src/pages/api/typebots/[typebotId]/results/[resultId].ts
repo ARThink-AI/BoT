@@ -11,6 +11,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const resultId = req.query.resultId as string
     const result = await prisma.result.updateMany({
       where: { id: resultId },
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
       data,
     })
     return res.send(result)

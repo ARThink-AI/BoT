@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/dist/server/web/spec-extension/response';
-import { env } from "@typebot.io/env";
+// import { env } from "@typebot.io/env";
 import { NextApiRequest } from 'next';
 
 const responseHeaders = {
@@ -10,6 +10,7 @@ const responseHeaders = {
 
 export default async function handler(req : NextApiRequest , res : NextResponse) {
   try {
+    console.log("ress",res);
     if ( req.method == "GET" ) {
       console.log("req params", req.query );
     const responseData = { message: "Success in get request" };

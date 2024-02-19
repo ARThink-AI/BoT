@@ -2,7 +2,7 @@ import prisma from '@typebot.io/lib/prisma'
 import { authenticatedProcedure } from '@/helpers/server/trpc'
 import { TRPCError } from '@trpc/server'
 import { ResultWithAnswers, resultWithAnswersSchema } from '@typebot.io/schemas'
-import { any, z } from 'zod'
+import { z } from 'zod'
 import { isReadTypebotForbidden } from '@/features/typebot/helpers/isReadTypebotForbidden'
 
 const maxLimit = 100
