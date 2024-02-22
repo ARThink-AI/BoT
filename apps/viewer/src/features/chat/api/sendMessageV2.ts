@@ -167,14 +167,14 @@ export const sendMessageV2 = publicProcedure
               clientSideActions,
             })
        console.log("restarting session");
-       if ( typebot?.settings?.general?.isTicketEnabled && startParams?.prefilledVariables?.TicketInfo ) {
+       if ( typebot?.settings?.general?.isTicketEnabled && typebot?.settings?.general?.ticketInfo?.trim() != "" ) {
           try {
           console.log("is Ticket enabled");
           const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
           const decipher = crypto.createDecipher('aes-256-cbc', key);
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          let decryptedData = decipher.update(startParams?.prefilledVariables?.TicketInfo, 'hex', 'utf-8');
+          let decryptedData = decipher.update( typebot?.settings?.general?.ticketInfo , 'hex', 'utf-8');
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           decryptedData += decipher.final('utf-8');

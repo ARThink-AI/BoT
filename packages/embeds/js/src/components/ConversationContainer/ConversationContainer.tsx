@@ -613,19 +613,25 @@ export const ConversationContainer = (props: Props) => {
 
      comments.push(finalText);
 
-      await fetch( "https://quadz.arthink.ai/api/v1/tickets/addcomment" , {
+      await fetch( "https://quadz.arthink.ai/api/v1/tickets/addnote" , {
         method : "POST" ,
         // @ts-ignore
         headers : {
           "Content-type" : "application/json",
           "accessToken" : sessionStorage.getItem("ticketaccess")
         }, 
+        // body : JSON.stringify( {
+        //   _id : sessionStorage.getItem("ticketId"),
+        //   comment : comments,
+        //   note : false ,
+        //   ticketid : false 
+        // } )
         body : JSON.stringify( {
-          _id : sessionStorage.getItem("ticketId"),
-          comment : comments,
-          note : false ,
-          ticketid : false 
-        } )
+          // @ts-ignore
+          ticketid : sessionStorage.getItem("ticketId") ,
+          note  : comments.join(" ")
+          
+         } )
       } )
 
 

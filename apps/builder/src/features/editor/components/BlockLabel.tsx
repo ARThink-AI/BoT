@@ -43,6 +43,8 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
     case InputBlockType.PICTURE_CHOICE:
       return <Text fontSize="sm">{scopedT('picChoice.label')}</Text>
     case InputBlockType.BARCODE_READER:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+      //@ts-ignore
       return    <Text fontSize="sm">{scopedT('barCodeReader.label')}</Text>
     case InputBlockType.PAYMENT:
       return <Text fontSize="sm">{scopedT('payment.label')}</Text>

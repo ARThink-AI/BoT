@@ -144,26 +144,34 @@ export const Bot = (props: BotProps & { class?: string }) => {
                         
                         priority: "65c1cc38bdc5617ff78a7ff6",
                         issue: "New Conversation for Quadz Bot",
-                        owner : data.ticketOwnerId
+                        owner : data.ticketOwnerId ,
+                        assignee : data.ticketOwnerId
         })
       } );
       resp2 = await resp2.json();
       console.log("resp22", resp2 );
       // @ts-ignore
       sessionStorage.setItem("ticketId", resp2.ticket._id );
-      fetch("https://quadz.arthink.ai/api/v1/tickets/addcomment", {
+      fetch("https://quadz.arthink.ai/api/v1/tickets/addnote", {
          method : "POST" ,
          headers:  {
           "Content-type" : "application/json",
           "accessToken" : data.ticketAccessToken
          } ,
+        //  body : JSON.stringify( {
+        //   // @ts-ignore
+        //   _id : resp2.ticket._id ,
+        //   comment : [finalText],
+        //   note : false ,
+        //   ticketid : false 
+        //  } )
          body : JSON.stringify( {
           // @ts-ignore
-          _id : resp2.ticket._id ,
-          comment : [finalText],
-          note : false ,
-          ticketid : false 
-         } ) 
+          ticketid : resp2.ticket._id ,
+          note  : finalText,
+          
+         } )
+
       } ).then( result => {
         console.log("got comment result", result );
       } ).catch( err => {
