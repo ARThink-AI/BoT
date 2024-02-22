@@ -138,7 +138,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
           "accessToken" : data.ticketAccessToken
         }, 
         body : JSON.stringify({
-          subject: `Quadz Bot Session ${data.resultId}`,
+          subject: `New Customer Enquiry`,
                         group: "65c1cc159b1be8f60e7d58ef",
                         type: "65c1cc159b1be8f60e7d58eb",
                         
