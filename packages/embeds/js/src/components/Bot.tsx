@@ -139,7 +139,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
         }, 
         body : JSON.stringify({
           subject: `New Customer Enquiry`,
-                        group: "65c1cc159b1be8f60e7d58ef",
+                        // group: "65c1cc159b1be8f60e7d58ef",
+                        group : "65d811c50d1d2c45b9395dd3",
                         type: "65c1cc159b1be8f60e7d58eb",
                         
                         priority: "65c1cc38bdc5617ff78a7ff6",
