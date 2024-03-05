@@ -18,6 +18,8 @@ type Props = {
 export const ButtonsBlockSettings = ({ options, onOptionsChange }: Props) => {
   const updateIsMultiple = (isMultipleChoice: boolean) =>
     options && onOptionsChange({ ...options, isMultipleChoice })
+  const updateIsDropdown = ( isDropdown : boolean ) =>
+    options &&   onOptionsChange({ ...options, isDropdown })
   const updateIsSearchable = (isSearchable: boolean) =>
     options && onOptionsChange({ ...options, isSearchable })
   const updateButtonLabel = (buttonLabel: string) =>
@@ -36,12 +38,18 @@ export const ButtonsBlockSettings = ({ options, onOptionsChange }: Props) => {
         initialValue={options?.isMultipleChoice ?? false}
         onCheckChange={updateIsMultiple}
       >
+       
         <TextInput
           label="Submit button label:"
           defaultValue={options?.buttonLabel ?? 'Send'}
           onChange={updateButtonLabel}
         />
       </SwitchWithRelatedSettings>
+      <SwitchWithRelatedSettings
+        label="Dropdown ?"
+        initialValue={options?.isDropdown ?? false}
+        onCheckChange={updateIsDropdown}
+      ></SwitchWithRelatedSettings>
       <SwitchWithRelatedSettings
         label="Is searchable?"
         initialValue={options?.isSearchable ?? false}
