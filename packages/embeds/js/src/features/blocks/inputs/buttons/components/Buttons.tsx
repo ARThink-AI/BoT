@@ -154,7 +154,7 @@ const checkAudioStart = (audio) => {
         <div class={'flex flex-wrap justify-end gap-2'} >
         <div style={{ display : "flex" , "flex-direction" : "column" , "gap" : "8px" , "align-items" : "flex-end"  }} >
         <select onChange={ (e) => setSelectedDropdownItem(e?.target?.value) } value={selectedDropdownItem()} >
-        <option disabled selected value="" > Select Item  </option>
+        <option disabled selected value="" > Select  </option>
         <For each={filteredItems()}>
         {(item, index) => (
           <option  value={item.id} > { item.content }   </option>
