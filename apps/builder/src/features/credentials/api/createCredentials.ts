@@ -4,6 +4,7 @@ import { TRPCError } from '@trpc/server'
 import { stripeCredentialsSchema , razorpayCredentialsSchema } from '@typebot.io/schemas/features/blocks/inputs/payment/schemas'
 import { googleSheetsCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/googleSheets/schemas'
 import { openAICredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/openai'
+import { trudeskCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/trudesk'
 import { smtpCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/sendEmail'
 import { encrypt } from '@typebot.io/lib/api/encryption/encrypt'
 import { z } from 'zod'
@@ -40,6 +41,7 @@ export const createCredentials = authenticatedProcedure
           openAICredentialsSchema.pick(inputShape),
           whatsAppCredentialsSchema.pick(inputShape),
           zemanticAiCredentialsSchema.pick(inputShape),
+          trudeskCredentialsSchema.pick(inputShape),
         ])
         .and(z.object({ id: z.string().cuid2().optional() })),
     })

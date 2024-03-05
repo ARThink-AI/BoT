@@ -50,6 +50,7 @@ import { BarCodeInputSettings } from '@/features/blocks/inputs/barCodeReader/com
 import { SettingsHoverBar } from './SettingsHoverBar'
 import { PixelSettings } from '@/features/blocks/integrations/pixel/components/PixelSettings'
 import { ZemanticAiSettings } from '@/features/blocks/integrations/zemanticAi/ZemanticAiSettings'
+import { TrudeskSettings } from '@/features/blocks/integrations/trudesk/TrudeskSettings'
 
 type Props = {
   block: BlockWithOptions
@@ -320,6 +321,9 @@ export const BlockSettings = ({
     }
     case IntegrationBlockType.OPEN_AI: {
       return <OpenAISettings block={block} onOptionsChange={updateOptions} />
+    }
+    case IntegrationBlockType.TRUDESK: {
+      return <TrudeskSettings block={block} onOptionsChange={updateOptions}  />
     }
     case IntegrationBlockType.PIXEL: {
       return (

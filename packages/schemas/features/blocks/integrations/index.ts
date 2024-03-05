@@ -11,3 +11,4 @@ export * from './pixel/schemas'
 export * from './pixel/constants'
 export * from './zemanticAi'
 export * from "./flowwise";
+export * from "./trudesk";

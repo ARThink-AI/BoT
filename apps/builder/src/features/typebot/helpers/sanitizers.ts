@@ -75,6 +75,16 @@ const sanitizeBlock =
             ),
           },
         }
+        case IntegrationBlockType.TRUDESK:
+          return {
+            ...block,
+            options: {
+              ...block.options,
+              credentialsId: await sanitizeCredentialsId(workspaceId)(
+                block.options.credentialsId
+              ),
+            },
+          }  
       case IntegrationBlockType.EMAIL:
         return {
           ...block,

@@ -46,6 +46,7 @@ import { PictureChoiceNode } from '@/features/blocks/inputs/pictureChoice/compon
 import { PixelNodeBody } from '@/features/blocks/integrations/pixel/components/PixelNodeBody'
 import { useScopedI18n } from '@/locales'
 import { ZemanticAiNodeBody } from '@/features/blocks/integrations/zemanticAi/ZemanticAiNodeBody'
+import { TrudeskNodeBody } from '@/features/blocks/integrations/trudesk/TrudeskNodeBody'
 
 type Props = {
   block: Block | StartBlock
@@ -108,7 +109,7 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     case InputBlockType.PICTURE_CHOICE: {
       return <PictureChoiceNode block={block} indices={indices} />
     }
-    case InputBlockType.BARCODE_READER:  {
+    case InputBlockType.BARCODE_READER: {
       return <BarCodeInputContent block={block} />
     }
     case InputBlockType.PHONE: {
@@ -202,6 +203,13 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
         />
       )
     }
+    case IntegrationBlockType.TRUDESK:
+      return (
+        <TrudeskNodeBody
+          task={block.options.task}
+          variableId={"variableId" in block.options ? block.options.variableId : ""}
+        />
+      )
     case IntegrationBlockType.PIXEL: {
       return <PixelNodeBody options={block.options} />
     }

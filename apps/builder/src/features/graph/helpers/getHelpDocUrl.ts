@@ -57,6 +57,8 @@ export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string  => {
       return 'https://arthink.ai'  
     case IntegrationBlockType.OPEN_AI:
       return 'https://docs.typebot.io/editor/blocks/integrations/openai'
+    case IntegrationBlockType.TRUDESK:
+      return 'https://arthink.ai'
     case IntegrationBlockType.MAKE_COM:
       return 'https://docs.typebot.io/editor/blocks/integrations/make-com'
     case LogicBlockType.AB_TEST:

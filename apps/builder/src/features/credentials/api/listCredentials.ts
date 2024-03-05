@@ -4,6 +4,7 @@ import { TRPCError } from '@trpc/server'
 import { stripeCredentialsSchema , razorpayCredentialsSchema } from '@typebot.io/schemas/features/blocks/inputs/payment/schemas'
 import { googleSheetsCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/googleSheets/schemas'
 import { openAICredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/openai'
+import {  trudeskCredentialsSchema } from "@typebot.io/schemas/features/blocks/integrations/trudesk";
 import { smtpCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/sendEmail'
 import { z } from 'zod'
 import { isReadWorkspaceFobidden } from '@/features/workspace/helpers/isReadWorkspaceFobidden'
@@ -29,7 +30,8 @@ export const listCredentials = authenticatedProcedure
         .or(openAICredentialsSchema.shape.type)
         .or(whatsAppCredentialsSchema.shape.type)
         .or(zemanticAiCredentialsSchema.shape.type)
-        .or(razorpayCredentialsSchema.shape.type),
+        .or(razorpayCredentialsSchema.shape.type)
+        .or( trudeskCredentialsSchema.shape.type ),
     })
   )
   .output(

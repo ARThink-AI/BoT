@@ -36,7 +36,8 @@ import {
   sendEmailBlockSchema,
   webhookBlockSchema,
   zapierBlockSchema,
-  flowwiseBlockSchema
+  flowwiseBlockSchema ,
+  trudeskBlockSchema
 } from './integrations'
 import { openAIBlockSchema } from './integrations/openai'
 import {
@@ -133,6 +134,7 @@ export const blockSchema = z.discriminatedUnion('type', [
   pixelBlockSchema,
   zemanticAiBlockSchema,
   flowwiseBlockSchema,
+  trudeskBlockSchema,
 ])
 
 export type Block = z.infer<typeof blockSchema>

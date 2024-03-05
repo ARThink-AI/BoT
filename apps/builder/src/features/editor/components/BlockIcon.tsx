@@ -119,6 +119,8 @@ export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
       return <ChatwootLogo {...props} />
     case IntegrationBlockType.OPEN_AI:
       return <OpenAILogo fill={openAIColor} {...props} />
+    case IntegrationBlockType.TRUDESK:
+      return  <WebhookIcon {...props} /> 
     case IntegrationBlockType.PIXEL:
       return <PixelLogo {...props} />
     case IntegrationBlockType.ZEMANTIC_AI:

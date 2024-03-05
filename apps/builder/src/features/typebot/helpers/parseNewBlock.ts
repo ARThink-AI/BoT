@@ -146,6 +146,8 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
       return defaultChatwootOptions
     case IntegrationBlockType.OPEN_AI:
       return {}
+    case IntegrationBlockType.TRUDESK:
+      return {}  
     case IntegrationBlockType.PIXEL:
       return {}
     case IntegrationBlockType.ZEMANTIC_AI:
