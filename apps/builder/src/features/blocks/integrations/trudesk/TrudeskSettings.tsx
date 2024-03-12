@@ -1,17 +1,21 @@
-import { Stack , useDisclosure  } from "@chakra-ui/react";
+import { Stack, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 import { CredentialsDropdown } from '@/features/credentials/components/CredentialsDropdown'
 import {
-  trudeskTasks ,
+  trudeskTasks,
   TrudeskBlock
 } from "@typebot.io/schemas/features/blocks/integrations/trudesk"
 import { TrudeskCredentialsModal } from "./TrudeskCredentialsModal";
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { CreateNote } from "./components/CreateNote/CreateNote";
+import { UpdateAssigneeAndGroup } from "./components/UpdateAssigneeAndGroup/UpdateAssigneeAndGroup";
+import { UpdatePriority } from "./components/UpdatePriority/UpdatePriority";
+import { UpdateTags } from "./components/UpdateTags/UpdateTags";
+import { UpdateStatus } from "./components/UpdateStatus/UpdateStatus";
 import { CreateTicket } from "./components/CreateTicket/CreateTicket";
 import { DropdownList } from '@/components/DropdownList'
 type Props = {
-  block : TrudeskBlock ,
+  block: TrudeskBlock,
   onOptionsChange: (options: TrudeskBlock['options']) => void
 }
 
@@ -36,25 +40,55 @@ export const TrudeskSettings = ({
       case 'Create Note': {
         onOptionsChange({
           credentialsId: options?.credentialsId,
-          task 
+          task
         })
         break
-     
+
 
       }
       case 'Create Ticket': {
         onOptionsChange({
           credentialsId: options?.credentialsId,
-          task 
+          task
         })
         break
-       }   
+      }
+      case 'Update Assignee and Group': {
+        onOptionsChange({
+          credentialsId: options?.credentialsId,
+          task
+        })
+        break
+      }
+      case 'Update Tags': {
+        onOptionsChange({
+          credentialsId: options?.credentialsId,
+          task
+        })
+        break
+      }
+      case 'Update Priority': {
+        onOptionsChange({
+          credentialsId: options?.credentialsId,
+          task
+        })
+        break
+      }
+      case 'Update Status': {
+        onOptionsChange({
+          credentialsId: options?.credentialsId,
+          task
+        })
+        break
+      }
+
+
     }
   }
 
   return (
     <Stack>
-{workspace && (
+      {workspace && (
         <>
           <CredentialsDropdown
             type="trudesk"
@@ -69,27 +103,27 @@ export const TrudeskSettings = ({
             onClose={onClose}
             onNewCredentials={updateCredentialsId}
           />
-        
+
         </>
       )}
-      { options?.credentialsId && (
+      {options?.credentialsId && (
 
         <>
-        <DropdownList
+          <DropdownList
             currentItem={options.task}
             items={trudeskTasks}
             onItemSelect={updateTask}
             placeholder="Select task"
           />
-        { options?.task && (
-          <TrudeskTaskSettings
-          options={options}
-          onOptionsChange={onOptionsChange}
-          />
-        ) }
+          {options?.task && (
+            <TrudeskTaskSettings
+              options={options}
+              onOptionsChange={onOptionsChange}
+            />
+          )}
         </>
 
-      ) }
+      )}
     </Stack>
   )
 }
@@ -98,26 +132,55 @@ const TrudeskTaskSettings = ({
   options,
   onOptionsChange,
 }: {
-  options: any 
+  options: any
   onOptionsChange: (options: TrudeskBlock['options']) => void
 }) => {
   switch (options.task) {
     case 'Create Note': {
       return (
         <CreateNote
-        options={options}
-        onOptionsChange={onOptionsChange}
+          options={options}
+          onOptionsChange={onOptionsChange}
         />
       )
     }
     case 'Create Ticket': {
       return (
         <CreateTicket
-        options={options}
-        onOptionsChange={onOptionsChange}
+          options={options}
+          onOptionsChange={onOptionsChange}
         />
       )
     }
+    case 'Update Assignee and Group':
+      return (
+        <UpdateAssigneeAndGroup
+          options={options}
+          onOptionsChange={onOptionsChange}
+        />
+      )
+    case 'Update Tags':
+      return (
+        <UpdateTags
+          options={options}
+          onOptionsChange={onOptionsChange}
+        />
+      )
+    case 'Update Priority':
+      return (
+        <UpdatePriority
+          options={options}
+          onOptionsChange={onOptionsChange}
+        />
+      )
+    case 'Update Status':
+      return (
+        <UpdateStatus
+          options={options}
+          onOptionsChange={onOptionsChange}
+        />
+      )
+
   }
 }
 

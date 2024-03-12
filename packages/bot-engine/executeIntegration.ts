@@ -12,10 +12,12 @@ import {
   SessionState,
 } from '@typebot.io/schemas'
 import { ExecuteIntegrationResponse } from './types'
+import { executeTrudeskBlock } from './blocks/integrations/trudesk/executeTrudeskBlock'
 
 export const executeIntegration =
   (state: SessionState) =>
   async (block: IntegrationBlock): Promise<ExecuteIntegrationResponse> => {
+    console.log("execute integration called", JSON.stringify(block) );
     switch (block.type) {
       case IntegrationBlockType.GOOGLE_SHEETS:
         return executeGoogleSheetBlock(state, block)
@@ -35,6 +37,8 @@ export const executeIntegration =
         return executeOpenAIBlock(state, block)
       case IntegrationBlockType.PIXEL:
         return executePixelBlock(state, block)
+      case IntegrationBlockType.TRUDESK:
+        return executeTrudeskBlock(state,block)  
       case IntegrationBlockType.ZEMANTIC_AI:
         return executeZemanticAiBlock(state, block)
     }

@@ -9,8 +9,8 @@ const generalSettings = z.object({
   isInputPrefillEnabled: z.boolean().optional(),
   isHideQueryParamsEnabled: z.boolean().optional(),
   isVoiceEnabled : z.boolean().optional(),
-  isTicketEnabled : z.boolean().optional(),
-  ticketInfo : z.string().optional(),
+ 
+ 
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({
@@ -55,8 +55,8 @@ export const defaultSettings = ({
     isInputPrefillEnabled: true,
     isHideQueryParamsEnabled: true,
     isVoiceEnabled : false,
-    isTicketEnabled : false ,
-    ticketInfo:  ""
+   
+   
   },
   typingEmulation: { enabled: true, speed: 300, maxDelay: 1.5 },
   metadata: {

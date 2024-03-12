@@ -59,19 +59,24 @@ export const resumeWebhookExecution = ({
     VariableWithUnknowValue[]
   >((newVariables, varMapping) => {
     if (!varMapping?.bodyPath || !varMapping.variableId) return newVariables
-    const existingVariable = typebot.variables.find(byId(varMapping.variableId))
+    const existingVariable = typebot.variables.find(byId(varMapping.variableId));
+    console.log("exisiting variable",  JSON.stringify(existingVariable)   );
     if (!existingVariable) return newVariables
     const func = Function(
       'data',
       `return data.${parseVariables(typebot.variables)(varMapping?.bodyPath)}`
     )
+    console.log("func",func);
     try {
-      const value: unknown = func(response)
+      const value: unknown = func(response);
+      console.log("valueeeeee",value);
       return [...newVariables, { ...existingVariable, value }]
     } catch (err) {
       return newVariables
     }
   }, [])
+  console.log("new variables", JSON.stringify(newVariables) );
+  console.log("logs updated", JSON.stringify(logs) );
   if (newVariables.length > 0) {
     const newSessionState = updateVariablesInSession(state)(newVariables)
     return {

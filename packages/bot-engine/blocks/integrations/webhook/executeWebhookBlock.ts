@@ -81,6 +81,7 @@ export const executeWebhookBlock = async (
     }
   const { response: webhookResponse, logs: executeWebhookLogs } =
     await executeWebhook(parsedWebhook)
+  console.log("execute webhook response", JSON.stringify(webhookResponse)  )  
   return resumeWebhookExecution({
     state,
     block,

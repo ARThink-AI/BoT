@@ -19,6 +19,7 @@ import { formatPhoneNumber } from './blocks/inputs/phone/formatPhoneNumber'
 import { validateUrl } from './blocks/inputs/url/validateUrl'
 import { resumeChatCompletion } from './blocks/integrations/openai/resumeChatCompletion'
 import { resumeWebhookExecution } from './blocks/integrations/webhook/resumeWebhookExecution'
+import { resumeTrudeskExecution } from './blocks/integrations/trudesk/resumeTrudeskBlock' 
 import { upsertAnswer } from './queries/upsertAnswer'
 import { parseButtonsReply } from './blocks/inputs/buttons/parseButtonsReply'
 import { ParsedReply } from './types'
@@ -40,7 +41,7 @@ export const continueBotFlow = async (
   reply: string | undefined,
   { state, version }: Params
 ): Promise<ChatReply & { newSessionState: SessionState }> => {
-  console.log("replyy",reply);
+  console.log("continue bot flow called replyy",reply);
   
   let firstBubbleWasStreamed = false
   let newSessionState = { ...state }
@@ -84,7 +85,17 @@ export const continueBotFlow = async (
       response: JSON.parse(reply),
     })
     if (result.newSessionState) newSessionState = result.newSessionState
-  } else if (
+
+  } else if ( reply && block.type === IntegrationBlockType.TRUDESK ) {
+ const result = resumeTrudeskExecution({
+      state,
+      block,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+      response: JSON.parse(reply),
+    })
+    if (result.newSessionState) newSessionState = result.newSessionState
+  }  else if (
     block.type === IntegrationBlockType.OPEN_AI &&
     block.options.task === 'Create chat completion'
   ) {

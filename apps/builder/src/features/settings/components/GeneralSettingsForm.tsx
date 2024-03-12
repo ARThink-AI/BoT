@@ -7,10 +7,10 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { GeneralSettings, rememberUserStorages } from '@typebot.io/schemas'
-import React , { useState } from 'react'
+import React, { useState } from 'react'
 import { isDefined } from '@typebot.io/lib'
 import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
-import { Input , Button } from '@chakra-ui/react'
+import { Input, Button } from '@chakra-ui/react'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
@@ -24,7 +24,7 @@ export const GeneralSettingsForm = ({
   generalSettings,
   onGeneralSettingsChange,
 }: Props) => {
-  const [ ticketInfo , setTicketInfo ] = useState(generalSettings.ticketInfo);
+
   const toggleRememberUser = (isEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
@@ -40,31 +40,22 @@ export const GeneralSettingsForm = ({
       isInputPrefillEnabled,
     })
 
-    
+
 
   const handleHideQueryParamsChange = (isHideQueryParamsEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
       isHideQueryParamsEnabled,
     })
-    const handleVoiceChange = (isVoiceEnabled: boolean) =>
+  const handleVoiceChange = (isVoiceEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
       isVoiceEnabled,
     })
 
-    const handleTicketInfo = ( ticketInfo : string  ) => {
-      onGeneralSettingsChange({
-        ...generalSettings,
-        ticketInfo,
-      })
-    }
 
-    const handleTicketChange = ( isTicketEnabled : boolean ) => 
-    onGeneralSettingsChange({
-      ...generalSettings ,
-      isTicketEnabled,
-    })
+
+
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
   ) =>
@@ -96,23 +87,11 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
       />
-       <SwitchWithLabel
-        label="Toggle for enable ticketing system"
-        initialValue={generalSettings.isTicketEnabled ?? false}
-        onCheckChange={handleTicketChange}
-        moreInfoContent="Toggle for enable ticketing system "
-      />
-      { generalSettings.isTicketEnabled && (
-        <div style={{ display : "flex" , flexDirection : "row" , alignItems : "center", gap:  "10px" }} >
-      <Input placeholder='Enter Ticket Info' value={ticketInfo} onChange={ e => setTicketInfo(e?.target?.value) } />
-      { /* // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
-      //@ts-ignore */ }
-      <Button colorScheme='blue'  onClick={ () => handleTicketInfo(ticketInfo) } > Update  </Button>
-      </div>
-      )  }
-      
 
-      
+
+
+
+
 
       <SwitchWithRelatedSettings
         label={'Remember user'}

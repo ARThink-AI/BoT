@@ -38,6 +38,16 @@ export const listTicketTypes = authenticatedProcedure.meta({
         id: z.string(),
         name: z.string()
       })),
+      tags: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        normalized: z.string()
+      })),
+      status: z.array(z.object({
+        id: z.string(),
+        name: z.string()
+
+      })),
     })
     // @ts-ignore
   ).query(async ({ input: { credentialsId, workspaceId }, ctx: { user } }) => {
@@ -120,6 +130,38 @@ export const listTicketTypes = authenticatedProcedure.meta({
             name: usr.fullname
           }
         })
+
+        const ticketTagsResponse = await got.get(`${data.baseUrl}/api/v1/tickets/tags`, {
+          headers: {
+            accessToken: `${loginData.accessToken}`
+          }
+        }).json();
+
+
+
+
+        // @ts-ignore 
+        resData.tags = ticketTagsResponse.tags.map(tag => {
+          return {
+            id: tag._id,
+            name: tag.name,
+            normalized: tag.normalized
+          }
+        })
+        const ticketStatusResponse = await got.get(`${data.baseUrl}/api/v1/tickets/status`, {
+          headers: {
+            accessToken: `${loginData.accessToken}`
+          }
+        }).json();
+
+        // @ts-ignore
+        resData.status = ticketStatusResponse.status.map(g => {
+          return {
+            id: g._id,
+            name: g.name
+          }
+        })
+
         return resData
       } else {
         throw new TRPCError({

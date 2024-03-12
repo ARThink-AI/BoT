@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
-const openAITokensPage = 'https://platform.openai.com/account/api-keys'
+
 
 type Props = {
   isOpen: boolean
@@ -34,9 +34,9 @@ export const TrudeskCredentialsModal = ({
   const { workspace } = useWorkspace()
   const { showToast } = useToast()
   //const [apiKey, setApiKey] = useState('')
-  const [ userName,  setUserName ] = useState("");
-  const [ password , setPassword ] = useState("");
-  const [ baseUrl , setBaseUrl  ] = useState("");
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
   const [name, setName] = useState('')
 
   const [isCreating, setIsCreating] = useState(false)
@@ -71,8 +71,8 @@ export const TrudeskCredentialsModal = ({
         workspaceId: workspace.id,
         name,
         data: {
-          userName ,
-          password ,
+          userName,
+          password,
           baseUrl
 
         },
@@ -97,32 +97,32 @@ export const TrudeskCredentialsModal = ({
               debounceTimeout={0}
             />
             <TextInput
-             isRequired 
-             label="Base Url"
-             onChange={setBaseUrl}
-             placeholder='Enter Base Url'
-             withVariableButton={false}
-             debounceTimeout={0}
+              isRequired
+              label="Base Url"
+              onChange={setBaseUrl}
+              placeholder='Enter Base Url'
+              withVariableButton={false}
+              debounceTimeout={0}
             />
             <TextInput
-             isRequired
-             type="text"
-             label="User Name"
-             onChange={setUserName}
-             placeholder='Enter User Name'
-             withVariableButton={false}
-             debounceTimeout={0}
+              isRequired
+              type="text"
+              label="User Name"
+              onChange={setUserName}
+              placeholder='Enter User Name'
+              withVariableButton={false}
+              debounceTimeout={0}
 
             />
             <TextInput
-             isRequired
-             type="text"
-             label="Password"
-             onChange={ setPassword }
-             placeholder='Enter Password'
-             withVariableButton={false}
-             debounceTimeout={0}
-             />
+              isRequired
+              type="text"
+              label="Password"
+              onChange={setPassword}
+              placeholder='Enter Password'
+              withVariableButton={false}
+              debounceTimeout={0}
+            />
 
 
             {/* <TextInput
@@ -146,7 +146,7 @@ export const TrudeskCredentialsModal = ({
             <Alert status="warning">
               <AlertIcon />
               Make sure to add admin account of trudesk.
-              
+
             </Alert>
           </ModalBody>
 
@@ -154,7 +154,7 @@ export const TrudeskCredentialsModal = ({
             <Button
               type="submit"
               isLoading={isCreating}
-              isDisabled={ userName?.trim() === '' || name?.trim() === '' || password?.trim() === '' || baseUrl?.trim() === '' }
+              isDisabled={userName?.trim() === '' || name?.trim() === '' || password?.trim() === '' || baseUrl?.trim() === ''}
               colorScheme="blue"
             >
               Create

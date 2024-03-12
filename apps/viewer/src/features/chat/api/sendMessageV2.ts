@@ -167,77 +167,77 @@ export const sendMessageV2 = publicProcedure
               clientSideActions,
             })
        console.log("restarting session");
-       if ( typebot?.settings?.general?.isTicketEnabled && typebot?.settings?.general?.ticketInfo?.trim() != "" ) {
-          try {
-          console.log("is Ticket enabled");
-          const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
-          const decipher = crypto.createDecipher('aes-256-cbc', key);
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          let decryptedData = decipher.update( typebot?.settings?.general?.ticketInfo , 'hex', 'utf-8');
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          decryptedData += decipher.final('utf-8');
-          console.log("decrypted data", decryptedData );
-          let resp1 = await fetch("https://quadz.arthink.ai/api/v1/login", {
-            method : "POST",
-            headers: {
-              "Content-type" : "application/json"
-            },
-            body : decryptedData
+      //  if ( typebot?.settings?.general?.isTicketEnabled && typebot?.settings?.general?.ticketInfo?.trim() != "" ) {
+      //     try {
+      //     console.log("is Ticket enabled");
+      //     const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
+      //     const decipher = crypto.createDecipher('aes-256-cbc', key);
+      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //     // @ts-ignore
+      //     let decryptedData = decipher.update( typebot?.settings?.general?.ticketInfo , 'hex', 'utf-8');
+      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //     // @ts-ignore
+      //     decryptedData += decipher.final('utf-8');
+      //     console.log("decrypted data", decryptedData );
+      //     let resp1 = await fetch("https://quadz.arthink.ai/api/v1/login", {
+      //       method : "POST",
+      //       headers: {
+      //         "Content-type" : "application/json"
+      //       },
+      //       body : decryptedData
 
-          });
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+      //     });
+      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //     // @ts-ignore
           
-          resp1=  await resp1.json();
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          console.log("ticket login data", resp1.accessToken );
-          return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ticketAccessToken : resp1.accessToken,
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ticketOwnerId : resp1.user._id ,
-            sessionId: session.id,
-            typebot: typebot
-              ? {
-                  id: typebot.id,
-                  theme: typebot.theme,
-                  settings: typebot.settings,
-                }
-              : undefined,
-            messages,
-            input,
-            resultId,
-            dynamicTheme,
-            logs,
-            clientSideActions,
-          }
+      //     resp1=  await resp1.json();
+      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //     // @ts-ignore
+      //     console.log("ticket login data", resp1.accessToken );
+      //     return {
+      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //       // @ts-ignore
+      //       ticketAccessToken : resp1.accessToken,
+      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //       // @ts-ignore
+      //       ticketOwnerId : resp1.user._id ,
+      //       sessionId: session.id,
+      //       typebot: typebot
+      //         ? {
+      //             id: typebot.id,
+      //             theme: typebot.theme,
+      //             settings: typebot.settings,
+      //           }
+      //         : undefined,
+      //       messages,
+      //       input,
+      //       resultId,
+      //       dynamicTheme,
+      //       logs,
+      //       clientSideActions,
+      //     }
 
-        } catch(err) {
-          console.log("error happened while login");
-          return {
-            sessionId: session.id,
-            typebot: typebot
-              ? {
-                  id: typebot.id,
-                  theme: typebot.theme,
-                  settings: typebot.settings,
-                }
-              : undefined,
-            messages,
-            input,
-            resultId,
-            dynamicTheme,
-            logs,
-            clientSideActions,
-          }
-        } 
+      //   } catch(err) {
+      //     console.log("error happened while login");
+      //     return {
+      //       sessionId: session.id,
+      //       typebot: typebot
+      //         ? {
+      //             id: typebot.id,
+      //             theme: typebot.theme,
+      //             settings: typebot.settings,
+      //           }
+      //         : undefined,
+      //       messages,
+      //       input,
+      //       resultId,
+      //       dynamicTheme,
+      //       logs,
+      //       clientSideActions,
+      //     }
+      //   } 
 
-       } else {
+      //  } else {
         return {
           sessionId: session.id,
           typebot: typebot
@@ -254,7 +254,7 @@ export const sendMessageV2 = publicProcedure
           logs,
           clientSideActions,
         }
-       }
+      //  }
         // return {
         //   sessionId: session.id,
         //   typebot: typebot

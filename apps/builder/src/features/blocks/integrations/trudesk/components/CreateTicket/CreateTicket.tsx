@@ -2,13 +2,27 @@ import React, { useEffect, useState, ChangeEvent } from "react";
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { trpc } from '@/lib/trpc'
 import { useToast } from '@/hooks/useToast'
-import { VStack, Stack, FormLabel, Select } from '@chakra-ui/react';
+import { VStack, Stack, FormLabel, Select as S } from '@chakra-ui/react';
 import { TextInput } from "@/components/inputs";
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { Variable } from '@typebot.io/schemas'
 
+import Select from 'react-select';
+
+
+
 // @ts-ignore
 export const CreateTicket = ({ options, onOptionsChange }) => {
+
+  const [selectedOption, setSelectedOption] = useState(
+    options?.tags ? options?.tags.map((t: { id: string, name: string, normalized: string }) => {
+      return {
+        label: t.name,
+        value: t.id
+      }
+    }) : null
+  );
+  console.log("selected option", selectedOption);
 
   const { workspace } = useWorkspace();
   const { showToast } = useToast();
@@ -63,6 +77,26 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
     })
   }
 
+  const handleVariableChange2 = (variable?: Variable) => {
+    onOptionsChange({
+      ...options,
+      variableId1: variable?.id
+    })
+  }
+
+  const handleTagsChange = (tags: [{ label: string, value: string }]) => {
+
+    let tagsSelected = tags.map((t: { label: string, value: string }) => {
+      return tickettypesdata?.tags?.filter(tp => tp.id == t.value)[0]
+    });
+
+    onOptionsChange({
+      ...options,
+      tags: tagsSelected
+    })
+    setSelectedOption(tags);
+
+  }
 
 
 
@@ -108,7 +142,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
       <Stack direction={"row"} spacing={4} justifyContent={"space-evenly"} >
         <VStack spacing={1} >
           <FormLabel>Enter Owner  </FormLabel>
-          <Select
+          <S
             placeholder="Select Owner"
             value={options?.owner}
             onChange={handleOwnerChange}
@@ -120,14 +154,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
                 </option>
               )
             })}
-          </Select>
+          </S>
 
 
 
         </VStack>
         <VStack spacing={1} >
           <FormLabel>Enter Assignee   </FormLabel>
-          <Select
+          <S
             placeholder="Select Assignee"
             value={options?.assignee}
             onChange={handleAssigneeChange}
@@ -139,7 +173,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
                 </option>
               )
             })}
-          </Select>
+          </S>
 
         </VStack>
 
@@ -147,7 +181,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
       </Stack>
       <VStack spacing={1} >
         <FormLabel>Choose Group </FormLabel>
-        <Select
+        <S
           placeholder="Select Group"
           value={options?.group}
           onChange={handleGroupChange}
@@ -159,7 +193,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
               </option>
             )
           })}
-        </Select>
+        </S>
 
 
 
@@ -168,7 +202,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
 
       <VStack spacing={1} >
         <FormLabel>Choose type </FormLabel>
-        <Select
+        <S
+
           placeholder="Select Type"
           value={options?.type}
           onChange={handleTypeChange}
@@ -180,15 +215,42 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
               </option>
             )
           })}
-        </Select>
+        </S>
 
+
+      </VStack>
+      <VStack spacing={1} >
+        <FormLabel>Choose tags  </FormLabel>
+        <Select
+          theme={(theme) => ({
+            ...theme,
+            borderRadius: 0,
+            colors: {
+              ...theme.colors,
+              primary25: 'hotpink',
+              primary: 'black',
+              neutral0: "black"
+            },
+          })}
+
+          isMulti
+          defaultValue={selectedOption}
+          // @ts-ignore
+          onChange={handleTagsChange}
+          options={tickettypesdata?.tags?.map(t => {
+            return {
+              label: t.name,
+              value: t.id
+            }
+          })}
+        />
 
       </VStack>
 
       {options?.type && (
         <Stack direction={"row"} spacing={3} justifyContent={"flex-start"} >
           <FormLabel>Choose Priority  </FormLabel>
-          <Select
+          <S
             placeholder="Select Priority"
             value={options?.priority}
             onChange={handlePriorityChange}
@@ -200,7 +262,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
                 </option>
               )
             })}
-          </Select>
+          </S>
 
         </Stack>
       )}
@@ -210,6 +272,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
           onSelectVariable={handleVariableChange}
           placeholder="Search for a variable"
           initialVariableId={options?.variableId}
+        />
+      </VStack>
+      <VStack spacing={1} >
+        <FormLabel>Save Ticket UID  in variable</FormLabel>
+        <VariableSearchInput
+          onSelectVariable={handleVariableChange2}
+          placeholder="Search for a variable"
+          initialVariableId={options?.variableId1}
         />
       </VStack>
 
