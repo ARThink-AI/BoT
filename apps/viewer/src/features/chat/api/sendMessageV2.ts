@@ -11,7 +11,7 @@ import { restartSession } from '@typebot.io/bot-engine/queries/restartSession'
 import { continueBotFlow } from '@typebot.io/bot-engine/continueBotFlow'
 import { parseDynamicTheme } from '@typebot.io/bot-engine/parseDynamicTheme'
 import { isDefined } from '@typebot.io/lib/utils'
-import crypto from "crypto";
+
 export const sendMessageV2 = publicProcedure
   .meta({
     openapi: {

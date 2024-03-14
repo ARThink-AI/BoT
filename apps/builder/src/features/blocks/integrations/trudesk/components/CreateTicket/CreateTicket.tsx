@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { trpc } from '@/lib/trpc'
 import { useToast } from '@/hooks/useToast'
@@ -11,6 +11,7 @@ import Select from 'react-select';
 
 
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const CreateTicket = ({ options, onOptionsChange }) => {
 
@@ -86,7 +87,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
 
   const handleTagsChange = (tags: [{ label: string, value: string }]) => {
 
-    let tagsSelected = tags.map((t: { label: string, value: string }) => {
+    const tagsSelected = tags.map((t: { label: string, value: string }) => {
       return tickettypesdata?.tags?.filter(tp => tp.id == t.value)[0]
     });
 
@@ -117,17 +118,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
   );
   console.log("ticket types", tickettypesdata);
 
-  useEffect(() => {
-    try {
-      console.log("create ticket rendered", JSON.stringify(options));
-      console.log("workspace id", workspace?.id);
-    } catch (err) {
-      console.log("error", err);
-    }
 
-
-
-  }, []);
 
 
   return tickettypesdata && (
@@ -235,6 +226,7 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
 
           isMulti
           defaultValue={selectedOption}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           onChange={handleTagsChange}
           options={tickettypesdata?.tags?.map(t => {

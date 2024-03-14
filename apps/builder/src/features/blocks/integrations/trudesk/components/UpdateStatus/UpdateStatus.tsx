@@ -5,10 +5,11 @@ import { trpc } from '@/lib/trpc'
 import { useToast } from '@/hooks/useToast'
 
 
-import { VStack, FormLabel, Select as S, Stack } from '@chakra-ui/react';
+import { VStack, FormLabel, Select as S } from '@chakra-ui/react';
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { Variable } from '@typebot.io/schemas'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const UpdateStatus = ({ options, onOptionsChange }) => {
   const { workspace } = useWorkspace();

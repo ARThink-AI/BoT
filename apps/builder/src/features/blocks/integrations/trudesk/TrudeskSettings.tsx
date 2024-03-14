@@ -14,6 +14,7 @@ import { UpdateTags } from "./components/UpdateTags/UpdateTags";
 import { UpdateStatus } from "./components/UpdateStatus/UpdateStatus";
 import { CreateTicket } from "./components/CreateTicket/CreateTicket";
 import { DropdownList } from '@/components/DropdownList'
+
 type Props = {
   block: TrudeskBlock,
   onOptionsChange: (options: TrudeskBlock['options']) => void
@@ -132,7 +133,10 @@ const TrudeskTaskSettings = ({
   options,
   onOptionsChange,
 }: {
-  options: any
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+  // @ts-ignore
+  // options: any
+  options: TrudeskBlock['options']
   onOptionsChange: (options: TrudeskBlock['options']) => void
 }) => {
   switch (options.task) {

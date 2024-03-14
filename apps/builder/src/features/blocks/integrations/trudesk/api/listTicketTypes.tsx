@@ -49,9 +49,11 @@ export const listTicketTypes = authenticatedProcedure.meta({
 
       })),
     })
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
   ).query(async ({ input: { credentialsId, workspaceId }, ctx: { user } }) => {
     try {
+      console.log("user", user);
       const credentials = await prisma.credentials.findUnique({
         where: {
           id: credentialsId,
@@ -81,17 +83,20 @@ export const listTicketTypes = authenticatedProcedure.meta({
       }
 
       if (loginData.success && loginData.accessToken) {
-        let resData = {};
+        const resData = {};
         const ticketTypesResponse = await got.get(`${data.baseUrl}/api/v1/tickets/types`, {
           headers: {
             accessToken: `${loginData.accessToken}`
           }
         }).json();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         resData.types = ticketTypesResponse.map(type => {
           return {
             id: type._id,
             name: type.name,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             priorities: type.priorities.map(p => {
               return {
                 id: p._id,
@@ -106,6 +111,7 @@ export const listTicketTypes = authenticatedProcedure.meta({
             accessToken: `${loginData.accessToken}`
           }
         }).json();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         resData.groups = ticketGroupsResponse.groups.map(g => {
           return {
@@ -123,6 +129,7 @@ export const listTicketTypes = authenticatedProcedure.meta({
           }
         }).json();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         resData.users = ticketUsersAndAssigneesResponse.filter(assignee => assignee.role.isAgent == true).map(usr => {
           return {
@@ -140,7 +147,8 @@ export const listTicketTypes = authenticatedProcedure.meta({
 
 
 
-        // @ts-ignore 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         resData.tags = ticketTagsResponse.tags.map(tag => {
           return {
             id: tag._id,
@@ -154,6 +162,7 @@ export const listTicketTypes = authenticatedProcedure.meta({
           }
         }).json();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         resData.status = ticketStatusResponse.status.map(g => {
           return {

@@ -9,6 +9,7 @@ import { VStack, FormLabel, Select as S, Stack } from '@chakra-ui/react';
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { Variable } from '@typebot.io/schemas'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const UpdatePriority = ({ options, onOptionsChange }) => {
   const { workspace } = useWorkspace();

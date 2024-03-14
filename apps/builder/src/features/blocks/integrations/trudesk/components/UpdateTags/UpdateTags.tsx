@@ -8,6 +8,7 @@ import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { Variable } from '@typebot.io/schemas'
 import Select from 'react-select';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const UpdateTags = ({ options, onOptionsChange }) => {
   const [selectedOption, setSelectedOption] = useState(
@@ -51,7 +52,7 @@ export const UpdateTags = ({ options, onOptionsChange }) => {
 
   const handleTagsChange = (tags: [{ label: string, value: string }]) => {
 
-    let tagsSelected = tags.map((t: { label: string, value: string }) => {
+    const tagsSelected = tags.map((t: { label: string, value: string }) => {
       return tickettypesdata?.tags?.filter(tp => tp.id == t.value)[0]
     });
 
@@ -81,6 +82,7 @@ export const UpdateTags = ({ options, onOptionsChange }) => {
 
           isMulti
           defaultValue={selectedOption}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           onChange={handleTagsChange}
           options={tickettypesdata?.tags?.map(t => {

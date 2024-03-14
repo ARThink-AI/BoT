@@ -2,6 +2,7 @@ import React from "react";
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { VStack, FormLabel } from '@chakra-ui/react';
 import { Variable } from '@typebot.io/schemas'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const CreateNote = ({ options, onOptionsChange }) => {
   const handleVariableChange = (variable?: Variable) => {

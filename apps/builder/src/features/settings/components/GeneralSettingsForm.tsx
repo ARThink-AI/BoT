@@ -7,10 +7,10 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { GeneralSettings, rememberUserStorages } from '@typebot.io/schemas'
-import React, { useState } from 'react'
+import React from 'react'
 import { isDefined } from '@typebot.io/lib'
 import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
-import { Input, Button } from '@chakra-ui/react'
+// import { Input, Button } from '@chakra-ui/react'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
