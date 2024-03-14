@@ -89,6 +89,8 @@ export const UpdateTags = ({ options, onOptionsChange }) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           onChange={handleTagsChange}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           options={tickettypesdata?.tags?.map(t => {
             return {
               label: t.name,
