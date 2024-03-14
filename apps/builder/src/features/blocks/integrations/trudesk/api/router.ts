@@ -1,8 +1,7 @@
 import { router } from '@/helpers/server/trpc'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-import { listTicketTypes } from './listtickettypes'
+
+import { listTicketType } from './listTicketType' 
 export const trudeskRouter = router({
-  listTicketTypes : listTicketTypes
+  listTicketTypes : listTicketType
 })
 

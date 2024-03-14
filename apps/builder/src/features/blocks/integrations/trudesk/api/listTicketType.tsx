@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { decrypt } from '@typebot.io/lib/api/encryption/decrypt'
 import got from 'got'
 
-export const listTicketTypes = authenticatedProcedure.meta({
+export const listTicketType = authenticatedProcedure.meta({
   openapi: {
     method: 'GET',
     path: '/trudesk/tickettypes',
