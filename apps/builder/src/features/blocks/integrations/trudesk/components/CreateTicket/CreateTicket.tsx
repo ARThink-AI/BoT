@@ -161,6 +161,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
             value={options?.assignee}
             onChange={handleAssigneeChange}
           >
+            {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
             {tickettypesdata?.users?.map(usr => {
               return (
                 <option value={usr.id} key={usr.id}>
@@ -181,6 +183,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
           value={options?.group}
           onChange={handleGroupChange}
         >
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {tickettypesdata?.groups?.map(usr => {
             return (
               <option value={usr.id} key={usr.id}>
@@ -203,6 +207,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
           value={options?.type}
           onChange={handleTypeChange}
         >
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {tickettypesdata?.types?.map(usr => {
             return (
               <option value={usr.id} key={usr.id}>
@@ -251,6 +257,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
             value={options?.priority}
             onChange={handlePriorityChange}
           >
+            {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
             {tickettypesdata?.types?.filter(t => t.id == options.type)[0].priorities.map(usr => {
               return (
                 <option value={usr.id} key={usr.id}>

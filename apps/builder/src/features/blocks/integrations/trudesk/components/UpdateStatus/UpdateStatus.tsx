@@ -80,6 +80,8 @@ export const UpdateStatus = ({ options, onOptionsChange }) => {
           value={options?.status}
           onChange={handleStatusChange}
         >
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {tickettypesdata?.status?.map(usr => {
             return (
               <option value={usr.id} key={usr.id}>

@@ -80,6 +80,8 @@ export const UpdateAssigneeAndGroup = ({ options, onOptionsChange }) => {
           value={options?.assignee}
           onChange={handleAssigneeChange}
         >
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {tickettypesdata?.users?.map(usr => {
             return (
               <option value={usr.id} key={usr.id}>
@@ -97,6 +99,8 @@ export const UpdateAssigneeAndGroup = ({ options, onOptionsChange }) => {
           value={options?.group}
           onChange={handleGroupChange}
         >
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {tickettypesdata?.groups?.map(usr => {
             return (
               <option value={usr.id} key={usr.id}>
