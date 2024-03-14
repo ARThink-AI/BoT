@@ -88,6 +88,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
   const handleTagsChange = (tags: [{ label: string, value: string }]) => {
 
     const tagsSelected = tags.map((t: { label: string, value: string }) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return tickettypesdata?.tags?.filter(tp => tp.id == t.value)[0]
     });
 
