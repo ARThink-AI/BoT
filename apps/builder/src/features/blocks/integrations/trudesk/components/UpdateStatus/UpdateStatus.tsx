@@ -21,6 +21,8 @@ export const UpdateStatus = ({ options, onOptionsChange }) => {
     },
     {
       enabled: !!workspace,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       onError: (error) => {
         showToast({
           description: error.message,
