@@ -142,6 +142,8 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
             value={options?.owner}
             onChange={handleOwnerChange}
           >
+            {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
             {tickettypesdata?.users?.map(usr => {
               return (
                 <option value={usr.id} key={usr.id}>
