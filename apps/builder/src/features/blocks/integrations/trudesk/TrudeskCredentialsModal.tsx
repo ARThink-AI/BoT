@@ -83,7 +83,7 @@ export const TrudeskCredentialsModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add Trudesk account</ModalHeader>
+        <ModalHeader>Add Quadz account</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={createTrudeskCredentials}>
           <ModalBody as={Stack} spacing="6">
@@ -144,7 +144,7 @@ export const TrudeskCredentialsModal = ({
             /> */}
             <Alert status="warning">
               <AlertIcon />
-              Make sure to add admin account of trudesk.
+              Make sure to add admin account of Quadz.
 
             </Alert>
           </ModalBody>

@@ -254,7 +254,7 @@ export default {
   'editor.sidebarBlock.pabbly.label': 'Pabbly',
   'editor.sidebarBlock.chatwoot.label': 'Chatwoot',
   'editor.sidebarBlock.openai.label': 'OpenAI',
-  'editor.sidebarBlock.trudesk.label': 'TruDesk',
+  'editor.sidebarBlock.trudesk.label': 'Quadz',
   'editor.sidebarBlock.pixel.label': 'Pixel',
   'editor.sidebarBlock.zemanticAi.label': 'Zemantic AI',
   'editor.sidebarBlock.flowwise.label': 'Flow Wise',

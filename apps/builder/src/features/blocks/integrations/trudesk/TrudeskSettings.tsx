@@ -97,7 +97,7 @@ export const TrudeskSettings = ({
             currentCredentialsId={options?.credentialsId}
             onCredentialsSelect={updateCredentialsId}
             onCreateNewClick={onOpen}
-            credentialsName="Trudesk account"
+            credentialsName="Quadz account"
           />
           <TrudeskCredentialsModal
             isOpen={isOpen}
