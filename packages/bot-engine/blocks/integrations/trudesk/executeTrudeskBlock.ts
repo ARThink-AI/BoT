@@ -4,7 +4,7 @@ import {
   ReplyLog ,
   WebhookResponse
 } from "@typebot.io/schemas";
-import { byId } from '@typebot.io/lib'
+import { byId  } from '@typebot.io/lib'
 
 import got , { HTTPError }  from "got";
 import { ExecuteIntegrationResponse } from '../../../types'
@@ -12,6 +12,8 @@ import prisma from '@typebot.io/lib/prisma'
 import { decrypt } from "@typebot.io/lib/api/encryption/decrypt";  
 
 import { resumeTrudeskExecution } from "./resumeTrudeskBlock";
+
+
 
 export const executeTrudeskBlock = async (
   state: SessionState,
@@ -36,6 +38,23 @@ export const executeTrudeskBlock = async (
   console.log("data decrypted",data);
 
   if ( block.options.task == "Create Ticket" ) {
+    let variableRegex = /{{(.*?)}}/g;
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    let variables  = block.options?.subject?.match(variableRegex);
+    if ( variables  ) {
+     for ( let variable  of variables ) {
+      let variableName = variable.slice(2, -2);
+      let typebotVariable = typebot.variables.find( (variable) => variable.name === variableName );
+      if ( typebotVariable  ) {
+          let variableValue = typebotVariable.value;
+          console.log("variableValue",variableValue);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    block.options.subject =  block.options?.subject?.replace(variable, variableValue );
+      } 
+     }
+    }
     const { response: webhookResponse, logs: executeWebhookLogs } =
     await createTicket(data,block);
     return resumeTrudeskExecution({
@@ -47,6 +66,7 @@ export const executeTrudeskBlock = async (
   } else if ( block.options.task == "Create Note" ) {
     let ticketId;
     let note;
+    
     if ( block.options.variableId1 ) {
       const existingTicketIdVariable = typebot.variables.find(byId(block.options.variableId1));
       ticketId = existingTicketIdVariable?.value;
