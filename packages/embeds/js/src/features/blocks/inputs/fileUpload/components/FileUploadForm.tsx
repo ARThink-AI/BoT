@@ -122,13 +122,14 @@ export const FileUploadForm = (props: Props) => {
     )
 
   return (
-    <form class="flex flex-col w-full gap-2" onSubmit={handleSubmit}>
+    <form class="flex flex-col 	justify-center items-center w-full gap-2" onSubmit={handleSubmit}>
       <label
         for="dropzone-file"
         class={
-          'typebot-upload-input py-6 flex flex-col justify-center items-center w-full bg-gray-50 border-2 border-gray-300 border-dashed cursor-pointer hover:bg-gray-100 px-8 ' +
+          'typebot-upload-input py-6 flex flex-col justify-center  items-center lg:w-2/3 md:w-2/3 sm:w-full border-2 border-gray-500 border-dashed  cursor-pointer hover:bg-gray-50 px-8 ' +
           (isDraggingOver() ? 'dragging-over' : '')
         }
+        style={{ "border-radius": '24px' }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDropFile}
@@ -136,13 +137,12 @@ export const FileUploadForm = (props: Props) => {
         <Switch>
           <Match when={isUploading()}>
             <Show when={selectedFiles().length > 1} fallback={<Spinner />}>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div class="w-full bg-gray-200 flex justify-center gap-2 items-center rounded-full h-2.5">
                 <div
                   class="upload-progress-bar h-2.5 rounded-full"
                   style={{
-                    width: `${
-                      uploadProgressPercent() > 0 ? uploadProgressPercent : 10
-                    }%`,
+                    width: `${uploadProgressPercent() > 0 ? uploadProgressPercent : 10
+                      }%`,
                     transition: 'width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 />
@@ -156,7 +156,7 @@ export const FileUploadForm = (props: Props) => {
                   <span class="relative">
                     <FileIcon />
                     <div
-                      class="total-files-indicator flex items-center justify-center absolute -right-1 rounded-full px-1 w-4 h-4"
+                      class="total-files-indicator flex items-center justify-center absolute -right-1 px-1 w-4 h-4"
                       style={{ bottom: '5px' }}
                     >
                       {selectedFiles().length}
@@ -164,7 +164,7 @@ export const FileUploadForm = (props: Props) => {
                   </span>
                 </Show>
                 <p
-                  class="text-sm text-gray-500 text-center"
+                  class="text-sm md:text-base lg:text-lg text-gray-500 text-center my-3"
                   innerHTML={props.block.options.labels.placeholder}
                 />
               </div>
@@ -212,10 +212,9 @@ export const FileUploadForm = (props: Props) => {
             </Show>
             <SendButton type="submit" disableIcon>
               {props.block.options.labels.button ===
-              defaultFileInputOptions.labels.button
-                ? `Upload ${selectedFiles().length} file${
-                    selectedFiles().length > 1 ? 's' : ''
-                  }`
+                defaultFileInputOptions.labels.button
+                ? `Upload ${selectedFiles().length} file${selectedFiles().length > 1 ? 's' : ''
+                }`
                 : props.block.options.labels.button}
             </SendButton>
           </div>
@@ -229,30 +228,22 @@ export const FileUploadForm = (props: Props) => {
 }
 
 const UploadIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    class="mb-3 text-gray-500"
-  >
-    <polyline points="16 16 12 12 8 16" />
-    <line x1="12" y1="12" x2="12" y2="21" />
-    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-    <polyline points="16 16 12 12 8 16" />
-  </svg>
+  <svg xmlns="http://www.w3.org/2000/svg"
+    height="40px"
+    viewBox="0 -960 960 960"
+    width="40px">
+    <path d="M440-367v127q0 17 11.5 28.5T480-200q17 0 28.5-11.5T520-240v-127l36
+     36q6 6 13.5 9t15 2.5q7.5-.5 14.5-3.5t13-9q11-12 11.5-28T612-388L508-492q-6-6-13-8.5t-15-2.5q-8 0-15
+      2.5t-13 8.5L348-388q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM240-80q-33 
+      0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11
+       11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560q0 17 11.5 28.5T560-600h160L520-800v160Z" fill="#4A7194" /></svg>
 )
 
 const FileIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="200px"
+    height="200px"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
