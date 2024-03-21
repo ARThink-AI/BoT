@@ -19,6 +19,7 @@ export const Buttons = (props: Props) => {
   let inputRef: HTMLInputElement | undefined
   const [filteredItems, setFilteredItems] = createSignal(props.defaultItems)
   const [selectedDropdownItem, setSelectedDropdownItem] = createSignal("");
+  const [isSelected, setISelected] = createSignal(false);
   const [audioStarted, setAudioStarted] = createSignal(false);
   const [audioInstance, setAudioInstance] = createSignal(null);
 
@@ -102,51 +103,7 @@ export const Buttons = (props: Props) => {
 
   onMount(async () => {
     if (!isMobile() && inputRef) inputRef.focus()
-    //     try {
-    //       let finalText = "";
-    //    if ( props.defaultItems.length == 1 ) {
-    //      finalText = props?.defaultItems[0]?.content ? props.defaultItems[0].content :  "";
-    //    } else {
-    //     finalText = "Choose from " +
-    //     props.defaultItems.map((item, index) => {
-    //       if (index === props.defaultItems.length - 1) {
-    //         return "and " + item.content;
-    //       } else {
-    //         return item.content;
-    //       }
-    //     }).join(", ")
-    //    }
-    //   //  const response = await fetch(`http://localhost:3006/data/${encodeURIComponent(finalText)}`);
-    //   //  const result = await response.json();
-    //   const response = await fetch(`${ env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE }/api/integrations/texttospeech`,{
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json', // Set the appropriate content type
-    //       // Add any other headers as needed
-    //     },
-    //     body: JSON.stringify({ text: finalText }),
-    //   });
-    //   let result = await response.json();
-    //   result = result.message
-    //    if (result.audioData) {
-    //      const audioBlob = base64toBlob(result.audioData, 'audio/mp3');
-    //      const audioUrl = URL.createObjectURL(audioBlob);
 
-    //      const audio = new Audio(audioUrl);
-    //      setAudioInstance(audio);
-    //      // setAudioData(audio)
-    //      checkAudioStart(audio);
-    //  } else {
-    //    console.error('Error in response:', result);
-    //  }
-
-    //     } catch(error) {
-    //       console.error('Error:', error);
-    //       // localStorage.setItem(AUDIO_PLAYING_KEY,  'false');
-    //       localStorage.setItem(AUDIO_PLAYING_KEY, 'false');
-    //   setAudioStarted(true);
-    //       // setIsAudioPlaying(false);
-    //     } 
   })
 
   const handleClick = (itemIndex: number) =>
@@ -154,9 +111,9 @@ export const Buttons = (props: Props) => {
 
   const handleDropdownSubmit = () => {
     if (selectedDropdownItem().trim() == "") return
-    let selectedItem = selectedDropdownItem();
+    const selectedItem = selectedDropdownItem();
     console.log("selected item", selectedItem);
-    let content = filteredItems().filter(item => item.id == selectedItem)[0].content;
+    const content = filteredItems().filter(item => item.id == selectedItem)[0].content;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     props.onSubmit({ value: content })
@@ -193,17 +150,20 @@ export const Buttons = (props: Props) => {
       </Show>
 
       <Show when={props.options?.isDropdown} >
-        <div class={'flex flex-wrap justify-end gap-2'} >
-          <div style={{ display: "flex", "flex-direction": "column", "gap": "8px", "align-items": "flex-end" }} >
-            <select onChange={(e) => setSelectedDropdownItem(e?.target?.value)} value={selectedDropdownItem()} >
-              <option disabled selected value="" > Select Item  </option>
+        <div class={'flex justify-end gap-2'} >
+          <div style={{ display: "flex", "flex-direction": "column", "align-items": "flex-end" }}  >
+            <select class='p-2 border-2 border-gray-300 focus:outline-none focus:ring focus:ring-blue-700 appearance-none , rounded-md px-4 py-2 lg:w-72 md:w-2/3 sm:w-full ' onChange={(e) => {
+              setSelectedDropdownItem(e?.target?.value)
+              setISelected(true)
+            }} value={selectedDropdownItem()} >
+              <option disabled selected value="" > Select</option>
               <For each={filteredItems()}>
                 {(item, index) => (
                   <option value={item.id} > {item.content}   </option>
                 )}
               </For>
             </select>
-            <button onClick={handleDropdownSubmit} > Send  </button>
+            <button hidden={!isSelected()} class="p-2.5 mt-2 w-1/4 text-white bg-blue-700 rounded" onClick={handleDropdownSubmit} > Send  </button>
           </div>
 
 
@@ -216,8 +176,9 @@ export const Buttons = (props: Props) => {
         when={!props.options?.isDropdown}
       >
         <div
+
           class={
-            'flex flex-wrap justify-end gap-2' +
+            'flex flex-wrap justify-end gap-2 ' +
             (props.options.isSearchable
               ? ' overflow-y-scroll max-h-80 rounded-md hide-scrollbar'
               : '')
@@ -226,13 +187,17 @@ export const Buttons = (props: Props) => {
           <For each={filteredItems()}>
             {(item, index) => (
               <span class={'relative' + (isMobile() ? ' w-full' : '')}>
+
                 <Button
                   on:click={() => handleClick(index())}
                   data-itemid={item.id}
                   class="w-full"
+
                 >
                   {item.content}
                 </Button>
+
+
                 {props.inputIndex === 0 && props.defaultItems.length === 1 && (
                   <span class="flex h-3 w-3 absolute top-0 right-0 -mt-1 -mr-1 ping">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full brightness-200 opacity-75" />
