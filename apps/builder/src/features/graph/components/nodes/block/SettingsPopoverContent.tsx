@@ -32,7 +32,7 @@ import { TextInputSettings } from '@/features/blocks/inputs/textInput/components
 import { GoogleAnalyticsSettings } from '@/features/blocks/integrations/googleAnalytics/components/GoogleAnalyticsSettings'
 import { SendEmailSettings } from '@/features/blocks/integrations/sendEmail/components/SendEmailSettings'
 import { WebhookSettings } from '@/features/blocks/integrations/webhook/components/WebhookSettings';
-import { FlowwiseSettings  } from "@/features/blocks/integrations/flowwise/components/FlowwiseSettings";
+import { FlowwiseSettings } from "@/features/blocks/integrations/flowwise/components/FlowwiseSettings";
 import { ZapierSettings } from '@/features/blocks/integrations/zapier/components/ZapierSettings'
 import { RedirectSettings } from '@/features/blocks/logic/redirect/components/RedirectSettings'
 import { SetVariableSettings } from '@/features/blocks/logic/setVariable/components/SetVariableSettings'
@@ -47,6 +47,7 @@ import { ChatwootSettings } from '@/features/blocks/integrations/chatwoot/compon
 import { AbTestSettings } from '@/features/blocks/logic/abTest/components/AbTestSettings'
 import { PictureChoiceSettings } from '@/features/blocks/inputs/pictureChoice/components/PictureChoiceSettings'
 import { BarCodeInputSettings } from '@/features/blocks/inputs/barCodeReader/components/BarCodeReaderSettings';
+import { CardInputSettings } from '@/features/blocks/inputs/card/components/CardSettings';
 import { SettingsHoverBar } from './SettingsHoverBar'
 import { PixelSettings } from '@/features/blocks/integrations/pixel/components/PixelSettings'
 import { ZemanticAiSettings } from '@/features/blocks/integrations/zemanticAi/ZemanticAiSettings'
@@ -184,13 +185,21 @@ export const BlockSettings = ({
     }
     case InputBlockType.BARCODE_READER: {
       return (
-       <BarCodeInputSettings
-       options={block.options}
+        <BarCodeInputSettings
+          options={block.options}
           onOptionsChange={updateOptions}
-       />
+        />
       )
     }
-    
+    case InputBlockType.CARD: {
+      return (
+        <CardInputSettings
+          options={block.options}
+          onOptionsChange={updateOptions}
+        />
+      )
+    }
+
     case InputBlockType.PAYMENT: {
       return (
         <PaymentSettings
@@ -290,7 +299,7 @@ export const BlockSettings = ({
       return <ZapierSettings block={block} onOptionsChange={updateOptions} />
     }
     case IntegrationBlockType.FLOWWISE: {
-     return <FlowwiseSettings block={block} onOptionsChange={updateOptions} />
+      return <FlowwiseSettings block={block} onOptionsChange={updateOptions} />
     }
     case IntegrationBlockType.MAKE_COM: {
       return <MakeComSettings block={block} onOptionsChange={updateOptions} />
@@ -323,7 +332,7 @@ export const BlockSettings = ({
       return <OpenAISettings block={block} onOptionsChange={updateOptions} />
     }
     case IntegrationBlockType.TRUDESK: {
-      return <TrudeskSettings block={block} onOptionsChange={updateOptions}  />
+      return <TrudeskSettings block={block} onOptionsChange={updateOptions} />
     }
     case IntegrationBlockType.PIXEL: {
       return (

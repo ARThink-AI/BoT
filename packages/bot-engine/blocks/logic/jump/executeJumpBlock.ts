@@ -22,8 +22,10 @@ export const executeJumpBlock = (
 
   const portalEdge = createPortalEdge({
     to: { groupId: blockToJumpTo?.groupId, blockId: blockToJumpTo?.id },
-  })
+  });
+  console.log("portal edge", JSON.stringify(portalEdge) );
+  console.log("prev state", state );
   const newSessionState = addEdgeToTypebot(state, portalEdge)
-
+  console.log("new session state", JSON.stringify(newSessionState) );
   return { outgoingEdgeId: portalEdge.id, newSessionState }
 }

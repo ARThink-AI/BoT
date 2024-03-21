@@ -8,6 +8,7 @@ import {
 import { TrudeskCredentialsModal } from "./TrudeskCredentialsModal";
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { CreateNote } from "./components/CreateNote/CreateNote";
+import { CreateCustomer } from "./components/CreateCustomer/CreateCustomer";
 import { UpdateAssigneeAndGroup } from "./components/UpdateAssigneeAndGroup/UpdateAssigneeAndGroup";
 import { UpdatePriority } from "./components/UpdatePriority/UpdatePriority";
 import { UpdateTags } from "./components/UpdateTags/UpdateTags";
@@ -76,6 +77,13 @@ export const TrudeskSettings = ({
         break
       }
       case 'Update Status': {
+        onOptionsChange({
+          credentialsId: options?.credentialsId,
+          task
+        })
+        break
+      }
+      case 'Create Customer': {
         onOptionsChange({
           credentialsId: options?.credentialsId,
           task
@@ -180,6 +188,13 @@ const TrudeskTaskSettings = ({
     case 'Update Status':
       return (
         <UpdateStatus
+          options={options}
+          onOptionsChange={onOptionsChange}
+        />
+      )
+    case 'Create Customer':
+      return (
+        <CreateCustomer
           options={options}
           onOptionsChange={onOptionsChange}
         />

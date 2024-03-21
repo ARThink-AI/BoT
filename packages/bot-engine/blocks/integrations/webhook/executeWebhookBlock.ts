@@ -221,6 +221,7 @@ export const executeWebhook = async (
         description: `Webhook successfuly executed.`,
         details: {
           statusCode: response.statusCode,
+          body:  request.body,
           // request,
           response: safeJsonParse(response.body).data,
         },
@@ -246,6 +247,7 @@ export const executeWebhook = async (
         description: `Webhook returned an error.`,
         details: {
           statusCode: error.response.statusCode,
+          body:  request.body,
           // request,
           response,
         },
@@ -261,7 +263,8 @@ export const executeWebhook = async (
       status: 'error',
       description: `Webhook failed to execute.`,
       details: {
-        request,
+        body:  request.body,
+        // request,
         response,
       },
     })

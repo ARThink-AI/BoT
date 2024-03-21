@@ -183,6 +183,7 @@ export const listTicketType = authenticatedProcedure.meta({
 
 
     } catch (e) {
+      console.log("e", e);
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Could not list ticket types',

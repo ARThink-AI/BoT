@@ -24,6 +24,7 @@ import { FileInputContent } from '@/features/blocks/inputs/fileUpload/components
 import { NumberNodeContent } from '@/features/blocks/inputs/number/components/NumberNodeContent'
 import { PaymentInputContent } from '@/features/blocks/inputs/payment/components/PaymentInputContent'
 import { BarCodeInputContent } from '@/features/blocks/inputs/barCodeReader/components/BarCodeReaderContent';
+import { CardInputContent } from '@/features/blocks/inputs/card/components/CardContent';
 import { PhoneNodeContent } from '@/features/blocks/inputs/phone/components/PhoneNodeContent'
 import { RatingInputContent } from '@/features/blocks/inputs/rating/components/RatingInputContent'
 import { TextInputNodeContent } from '@/features/blocks/inputs/textInput/components/TextInputNodeContent'
@@ -111,6 +112,9 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     }
     case InputBlockType.BARCODE_READER: {
       return <BarCodeInputContent block={block} />
+    }
+    case InputBlockType.CARD: {
+      return <CardInputContent block={block} />
     }
     case InputBlockType.PHONE: {
       return (
