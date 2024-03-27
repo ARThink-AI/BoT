@@ -163,7 +163,7 @@ export const Buttons = (props: Props) => {
                 )}
               </For>
             </select>
-            <button hidden={!isSelected()} class="p-2.5 mt-2 w-1/4 text-white bg-blue-700 rounded" onClick={handleDropdownSubmit} > Send  </button>
+            <button hidden={!isSelected()} class="p-2.5 mt-2 lg:w-72 md:w-2/3 sm:w-full text-white bg-blue-700 rounded" onClick={handleDropdownSubmit} > Send  </button>
           </div>
 
 
