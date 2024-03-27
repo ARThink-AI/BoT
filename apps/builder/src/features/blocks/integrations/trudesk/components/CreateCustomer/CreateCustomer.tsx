@@ -64,7 +64,7 @@ export const CreateCustomer = ({ options, onOptionsChange }) => {
         <VariableSearchInput
           onSelectVariable={handleVariablePhoneChange}
           placeholder="Search for a phone  variable"
-          initialVariableId={options?.variableEmailId}
+          initialVariableId={options?.variablePhoneId}
         />
       </VStack>
       <VStack spacing={1} >
