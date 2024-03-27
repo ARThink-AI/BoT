@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { blockBaseSchema, credentialsBaseSchema } from '../baseSchemas'
 import { IntegrationBlockType } from './enums'
 
-export const trudeskTasks = ['Create Ticket', 'Create Note','Update Assignee and Group','Update Tags','Update Priority','Update Status'] as const
+export const trudeskTasks = ['Create Ticket', 'Create Note','Update Assignee and Group','Update Tags','Update Priority','Update Status' ,'Create Customer' ] as const
 
 export const createTicketResponseValues = [
   'Ticket Id'
@@ -32,13 +32,13 @@ const initialOptionsSchema = z
 const createTicketOptionsSchema = z.object({
   task: z.literal(trudeskTasks[0]),
   subject : z.string().optional() ,
-  owner : z.string().optional() ,
   assignee : z.string().optional() ,
   group : z.string().optional() ,
   type : z.string().optional() ,
   priority : z.string().optional() ,
   variableId : z.string().optional(),
   variableId1 : z.string().optional(),
+  variableId2 : z.string().optional(),
   tags : z.array( z.object( {
     id : z.string() ,
     name : z.string() ,
@@ -90,6 +90,14 @@ const updateStatusSchema = z.object({
   variableId1:  z.string().optional(),
 }).merge( trudeskBaseOptionsSchema );
 
+const createCustomerSchema = z.object({
+  task : z.literal( trudeskTasks[6] ),
+  variableNameId : z.string().optional(),
+  variablePhoneId : z.string().optional(),
+  variableEmailId : z.string().optional(),
+  variableCustomerId : z.string().optional(),
+  variableAddressId : z.string().optional()
+}).merge(trudeskBaseOptionsSchema);
 
 export const trudeskBlockSchema = blockBaseSchema.merge(
     z.object({
@@ -101,7 +109,8 @@ export const trudeskBlockSchema = blockBaseSchema.merge(
         updateAssigneeAndGroupSchema ,
         updateTagsSchema ,
         updatePrioritySchema ,
-        updateStatusSchema
+        updateStatusSchema ,
+        createCustomerSchema
         
       ]),
     })

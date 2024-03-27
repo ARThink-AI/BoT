@@ -38,12 +38,12 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
     })
 
   }
-  const handleOwnerChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    onOptionsChange({
-      ...options,
-      owner: e.target.value
-    })
-  }
+  // const handleOwnerChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  //   onOptionsChange({
+  //     ...options,
+  //     owner: e.target.value
+  //   })
+  // }
 
   const handleAssigneeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     onOptionsChange({
@@ -75,6 +75,13 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
     onOptionsChange({
       ...options,
       variableId: variable?.id
+    })
+  }
+
+  const handleVariableChange3 = (variable?: Variable) => {
+    onOptionsChange({
+      ...options,
+      variableId2: variable?.id
     })
   }
 
@@ -135,15 +142,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
         debounceTimeout={0}
       />
       <Stack direction={"row"} spacing={4} justifyContent={"space-evenly"} >
-        <VStack spacing={1} >
+        {/* <VStack spacing={1} >
           <FormLabel>Enter Owner  </FormLabel>
           <S
             placeholder="Select Owner"
             value={options?.owner}
             onChange={handleOwnerChange}
           >
-            {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore */ }
+           
             {tickettypesdata?.users?.map(usr => {
               return (
                 <option value={usr.id} key={usr.id}>
@@ -155,6 +161,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
 
 
 
+        </VStack> */}
+        <VStack spacing={1} >
+          <FormLabel>Pick  CustomerId  </FormLabel>
+          <VariableSearchInput
+            onSelectVariable={handleVariableChange3}
+            placeholder="Search for a variable"
+            initialVariableId={options?.variableId2}
+          />
         </VStack>
         <VStack spacing={1} >
           <FormLabel>Enter Assignee   </FormLabel>

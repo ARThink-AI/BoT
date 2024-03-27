@@ -36,8 +36,42 @@ export const executeTrudeskBlock = async (
     credentials.iv
   )) as { userName: string, password: string, baseUrl: string };
   console.log("data decrypted",data);
+  if ( block.options.task == "Create Customer" ) {
 
-  if ( block.options.task == "Create Ticket" ) {
+      let name ;  
+      let  phone ;
+      let  email ; 
+      let  address ;
+      if ( block.options?.variableNameId ) {
+        const existingTicketIdVariable = typebot.variables.find(byId(block.options.variableNameId));
+        name  = existingTicketIdVariable?.value;
+      }
+      if ( block.options?.variableEmailId ) {
+        const existingTicketIdVariable = typebot.variables.find(byId(block.options.variableEmailId));
+        email  = existingTicketIdVariable?.value;
+      }
+      if ( block.options?.variablePhoneId ) {
+        const existingTicketIdVariable = typebot.variables.find(byId(block.options.variablePhoneId));
+        phone   = existingTicketIdVariable?.value;
+      }
+      if ( block.options?.variableAddressId ) {
+        const existingTicketIdVariable = typebot.variables.find(byId(block.options.variableAddressId));
+        address   = existingTicketIdVariable?.value;
+      }
+      const { response: webhookResponse, logs: executeWebhookLogs } =
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    await createCustomer(data,block, name , email, phone,  address );
+    return resumeTrudeskExecution({
+      state,
+      block,
+      logs: executeWebhookLogs,
+      response: webhookResponse,
+    })
+
+
+  } else  if ( block.options.task == "Create Ticket" ) {
+    let customerId;
     let variableRegex = /{{(.*?)}}/g;
      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -55,8 +89,15 @@ export const executeTrudeskBlock = async (
       } 
      }
     }
+    if ( block.options.variableId2 ) {
+      const existingCustomerIdVariable = typebot.variables.find(byId(block.options.variableId2));
+      customerId = existingCustomerIdVariable?.value;
+    }
+
     const { response: webhookResponse, logs: executeWebhookLogs } =
-    await createTicket(data,block);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    await createTicket(data,block , customerId );
     return resumeTrudeskExecution({
       state,
       block,
@@ -686,7 +727,102 @@ export const createNote  = async (data :  { userName: string, password: string, 
 
 }
 
-export const createTicket = async (data :  { userName: string, password: string, baseUrl: string } ,block : TrudeskBlock ) :Promise<{ response: WebhookResponse; logs?: ReplyLog[] }> => {
+export const createCustomer = async ( data :  { userName: string, password: string, baseUrl: string } ,block : TrudeskBlock, name : string , email : string , phone:  string , address : string  ) :Promise<{ response: WebhookResponse; logs?: ReplyLog[] }> => {
+  const logs: ReplyLog[] = [];
+  try {
+    const loginResponse = await got.post(`${data.baseUrl}/api/v1/login`, {
+      json: {
+        username: data?.userName,
+        password: data?.password,
+
+      }
+    }).json();
+    const loginData = loginResponse as {
+      accessToken: string,
+      success: boolean
+    }
+    console.log("login data",loginData);
+    let payloadData = {};
+    if ( name && name.trim() != "" ) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+     payloadData.name = name;
+    }
+    if ( email && email.trim() != "" ) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+        payloadData.email = email;
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if ( phone && phone.trim() != "" ) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+      payloadData.phoneNumber = phone;
+    }
+   console.log("final payload data", JSON.stringify( payloadData ) );
+    const createCustomerResponse = await got.post(`${data.baseUrl}/api/v3/users/create`, {
+      json : {...payloadData},
+      headers : {
+        accessToken: `${loginData.accessToken}`
+      }
+    } ).json();
+    
+    logs.push({
+      status: 'success',
+      description: `Webhook successfuly executed.`,
+      details: {
+        statusCode: 200,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+        response: { id :  createCustomerResponse?.account?._id },
+      },
+    })
+
+    return {
+      response: {
+
+        statusCode: 200,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+        data: { id :  createCustomerResponse?.account?._id },
+      },
+      logs,
+    }
+
+  } catch(error) {
+    
+    if (error instanceof HTTPError) {
+
+    const response = {
+      statusCode: error.response.statusCode,
+      data: "",
+    }
+    logs.push({
+      status: 'error',
+      description: `Webhook returned an error.`,
+      details: {
+        statusCode: error.response.statusCode,
+        response,
+      },
+    })
+    return { response, logs }
+    }
+    const response = {
+      statusCode: 500,
+      data: { message: `Error from Typebot server: ${error}` },
+    }
+    console.error(error)
+    logs.push({
+      status: 'error',
+      description: `Webhook failed to execute.`,
+      details: null,
+    })
+    return { response, logs }
+  }
+}
+
+export const createTicket = async (data :  { userName: string, password: string, baseUrl: string } ,block : TrudeskBlock , customerId : (string | null)  ) :Promise<{ response: WebhookResponse; logs?: ReplyLog[] }> => {
   const logs: ReplyLog[] = []
   try {
     const loginResponse = await got.post(`${data.baseUrl}/api/v1/login`, {
@@ -719,16 +855,16 @@ export const createTicket = async (data :  { userName: string, password: string,
         issue: "Ticket created",
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-        owner: block.options.owner ,
+        owner: customerId ? customerId : block.options.assignee ,
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
         assignee: block.options.assignee,
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-        tags : block.options?.tags.reduce((accumulator, currentValue) => {
+        tags : block.options?.tags ? block.options?.tags.reduce((accumulator, currentValue) => {
           accumulator.push(currentValue.id);
           return accumulator;
-        }, [])
+        }, []) : []
        
 
       },

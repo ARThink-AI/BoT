@@ -65,6 +65,18 @@ export const resumeTrudeskExecution = ({
       newSessionState,
       logs,
     }
+    } else if ( block.options.task == "Create Customer" && block.options?.variableCustomerId ) {
+      const existingVariable = typebot.variables.find(byId(block.options?.variableCustomerId));
+        // @ts-ignore
+      let newVariables = [ { ...existingVariable , value : response.data.id  } ]
+      // @ts-ignore
+      const newSessionState = updateVariablesInSession(state)(newVariables)
+    return {
+      outgoingEdgeId: block.outgoingEdgeId,
+      newSessionState,
+      logs,
+    }
+        
     } else {
       return {
         outgoingEdgeId: block.outgoingEdgeId,
