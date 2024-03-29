@@ -49,6 +49,12 @@ export const Bubble = (props: BubbleProps) => {
   const [isBotStarted, setIsBotStarted] = createSignal(false)
   const [socketInstance, setSocketInstance] = createSignal(null);
   const [burgerMenu, setBurgerMenu] = createSignal(false)
+  const [isClicked, setIsClicked] = createSignal(false);
+
+  // Function to handle button click
+  const handleClick = () => {
+    setIsClicked(!isClicked());
+  };
 
   const toggleBurgerIcon = () => {
     setBurgerMenu(!burgerMenu())
@@ -182,7 +188,7 @@ export const Bubble = (props: BubbleProps) => {
         part="bot"
         style={{
 
-          height: 'calc(100% - 80px)',
+          height: 'calc(100% - 48px)',
           transition:
             'transform 200ms cubic-bezier(0, 1.2, 1, 1), opacity 150ms ease-out',
           'transform-origin':
@@ -193,18 +199,19 @@ export const Bubble = (props: BubbleProps) => {
           'z-index': 42424242,
         }}
         class={
-          'fixed rounded-lg w-full sm:w-[400px] max-h-[704px]' +
+          'fixed rounded-lg w-full sm:w-[400px] max-h-[604px]' +
           (isBotOpened() ? ' opacity-1' : ' opacity-0 pointer-events-none') +
           (props.theme?.button?.size === 'large'
             ? ' bottom-24'
             : ' bottom-20') +
-          (props.theme?.placement === 'left' ? ' sm:left-5' : ' sm:right-5')
+          (props.theme?.placement === 'left' ? ' sm:left-5' : ' sm:right-5') +
+          (isClicked() ? ' lg:w-[600px] lg:h-[506px]' : '')
         }
       >
 
 
         <Show when={isBotStarted()}>
-          <header class="bg-blue-500 text-white p-4 h-24" >
+          <header class="bg-blue-500 text-white p-4 h-12 absolute top-[-50px]  w-[100%]" >
             <div class="flex justify-between items-center">
               <div class="">
                 <button id="burgerIcon" onClick={toggleBurgerIcon} class="text-white focus:outline-none">
@@ -213,21 +220,22 @@ export const Bubble = (props: BubbleProps) => {
                   </svg>
                 </button>
                 {burgerMenu() && (
-                  <div class="absolute h-25% z-10 top-40 left-10 bg-gray-900 text-white p-4">
+                  <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
+                    <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
                     <ul>
-                      <li><a href="#">Menu Item 1</a></li>
-                      <li><a href="#">Menu Item 2</a></li>
-                      <li><a href="#">Menu Item 3</a></li>
+                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Download Chat</a></li>
+                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Email Chat</a></li>
+                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
                       {/* Add more menu items as needed */}
                     </ul>
-                    <button onClick={closeBurgerMenu} class="text-white focus:outline-none mt-2">Close</button>
+                    {/* <button onClick={closeBurgerMenu} class="text-black focus:outline-none mt-2">Close</button> */}
                   </div>
 
                 )}
               </div>
               <div />
               <div class="flex space-x-4">
-                <button id="minimizeButton" class="text-white focus:outline-none">
+                <button id="minimizeButton" onClick={handleClick} class="text-white focus:outline-none">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4 21C3.71667 21 3.47917 20.9042 3.2875 20.7125C3.09583 20.5208 3 20.2833 3 20V14C3 13.7167 3.09583 13.4792 3.2875 13.2875C3.47917 13.0958 3.71667 13 4 13C4.28333 13 4.52083 13.0958 4.7125 13.2875C4.90417 13.4792 5 13.7167 5 14V17.6L17.6 5H14C13.7167 5 13.4792 4.90417 13.2875 4.7125C13.0958 4.52083 13 4.28333 13 4C13 3.71667 13.0958 3.47917 13.2875 3.2875C13.4792 3.09583 13.7167 3 14 3H20C20.2833 3 20.5208 3.09583 20.7125 3.2875C20.9042 3.47917 21 3.71667 21 4V10C21 10.2833 20.9042 10.5208 20.7125 10.7125C20.5208 10.9042 20.2833 11 20 11C19.7167 11 19.4792 10.9042 19.2875 10.7125C19.0958 10.5208 19 10.2833 19 10V6.4L6.4 19H10C10.2833 19 10.5208 19.0958 10.7125 19.2875C10.9042 19.4792 11 19.7167 11 20C11 20.2833 10.9042 20.5208 10.7125 20.7125C10.5208 20.9042 10.2833 21 10 21H4Z" fill="white" />
                   </svg>
@@ -244,7 +252,7 @@ export const Bubble = (props: BubbleProps) => {
           </header>
           <footer class="bg-blue-200 text-white p-4 absolute bottom-[30px] z-10  w-[100%]">
             <div class="container flex justify-center gap-2 sm:w-full mx-auto">
-              <input class="w-50 lg:w-2/3 md:w-2/3 sm:w-full" type="text" /> <button class="rounded-full bg-blue-500"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <input class="w-50 lg:w-2/3 md:w-2/3 sm:w-full rounded-md text-[#364652]" type="text" /> <button class="rounded-full bg-blue-500"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_63_137)">
                   <rect width="36" height="36" rx="18" fill="#0077CC" />
                   <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
