@@ -15,11 +15,13 @@ export const cardOptionsSchema = cardOptionsBaseSchema
       heading : z.string().optional(),
       subHeading : z.string().optional(),
       inputs : z.array( z.object( {
+        id : z.string().optional(),
          type : z.string().optional() ,
          label : z.string().optional() ,
          placeholder : z.string().optional(),
          dynamicDataVariableId : z.string().optional(),
-         answerVariableId : z.string().optional()
+         answerVariableId : z.string().optional(),
+         values: z.array(z.string()).optional()
         
        
          

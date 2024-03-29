@@ -2,6 +2,7 @@
 import { Text, VStack, Button } from '@chakra-ui/react'
 import {
   CardInputOptions,
+  Variable,
   cardInputTypes
 
 
@@ -10,7 +11,9 @@ import React, { ChangeEvent } from 'react'
 
 import { TextInput } from '@/components/inputs'
 
-
+import { createId } from '@paralleldrive/cuid2'
+import { Select, FormLabel } from "@chakra-ui/react";
+import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 
 type Props = {
   options: CardInputOptions
@@ -18,6 +21,7 @@ type Props = {
 }
 
 export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
+  console.log("options input", options.inputs);
   const updateHeading = (heading?: string) =>
     onOptionsChange({
       ...options,
@@ -46,14 +50,15 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
   const addInput = () => {
     onOptionsChange({
       ...options,
-      inputs: options.inputs.concat({ type: "text", label: "", placeholder: "", dynamicDataVariableId: "", answerVariableId: "" })
+      inputs: options.inputs.concat({ id: createId(), type: "text", label: "", placeholder: "", dynamicDataVariableId: "", answerVariableId: "" })
     })
   }
   const removeInput = (index: number) => {
-
+    let inputs = [...options.inputs];
+    inputs.splice(index, 1)
     onOptionsChange({
       ...options,
-      inputs: options.inputs.filter((inp, i) => i != index)
+      inputs: inputs
     })
   }
 
@@ -80,14 +85,29 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
 
         return (
           <VStack spacing={2} >
-            <input
-              type="text"
-              defaultValue={input?.label ?? ''}
-              onChange={(e) => {
-                updateInput("label", e.target.value, i)
-              }}
-            />
-            {/* <TextInput
+            <VStack spacing={1} >
+              <FormLabel> Input type </FormLabel>
+              <Select
+
+                placeholder="Select Type"
+                value={input?.type}
+                onChange={(e) => {
+                  updateInput("type", e.target.value, i)
+                }}
+              >
+                {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore */ }
+                {cardInputTypes.map(usr => {
+                  return (
+                    <option value={usr} key={usr}>
+                      {usr}
+                    </option>
+                  )
+                })}
+              </Select>
+            </VStack>
+            <TextInput
+              key={input.id + "label"}
               label="Label"
               // @ts-ignore
               onChange={(e) => {
@@ -96,7 +116,40 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               defaultValue={input?.label ?? ''}
               placeholder="Label..."
               withVariableButton={false}
-            /> */}
+            />
+            <TextInput
+              key={input.id + "placeholder"}
+              label="Placeholder"
+              // @ts-ignore
+              onChange={(e) => {
+                updateInput("placeholder", e, i)
+              }}
+              defaultValue={input?.placeholder ?? ''}
+              placeholder="Placeholder..."
+              withVariableButton={false}
+            />
+            {input.type != "text" && input.type != "email" && input.type != "phone" && input.type != "textarea" &&
+              <VStack spacing={1} >
+                <FormLabel> Load dynamic data from variable</FormLabel>
+                <VariableSearchInput
+                  key={input.id + "dynamicDataVariableId"}
+                  // @ts-ignore
+                  onSelectVariable={(v: Variable) => updateInput("dynamicDataVariableId", v?.id, i)}
+                  placeholder="Search for a variable"
+                  initialVariableId={input?.dynamicDataVariableId}
+                />
+              </VStack>
+            }
+            <VStack spacing={1} >
+              <FormLabel>  Save answer  </FormLabel>
+              <VariableSearchInput
+                key={input.id + "answerVariableId"}
+                // @ts-ignore
+                onSelectVariable={(v: Variable) => updateInput("answerVariableId", v?.id, i)}
+                placeholder="Search for a variable"
+                initialVariableId={input?.answerVariableId}
+              />
+            </VStack>
             <Button onClick={() => removeInput(i)} > Remove </Button>
           </VStack>
         )

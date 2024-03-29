@@ -13,16 +13,18 @@ import type {
   Theme,
   UrlInputBlock,
   PictureChoiceBlock,
+  CardInputBlock
 } from '@typebot.io/schemas'
 import { InputBlockType } from '@typebot.io/schemas/features/blocks/inputs/enums'
 import { GuestBubble } from './bubbles/GuestBubble'
 import { BotContext, InputSubmitContent } from '@/types'
 import { TextInput } from '@/features/blocks/inputs/textInput'
-import {  BarCodeInput  } from '@/features/blocks/inputs/barCode/components/BarCode';
+import { BarCodeInput } from '@/features/blocks/inputs/barCode/components/BarCode';
 import { NumberInput } from '@/features/blocks/inputs/number'
 import { EmailInput } from '@/features/blocks/inputs/email'
 import { UrlInput } from '@/features/blocks/inputs/url'
 import { PhoneInput } from '@/features/blocks/inputs/phone'
+import { CardInput } from '@/features/blocks/inputs/card'
 import { DateForm } from '@/features/blocks/inputs/date'
 import { RatingForm } from '@/features/blocks/inputs/rating'
 import { FileUploadForm } from '@/features/blocks/inputs/fileUpload'
@@ -51,21 +53,21 @@ type Props = {
 
 export const InputChatBlock = (props: Props) => {
   // @ts-ignore
-  const [answer, setAnswer] = createSignal<string>( props?.block?.answer ? props?.block?.answer : null )
+  const [answer, setAnswer] = createSignal<string>(props?.block?.answer ? props?.block?.answer : null)
   const [formattedMessage, setFormattedMessage] = createSignal<string>()
 
   const handleSubmit = async ({ label, value }: InputSubmitContent) => {
-    console.log("entered input chat block", JSON.stringify(props) );
-    console.log("label",label);
-    console.log("value",value);
-    if ( label || value ) {
+    console.log("entered input chat block", JSON.stringify(props));
+    console.log("label", label);
+    console.log("value", value);
+    if (label || value) {
       setAnswer(label ?? value)
       props.onSubmit(value ?? label)
     } else {
       setAnswer("Hi there")
       props.onSubmit("Hi there")
     }
-    
+
 
   }
 
@@ -137,16 +139,16 @@ const Input = (props: {
   //       (props.block.options as PaymentInputOptions).labels.success ??
   //       'Success',
   //   })
-  const submitPaymentSuccess = (opp : any ) => {
-    console.log("props blocks optionssss", props.block.options , opp );
+  const submitPaymentSuccess = (opp: any) => {
+    console.log("props blocks optionssss", props.block.options, opp);
     // @ts-ignore
-    if (props.block.options.provider == "Razorpay"  ) {
-     console.log("entered razorpay");
-     props.onSubmit({
-      value:
-        `${(props.block.options as PaymentInputOptions).labels.success} payload ${opp}` ??
-        `Success payload ${opp}`,
-    })
+    if (props.block.options.provider == "Razorpay") {
+      console.log("entered razorpay");
+      props.onSubmit({
+        value:
+          `${(props.block.options as PaymentInputOptions).labels.success} payload ${opp}` ??
+          `Success payload ${opp}`,
+      })
     } else {
       console.log("entered stripe");
       props.onSubmit({
@@ -155,10 +157,10 @@ const Input = (props: {
           'Success',
       })
     }
-    
+
 
   }
-    
+
   return (
     <Switch>
       <Match when={props.block.type === InputBlockType.TEXT}>
@@ -173,6 +175,13 @@ const Input = (props: {
           block={props.block as TextInputBlock}
           defaultValue={getPrefilledValue()}
           onSubmit={onSubmit}
+        />
+      </Match>
+      <Match when={props.block.type === InputBlockType.CARD}>
+        <CardInput
+          onSubmit={onSubmit}
+          block={props.block as CardInputBlock}
+          defaultValue={getPrefilledValue()}
         />
       </Match>
       <Match when={props.block.type === InputBlockType.NUMBER}>
