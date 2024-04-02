@@ -3,7 +3,7 @@ import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 import { isNotDefined, isNotEmpty } from '@typebot.io/lib'
 import { getInitialChatReplyQuery } from '@/queries/getInitialChatReplyQuery'
 import { ConversationContainer } from './ConversationContainer'
-import { setIsMobile , isMobile } from '@/utils/isMobileSignal'
+import { setIsMobile, isMobile } from '@/utils/isMobileSignal'
 import { BotContext, InitialChatReply, OutgoingLog } from '@/types'
 import { ErrorMessage } from './ErrorMessage'
 import {
@@ -21,8 +21,8 @@ import { computePlainText } from '@/features/blocks/bubbles/textBubble/helpers/c
 
 
 export type BotProps = {
-  socket? : any;
-  socket1? : any;
+  socket?: any;
+  socket1?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   typebot: string | any
   isPreview?: boolean
@@ -40,26 +40,41 @@ export type BotProps = {
 export const Bot = (props: BotProps & { class?: string }) => {
 
 
-  console.log("bot socket1", props.socket1 );
+  console.log("bot socket1", props.socket1);
+  // console.log("prefiled variables", props.prefilledVariables);
 
-  
+
   const [initialChatReply, setInitialChatReply] = createSignal<
     InitialChatReply | undefined
-    // @ts-ignore
-  >(  sessionStorage.getItem("intialize") ? JSON.parse( sessionStorage.getItem("intialize") )  : undefined )
+  // @ts-ignore
+  >(sessionStorage.getItem("intialize") ? JSON.parse(sessionStorage.getItem("intialize")) : undefined)
   const [selectedLanguage, setSelectedLanguage] = createSignal('en-IN');
   // @ts-ignore
-  const [customCss, setCustomCss] = createSignal( sessionStorage.getItem("initialize_css") ? JSON.parse( sessionStorage.getItem("initialize_css") )  :  '' )
+  const [customCss, setCustomCss] = createSignal(sessionStorage.getItem("initialize_css") ? JSON.parse(sessionStorage.getItem("initialize_css")) : '')
   const [isInitialized, setIsInitialized] = createSignal(false)
   const [error, setError] = createSignal<Error | undefined>()
 
   const initializeBot = async () => {
-    
+    const urlParams = new URLSearchParams(location.search)
+    props.onInit?.()
+    const prefilledVariables: { [key: string]: string } = {}
+    urlParams.forEach((value, key) => {
+      prefilledVariables[key] = value
+    })
+    if (Object.hasOwn(prefilledVariables, 'reset')) {
+
+      sessionStorage.removeItem("intialize");
+      sessionStorage.removeItem("initialize_css");
+      sessionStorage.removeItem("bot_init");
+      sessionStorage.removeItem("chatchunks");
+
+    }
     // @ts-ignore  
-    if ( sessionStorage.getItem("bot_init") && JSON.parse( sessionStorage.getItem("bot_init") ) == true  ) {
-          return 
+    if (!Object.hasOwn(prefilledVariables, 'reset') && sessionStorage.getItem("bot_init") && JSON.parse(sessionStorage.getItem("bot_init")) == true) {
+
+      return
     } else {
-      sessionStorage.setItem("bot_init", "true" );
+      sessionStorage.setItem("bot_init", "true");
     }
     console.log("initialize bot");
     setIsInitialized(true);
@@ -67,14 +82,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
     sessionStorage.removeItem("live");
     sessionStorage.removeItem("liveChat");
 
-    const urlParams = new URLSearchParams(location.search)
-    props.onInit?.()
-    const prefilledVariables: { [key: string]: string } = {}
-    urlParams.forEach((value, key) => {
-      prefilledVariables[key] = value
-    })
+
     const typebotIdFromProps =
-      typeof props.typebot === 'string' ? props.typebot : undefined
+      typeof props.typebot === 'string' ? props.typebot : undefined;
+    console.log("prefilled vairables", prefilledVariables);
+
     const { data, error } = await getInitialChatReplyQuery({
       stripeRedirectStatus: urlParams.get('redirect_status') ?? undefined,
       typebot: props.typebot,
@@ -113,81 +125,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
         typebotIdFromProps,
         data.resultId
       )
-    if ( data.ticketAccessToken && data.ticketOwnerId && data.resultId ) {
-      try {
 
-    console.log("data",data);
-    let text = ["BoT - /n"];
-    for ( let i=0; i < data.messages.length ; i++ ) {
-       if ( data.messages[i].type == "text" ) {
-        // @ts-ignore
-          let plainText = computePlainText(data.messages[i]?.content?.richText);
-          text.push(plainText);
-       }
-    }
-    console.log("final text array", text );
-    let finalText = text.reduce( ( a , curr ) => a + "/n" + curr  );
-     
-      sessionStorage.setItem("ticketaccess", data.ticketAccessToken );
-      sessionStorage.setItem("ticketOwnerId", data.ticketOwnerId );
-      console.log("intial chat reply", JSON.stringify(data) );
-      let resp2 = await fetch("https://quadz.arthink.ai/api/v1/tickets/create", {
-        method : "POST", 
-        headers : {
-          "Content-type" : "application/json",
-          "accessToken" : data.ticketAccessToken
-        }, 
-        body : JSON.stringify({
-          subject: `New Customer Enquiry`,
-                        // group: "65c1cc159b1be8f60e7d58ef",
-                        group : "65d811c50d1d2c45b9395dd3",
-                        type: "65c1cc159b1be8f60e7d58eb",
-                        
-                        priority: "65c1cc38bdc5617ff78a7ff6",
-                        issue: "New Conversation for Quadz Bot",
-                        owner : data.ticketOwnerId ,
-                        assignee : data.ticketOwnerId
-        })
-      } );
-      resp2 = await resp2.json();
-      console.log("resp22", resp2 );
-      // @ts-ignore
-      sessionStorage.setItem("ticketId", resp2.ticket._id );
-      fetch("https://quadz.arthink.ai/api/v1/tickets/addnote", {
-         method : "POST" ,
-         headers:  {
-          "Content-type" : "application/json",
-          "accessToken" : data.ticketAccessToken
-         } ,
-        //  body : JSON.stringify( {
-        //   // @ts-ignore
-        //   _id : resp2.ticket._id ,
-        //   comment : [finalText],
-        //   note : false ,
-        //   ticketid : false 
-        //  } )
-         body : JSON.stringify( {
-          // @ts-ignore
-          ticketid : resp2.ticket._id ,
-          note  : finalText,
-          
-         } )
-
-      } ).then( result => {
-        console.log("got comment result", result );
-      } ).catch( err => {
-        console.log("error",err);
-      } )
-
-
-    } catch(err) {
-      console.log("ticket create error");
-    }
-    }  
     setInitialChatReply(data);
-    sessionStorage.setItem("intialize", JSON.stringify(data) );
+    sessionStorage.setItem("intialize", JSON.stringify(data));
     setCustomCss(data.typebot.theme.customCss ?? '')
-    sessionStorage.setItem("initialize_css", JSON.stringify(data.typebot.theme.customCss ?? '') );
+    sessionStorage.setItem("initialize_css", JSON.stringify(data.typebot.theme.customCss ?? ''));
 
     if (data.input?.id && props.onNewInputBlock)
       props.onNewInputBlock({
@@ -209,11 +151,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
   // };
 
   createEffect(() => {
-    console.log(" value to run intitalize bot or not  ", isNotDefined(props.typebot) || isInitialized() );
+    console.log(" value to run intitalize bot or not  ", isNotDefined(props.typebot) || isInitialized());
     // console.log("session storage", sessionStorage.getItem("aaaa")  );
     // console.log("live agent id", crypto.randomUUID() );
     if (isNotDefined(props.typebot) || isInitialized()) return
-    
+
     initializeBot().then()
   })
 
@@ -235,76 +177,76 @@ export const Bot = (props: BotProps & { class?: string }) => {
         {(error) => <ErrorMessage error={error} />}
       </Show>
       <Show when={initialChatReply()} keyed>
-        
+
         {(initialChatReply) => (
           <>
-          <BotContent
-            initializeBot={initializeBot}
-            socket={props.socket}
-            class={props.class}
-            initialChatReply={{
-              ...initialChatReply,
-              typebot: {
-                ...initialChatReply.typebot,
-                settings:
-                  typeof props.typebot === 'string'
-                    ? initialChatReply.typebot?.settings
-                    : props.typebot?.settings,
-                theme:
-                  typeof props.typebot === 'string'
-                    ? initialChatReply.typebot?.theme
-                    : props.typebot?.theme,
-              },
-            }}
-            context={{
-              selectedLanguage : selectedLanguage(),
-              apiHost: props.apiHost,
-              isPreview:
-                typeof props.typebot !== 'string' || (props.isPreview ?? false),
-              resultId: initialChatReply.resultId,
-              sessionId: initialChatReply.sessionId,
-              typebot: initialChatReply.typebot,
-            }}
-            onNewInputBlock={props.onNewInputBlock}
-            onNewLogs={props.onNewLogs}
-            onAnswer={props.onAnswer}
-            onEnd={props.onEnd}
-          />
-          <Show when={ initialChatReply.typebot.settings.general.isVoiceEnabled } >
-          <div style={ !isMobile() ? { position : "relative" , top  :"-50%" , left : "80%" , width : "100px" } : { position : "relative" , top : "-20%" , left : "5%" , width : "20px" } } >
-      <select value={ selectedLanguage() } onChange={ (evt) => {
-        console.log("vall", evt?.target?.value );
-        setSelectedLanguage(evt?.target?.value);
-        initializeBot();
-      }  } >
-        <option value="en-IN" > English  </option>
-        <option value="hi-IN" > Hindi  </option>
-        <option value="te-IN" > Telugu  </option>
-        <option value="ta-IN">  Tamil </option>
-        <option value="mr-IN" > Marathi  </option>
-        <option value="kn-IN" > Kannada  </option>
-        <option value="ml-IN" > Malayalam  </option>
-        <option value="bn-IN" > Bengali </option>
-      </select>
-    </div>
-    </Show>
-    </>
+            <BotContent
+              initializeBot={initializeBot}
+              socket={props.socket}
+              class={props.class}
+              initialChatReply={{
+                ...initialChatReply,
+                typebot: {
+                  ...initialChatReply.typebot,
+                  settings:
+                    typeof props.typebot === 'string'
+                      ? initialChatReply.typebot?.settings
+                      : props.typebot?.settings,
+                  theme:
+                    typeof props.typebot === 'string'
+                      ? initialChatReply.typebot?.theme
+                      : props.typebot?.theme,
+                },
+              }}
+              context={{
+                selectedLanguage: selectedLanguage(),
+                apiHost: props.apiHost,
+                isPreview:
+                  typeof props.typebot !== 'string' || (props.isPreview ?? false),
+                resultId: initialChatReply.resultId,
+                sessionId: initialChatReply.sessionId,
+                typebot: initialChatReply.typebot,
+              }}
+              onNewInputBlock={props.onNewInputBlock}
+              onNewLogs={props.onNewLogs}
+              onAnswer={props.onAnswer}
+              onEnd={props.onEnd}
+            />
+            <Show when={initialChatReply.typebot.settings.general.isVoiceEnabled} >
+              <div style={!isMobile() ? { position: "relative", top: "-50%", left: "80%", width: "100px" } : { position: "relative", top: "-20%", left: "5%", width: "20px" }} >
+                <select value={selectedLanguage()} onChange={(evt) => {
+                  console.log("vall", evt?.target?.value);
+                  setSelectedLanguage(evt?.target?.value);
+                  initializeBot();
+                }} >
+                  <option value="en-IN" > English  </option>
+                  <option value="hi-IN" > Hindi  </option>
+                  <option value="te-IN" > Telugu  </option>
+                  <option value="ta-IN">  Tamil </option>
+                  <option value="mr-IN" > Marathi  </option>
+                  <option value="kn-IN" > Kannada  </option>
+                  <option value="ml-IN" > Malayalam  </option>
+                  <option value="bn-IN" > Bengali </option>
+                </select>
+              </div>
+            </Show>
+          </>
         )}
-         {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+        {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
       <select>
         <option> English  </option>
         <option> Hindi  </option>
         <option> Telugu  </option>
       </select>
     </div> */}
-    
+
       </Show>
     </>
   )
 }
 
 type BotContentProps = {
-  initializeBot : any,
+  initializeBot: any,
   initialChatReply: InitialChatReply
   context: BotContext
   class?: string
@@ -312,14 +254,14 @@ type BotContentProps = {
   onAnswer?: (answer: { message: string; blockId: string }) => void
   onEnd?: () => void
   onNewLogs?: (logs: OutgoingLog[]) => void
-  socket : any
+  socket: any
 }
 
 const BotContent = (props: BotContentProps) => {
-  console.log("props context language", props.context.selectedLanguage )
+  console.log("props context language", props.context.selectedLanguage)
   let botContainer: HTMLDivElement | undefined
   let conversationContainer: HTMLDivElement | undefined
-  let videoRef : HTMLVideoElement | undefined
+  let videoRef: HTMLVideoElement | undefined
   let audioQueue: Queue
   let textQueue: Queue
   let audioUrlQueue: Queue
@@ -333,7 +275,7 @@ const BotContent = (props: BotContentProps) => {
 
   const [audioText, setAudioText] = createSignal('');
   const [nodeText, setNodeText] = createSignal('');
-  const [ liveAgent, setLiveAgent ] = createSignal(false);
+  const [liveAgent, setLiveAgent] = createSignal(false);
 
   let queueInterval: NodeJS.Timeout;
   const resizeObserver = new ResizeObserver((entries) => {
@@ -435,7 +377,7 @@ const BotContent = (props: BotContentProps) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text, type: "translate" , langCode  : props.context.selectedLanguage  }),
+        body: JSON.stringify({ text, type: "translate", langCode: props.context.selectedLanguage }),
       });
 
       if (response.ok && currentAudio.paused) {
@@ -521,7 +463,7 @@ const BotContent = (props: BotContentProps) => {
     }
   };
   onMount(() => {
-    console.log("on mount calleddddd");
+    console.log("on mount calleddddd", JSON.stringify(props));
     if (!botContainer) return
     resizeObserver.observe(botContainer)
     if (!conversationContainer) return
@@ -554,7 +496,7 @@ const BotContent = (props: BotContentProps) => {
     if (videoRef) {
       videoRef?.pause()
     }
-    
+
 
     // requestUserMedia();
   })
@@ -571,16 +513,16 @@ const BotContent = (props: BotContentProps) => {
     resizeObserver.unobserve(botContainer)
     observer.disconnect()
     if (props.initialChatReply.typebot.settings.general.isVoiceEnabled) {
-    // document.removeEventListener('click', handleDocumentClick);
-    document.removeEventListener('mousedown', handleDocumentClick);
-    const audio = audioRef()
-    audio.removeEventListener("ended", ended);
-    const id = intervalId();
-    if (id !== null) {
-      console.log("clearing interval with id", id);
-      clearInterval(id);
+      // document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('mousedown', handleDocumentClick);
+      const audio = audioRef()
+      audio.removeEventListener("ended", ended);
+      const id = intervalId();
+      if (id !== null) {
+        console.log("clearing interval with id", id);
+        clearInterval(id);
+      }
     }
-  }
 
   })
 
@@ -605,11 +547,11 @@ const BotContent = (props: BotContentProps) => {
         </div>
         </div> */}
         <div ref={conversationContainer} class="flex w-full h-full justify-center">
-          
+
           <ConversationContainer
             // liveAgent={liveAgent()}
             initializeBot={props.initializeBot}
-             socket={props.socket}
+            socket={props.socket}
             context={props.context}
             initialChatReply={props.initialChatReply}
             onNewInputBlock={props.onNewInputBlock}
@@ -620,35 +562,35 @@ const BotContent = (props: BotContentProps) => {
         </div>
         <Show
           when={props.initialChatReply.typebot.settings.general.isBrandingEnabled}
-         />
+        />
       </div>
 
-      <Show when={  props.initialChatReply.typebot.settings.general.isVoiceEnabled }>
-    <div style={ !isMobile() ? { position : "relative" , top  : "-60%" , left : "77%", width : "250px" } : { position : "relative" , top:  "-99%", left : "77%" , width : "60px"  } } >
-    <video 
-    ref={videoRef} 
-    loop 
-    // autoplay
-    // muted={ audioRef().paused ? true : false }   
-    muted={true}
-      poster="background.jpg">
-      <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-                </source>
-    </video>
-    </div>
-    {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
+      <Show when={props.initialChatReply.typebot.settings.general.isVoiceEnabled}>
+        <div style={!isMobile() ? { position: "relative", top: "-60%", left: "77%", width: "250px" } : { position: "relative", top: "-99%", left: "77%", width: "60px" }} >
+          <video
+            ref={videoRef}
+            loop
+            // autoplay
+            // muted={ audioRef().paused ? true : false }   
+            muted={true}
+            poster="background.jpg">
+            <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </source>
+          </video>
+        </div>
+        {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
       <select>
         <option> English  </option>
         <option> Hindi  </option>
         <option> Telugu  </option>
       </select>
     </div> */}
-    </Show>
+      </Show>
 
       {/* <div style={{ "margin-left": "70%", position: "relative" }} > */}
 
-        <LiteBadge botContainer={botContainer} />
+      <LiteBadge botContainer={botContainer} />
 
 
       {/* </div> */}
