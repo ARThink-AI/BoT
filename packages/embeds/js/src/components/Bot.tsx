@@ -463,7 +463,7 @@ const BotContent = (props: BotContentProps) => {
     }
   };
   onMount(() => {
-    console.log("on mount calleddddd", JSON.stringify(props));
+    // console.log("on mount calleddddd", JSON.stringify(props));
     if (!botContainer) return
     resizeObserver.observe(botContainer)
     if (!conversationContainer) return

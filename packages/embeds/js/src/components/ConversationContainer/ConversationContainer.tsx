@@ -231,8 +231,8 @@ export const ConversationContainer = (props: Props) => {
 
   onMount(() => {
     ; (async () => {
-      console.log("conversation container", JSON.stringify(props));
-      console.log("session Iddd", props.context.sessionId);
+      // console.log("conversation container", JSON.stringify(props));
+      // console.log("session Iddd", props.context.sessionId);
       //  console.log("conversation container mounted", chatChunks() );
 
       //  setTimeout( () => {
