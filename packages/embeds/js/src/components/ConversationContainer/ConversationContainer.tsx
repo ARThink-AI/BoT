@@ -8,7 +8,7 @@ import {
   onMount,
   Show,
 } from 'solid-js'
-import { sendMessageQuery , storeLiveChatQuery  } from '@/queries/sendMessageQuery'
+import { sendMessageQuery, storeLiveChatQuery } from '@/queries/sendMessageQuery'
 import { ChatChunk } from './ChatChunk'
 import {
   BotContext,
@@ -43,16 +43,16 @@ const parseDynamicTheme = (
     hostAvatar:
       initialTheme.chat.hostAvatar && dynamicTheme?.hostAvatarUrl
         ? {
-            ...initialTheme.chat.hostAvatar,
-            url: dynamicTheme.hostAvatarUrl,
-          }
+          ...initialTheme.chat.hostAvatar,
+          url: dynamicTheme.hostAvatarUrl,
+        }
         : initialTheme.chat.hostAvatar,
     guestAvatar:
       initialTheme.chat.guestAvatar && dynamicTheme?.guestAvatarUrl
         ? {
-            ...initialTheme.chat.guestAvatar,
-            url: dynamicTheme?.guestAvatarUrl,
-          }
+          ...initialTheme.chat.guestAvatar,
+          url: dynamicTheme?.guestAvatarUrl,
+        }
         : initialTheme.chat.guestAvatar,
   },
 })
@@ -64,14 +64,14 @@ type Props = {
   onAnswer?: (answer: { message: string; blockId: string }) => void
   onEnd?: () => void
   onNewLogs?: (logs: OutgoingLog[]) => void
-  socket : any ,
-  initializeBot : any ,
+  socket: any,
+  initializeBot: any,
   // liveAgent : Boolean,
-  
+
 }
 
 export const ConversationContainer = (props: Props) => {
-  
+
   let chatContainer: HTMLDivElement | undefined
   // const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>([
   //   {
@@ -80,15 +80,15 @@ export const ConversationContainer = (props: Props) => {
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   // ])
- 
-  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>( !sessionStorage.getItem("chatchunks") ? [
+
+  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
     {
       input: props.initialChatReply.input,
       messages: props.initialChatReply.messages,
       clientSideActions: props.initialChatReply.clientSideActions,
     },
     // @ts-ignore
-  ] : JSON.parse( sessionStorage.getItem("chatchunks")) )
+  ] : JSON.parse(sessionStorage.getItem("chatchunks")))
 
 
   const [dynamicTheme, setDynamicTheme] = createSignal<
@@ -98,30 +98,30 @@ export const ConversationContainer = (props: Props) => {
   const [isSending, setIsSending] = createSignal(false)
   const [blockedPopupUrl, setBlockedPopupUrl] = createSignal<string>()
   const [hasError, setHasError] = createSignal(false)
-  const [ liveSocketInstance , setLiveSocketInstance ] = createSignal(null);
+  const [liveSocketInstance, setLiveSocketInstance] = createSignal(null);
   // @ts-ignore
-  const [ lastInput , setLastInput ] = createSignal( sessionStorage.getItem("lastinput") ? JSON.parse( sessionStorage.getItem("lastinput") )  :  null  );
+  const [lastInput, setLastInput] = createSignal(sessionStorage.getItem("lastinput") ? JSON.parse(sessionStorage.getItem("lastinput")) : null);
   // @ts-ignore
-  const [ live , setLive ] = createSignal( sessionStorage.getItem("live") ? JSON.parse( sessionStorage.getItem("live") )  : false );
-  
+  const [live, setLive] = createSignal(sessionStorage.getItem("live") ? JSON.parse(sessionStorage.getItem("live")) : false);
+
 
   // @ts-ignore
-  const [ liveChatData , setLiveChatData ] = createSignal( sessionStorage.getItem("liveChat") ? JSON.parse( sessionStorage.getItem("liveChat") )  : []  );
-  
+  const [liveChatData, setLiveChatData] = createSignal(sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : []);
+
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
-      
-      
+
+
   //     console.log("live agent enabled");
-      
+
   //     let chunks = [...chatChunks()];
   //     // @ts-ignore
   //     setLastInput( chunks[ chunks.length -1 ].input );
-      
+
   //     console.log("last input",  chunks[ chunks.length -1 ].input );
   //     chunks[ chunks.length -1 ].input = undefined
-       
+
   //      chunks.push(
   //       {
   //         input:  {
@@ -170,7 +170,7 @@ export const ConversationContainer = (props: Props) => {
   //     setLive(true);
   //     sessionStorage.removeItem("answer");
   //      setChatChunks(chunks); 
-       
+
 
 
   //     }
@@ -215,39 +215,40 @@ export const ConversationContainer = (props: Props) => {
 
 
 
-  createEffect( () => {
-     console.log("chat chunks changed", chatChunks() );
-     if ( sessionStorage.getItem("answer") ) {
-        let chunks = [...chatChunks()];
-        // @ts-ignore
-        chunks[ chunks.length - 2 ].input.answer = sessionStorage.getItem("answer");
+  createEffect(() => {
+    console.log("chat chunks changed", chatChunks());
+    if (sessionStorage.getItem("answer")) {
+      let chunks = [...chatChunks()];
+      // @ts-ignore
+      chunks[chunks.length - 2].input.answer = sessionStorage.getItem("answer");
 
-        sessionStorage.setItem("chatchunks", JSON.stringify( chunks ) )
-     } else {
-      sessionStorage.setItem("chatchunks", JSON.stringify( chatChunks() ) )
-     }
+      sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+    } else if (sessionStorage.getItem("chatchunks")) {
+      sessionStorage.setItem("chatchunks", JSON.stringify(chatChunks()))
+    }
     //  sessionStorage.setItem("chatchunks", JSON.stringify( chatChunks() ) );
-  } , );
+  },);
 
   onMount(() => {
-    ;(async () => {
-     console.log("session Iddd", props.context.sessionId );
-    //  console.log("conversation container mounted", chatChunks() );
-     
-    //  setTimeout( () => {
-    //   console.log("stream message triggered");
-    //   streamMessage({ id : "1234" , message : "this is streamed message" });
-    //   // console.log("updated stream message", chatChunks() );
-    //  }, 180000 );
+    ; (async () => {
+      // console.log("conversation container", JSON.stringify(props));
+      // console.log("session Iddd", props.context.sessionId);
+      //  console.log("conversation container mounted", chatChunks() );
+
+      //  setTimeout( () => {
+      //   console.log("stream message triggered");
+      //   streamMessage({ id : "1234" , message : "this is streamed message" });
+      //   // console.log("updated stream message", chatChunks() );
+      //  }, 180000 );
       // setTimeout( () => {
       //   console.log("chat cunks")
       //   console.log("timeout executed" );
       //   streamMessage({ id : "1234" , message : "this is streamed message" });
       // } , 10000 )
-     if ( sessionStorage.getItem("chatchunks") ) {
-      console.log("chat chunks already present", chatChunks() );
-       return 
-     }
+      if (sessionStorage.getItem("chatchunks")) {
+        console.log("chat chunks already present", chatChunks());
+        return
+      }
 
       const initialChunk = chatChunks()[0]
       if (initialChunk.clientSideActions) {
@@ -261,7 +262,7 @@ export const ConversationContainer = (props: Props) => {
           )
             setIsSending(true)
           const response = await executeClientSideAction({
-            socket : props.socket,
+            socket: props.socket,
             clientSideAction: action,
             context: {
               apiHost: props.context.apiHost,
@@ -292,9 +293,9 @@ export const ConversationContainer = (props: Props) => {
           streamingMessageId: id,
         },
       ])
-      // setTimeout( () => {
-      //   console.log("updated chunks", chatChunks() )
-      // } ,1000);
+    // setTimeout( () => {
+    //   console.log("updated chunks", chatChunks() )
+    // } ,1000);
     setStreamingMessage({ id, content: message })
   }
 
@@ -303,30 +304,114 @@ export const ConversationContainer = (props: Props) => {
       parseDynamicTheme(props.initialChatReply.typebot.theme, dynamicTheme())
     )
   })
-  
-  const sendLiveAgentMessage = (message : string | undefined) => {
-    console.log("send live agent message",message);
+
+  const sendLiveAgentMessage = (message: string | undefined) => {
+    console.log("send live agent message", message);
     // @ts-ignore
-    sessionStorage.setItem("answer", message );
-   if ( !liveSocketInstance() ) {
-    const socketInstance = io("http://172.178.92.219:3060" ,{
-      reconnection: true, // Enable reconnection
-      reconnectionAttempts: Infinity, // Retry indefinitely
-      reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
-      reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
-    } );
-    socketInstance.on("connect", () => {
-      console.log("socket instance connected");
+    sessionStorage.setItem("answer", message);
+    if (!liveSocketInstance()) {
+      const socketInstance = io("http://172.178.92.219:3060", {
+        reconnection: true, // Enable reconnection
+        reconnectionAttempts: Infinity, // Retry indefinitely
+        reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
+        reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
+      });
+      socketInstance.on("connect", () => {
+        console.log("socket instance connected");
+        // @ts-ignore
+        setLiveSocketInstance(socketInstance);
+        socketInstance.emit("joinRoom", { sessionId: props.initialChatReply.resultId });
+
+        socketInstance.on("responseFromBot", ({ message, id }) => {
+          console.log("reply", message);
+          let chunks = [...chatChunks()];
+          chunks.push(
+            {
+              input: {
+                "id": "ow5y1j9yvsp7jo46qaswc38k",
+                "groupId": "nb24en7liv3s8e959uxtz1h0",
+                "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+                // @ts-ignore
+                "type": "text input",
+                "options": {
+                  "labels": {
+                    "placeholder": "Ask question",
+                    "button": "Send"
+                  },
+                  "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+                  "isLong": false
+                },
+                "prefilledValue": "Hi"
+              },
+              messages: [
+                {
+                  id: "unhxagqgd46929s701gnz5z8",
+                  // @ts-ignore
+                  type: "text",
+                  content: {
+                    richText: [
+                      {
+                        "type": "variable",
+                        "children": [
+                          {
+                            "type": "p",
+                            "children": [
+                              {
+                                "text": message
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              clientSideActions: undefined
+            }
+          );
+          setChatChunks(chunks);
+
+
+          // @ts-ignore
+          let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+          livechatData.push({ user: "Support", message: message })
+          // @ts-ignore
+          sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+          // @ts-ignore
+          storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+            console.log("error", err);
+          })
+
+
+          socketInstance.off("responseFromBot")
+        })
+        socketInstance.emit("sendToQuadz", { message, id: "123", sessionId: props.initialChatReply.resultId });
+        let livechatData = [];
+
+        livechatData.push({ user: "User", message: message })
+        // @ts-ignore
+        sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+        // @ts-ignore
+        storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+          console.log("error", err);
+        })
+
+      })
+    } else {
+
+
+      let socketInstance = liveSocketInstance();
+
       // @ts-ignore
-      setLiveSocketInstance(socketInstance);
-      socketInstance.emit("joinRoom", { sessionId : props.initialChatReply.resultId });
-      
-      socketInstance.on("responseFromBot", ({ message , id }) => {
-         console.log("reply", message );
-         let chunks = [...chatChunks()];
-         chunks.push(
+      socketInstance.on("responseFromBot", ({ message }) => {
+        console.log("reply", message);
+
+        let chunks = [...chatChunks()];
+        chunks.push(
           {
-            input:  {
+            input: {
               "id": "ow5y1j9yvsp7jo46qaswc38k",
               "groupId": "nb24en7liv3s8e959uxtz1h0",
               "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
@@ -341,12 +426,12 @@ export const ConversationContainer = (props: Props) => {
                 "isLong": false
               },
               "prefilledValue": "Hi"
-            } ,
+            },
             messages: [
               {
                 id: "unhxagqgd46929s701gnz5z8",
                 // @ts-ignore
-                type : "text",
+                type: "text",
                 content: {
                   richText: [
                     {
@@ -368,120 +453,36 @@ export const ConversationContainer = (props: Props) => {
             ],
             clientSideActions: undefined
           }
-         );
-         setChatChunks(chunks); 
-         
+        );
+        setChatChunks(chunks);
 
-         // @ts-ignore
-         let livechatData = sessionStorage.getItem("liveChat") ?  JSON.parse( sessionStorage.getItem("liveChat") )  : [];
-      
-         livechatData.push( { user : "Support" , message : message } )
-         // @ts-ignore
-         sessionStorage.setItem("liveChat", JSON.stringify(livechatData) )
-         // @ts-ignore
-         storeLiveChatQuery( {apiHost : props.context.apiHost , typebotId : props.context.typebot.id , resultId : props.initialChatReply.resultId , livechat : livechatData }  ).then().catch( err => {
-           console.log("error",err);
-         } )
-        
+        // @ts-ignore
+        let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
 
-         socketInstance.off("responseFromBot")
-      } )
-      socketInstance.emit("sendToQuadz",{ message , id : "123" , sessionId : props.initialChatReply.resultId }  );
-      let livechatData = [];
-      
-      livechatData.push( { user : "User" , message : message } )
+        livechatData.push({ user: "Support", message: message })
+        // @ts-ignore
+        sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+        // @ts-ignore
+        storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+          console.log("error", err);
+        })
+        // @ts-ignore
+        socketInstance.off("responseFromBot")
+      })
       // @ts-ignore
-      sessionStorage.setItem("liveChat", JSON.stringify(livechatData) )
+      socketInstance.emit("sendToQuadz", { message, id: "123", sessionId: props.initialChatReply.resultId });
       // @ts-ignore
-      storeLiveChatQuery( {apiHost : props.context.apiHost , typebotId : props.context.typebot.id , resultId : props.initialChatReply.resultId , livechat : livechatData }  ).then().catch( err => {
-        console.log("error",err);
-      } )
-      
-    } )
-   } else {
+      let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
 
-   
-   let socketInstance = liveSocketInstance();
-  
-   // @ts-ignore
-   socketInstance.on("responseFromBot", ({ message }) => {
-    console.log("reply", message );
+      livechatData.push({ user: "User", message: message })
+      // @ts-ignore
+      sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+      // @ts-ignore
+      storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+        console.log("error", err);
+      })
+    }
 
-    let chunks = [...chatChunks()];
-    chunks.push(
-     {
-       input:  {
-         "id": "ow5y1j9yvsp7jo46qaswc38k",
-         "groupId": "nb24en7liv3s8e959uxtz1h0",
-         "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
-         // @ts-ignore
-         "type": "text input",
-         "options": {
-           "labels": {
-             "placeholder": "Ask question",
-             "button": "Send"
-           },
-           "variableId": "vb6co7ry0n84c9tuml9oae2ld",
-           "isLong": false
-         },
-         "prefilledValue": "Hi"
-       } ,
-       messages: [
-         {
-           id: "unhxagqgd46929s701gnz5z8",
-           // @ts-ignore
-           type : "text",
-           content: {
-             richText: [
-               {
-                 "type": "variable",
-                 "children": [
-                   {
-                     "type": "p",
-                     "children": [
-                       {
-                         "text": message
-                       }
-                     ]
-                   }
-                 ]
-               }
-             ]
-           }
-         }
-       ],
-       clientSideActions: undefined
-     }
-    );
-    setChatChunks(chunks); 
-
-    // @ts-ignore
-    let livechatData = sessionStorage.getItem("liveChat") ?  JSON.parse( sessionStorage.getItem("liveChat") )  : [];
-      
-    livechatData.push( { user : "Support" , message : message } )
-    // @ts-ignore
-    sessionStorage.setItem("liveChat", JSON.stringify(livechatData) )
-    // @ts-ignore
-    storeLiveChatQuery( {apiHost : props.context.apiHost , typebotId : props.context.typebot.id , resultId : props.initialChatReply.resultId , livechat : livechatData }  ).then().catch( err => {
-      console.log("error",err);
-    } )
-    // @ts-ignore
-    socketInstance.off("responseFromBot")
- } )
-  // @ts-ignore
-  socketInstance.emit("sendToQuadz",{ message , id : "123" , sessionId : props.initialChatReply.resultId  }  );
-   // @ts-ignore
-   let livechatData = sessionStorage.getItem("liveChat") ?  JSON.parse( sessionStorage.getItem("liveChat") )  : [];
-      
-   livechatData.push( { user : "User" , message : message } )
-   // @ts-ignore
-   sessionStorage.setItem("liveChat", JSON.stringify(livechatData) )
-   // @ts-ignore
-   storeLiveChatQuery( {apiHost : props.context.apiHost , typebotId : props.context.typebot.id , resultId : props.initialChatReply.resultId , livechat : livechatData }  ).then().catch( err => {
-     console.log("error",err);
-   } )
-}
-    
 
 
 
@@ -494,16 +495,16 @@ export const ConversationContainer = (props: Props) => {
     message: string | undefined,
     clientLogs?: SendMessageInput['clientLogs']
   ) => {
-    console.log("live value", live() );
-    if ( live() ) {
+    console.log("live value", live());
+    if (live()) {
       return sendLiveAgentMessage(message);
-       
+
     }
-    console.log("message by user", message );
-    
+    console.log("message by user", message);
+
 
     // @ts-ignore
-    sessionStorage.setItem("answer", message );
+    sessionStorage.setItem("answer", message);
     if (clientLogs) props.onNewLogs?.(clientLogs)
     setHasError(false)
     const currentInputBlock = [...chatChunks()].pop()?.input
@@ -525,19 +526,19 @@ export const ConversationContainer = (props: Props) => {
       message,
       clientLogs,
     });
-    console.log("send message dataa", data );
-    console.log("error sending data", error );
+    console.log("send message dataa", data);
+    console.log("error sending data", error);
     clearTimeout(longRequest)
     setIsSending(false)
     if (error) {
-      if ( error.message == "Session expired. You need to start a new session." ) {
-       console.log("session expireddd");
-       sessionStorage.removeItem("intialize");
-       sessionStorage.removeItem("initialize_css");
-       sessionStorage.removeItem("bot_init");
-       sessionStorage.removeItem("chatchunks");
-       props.initializeBot();
-       return 
+      if (error.message == "Session expired. You need to start a new session.") {
+        console.log("session expireddd");
+        sessionStorage.removeItem("intialize");
+        sessionStorage.removeItem("initialize_css");
+        sessionStorage.removeItem("bot_init");
+        sessionStorage.removeItem("chatchunks");
+        props.initializeBot();
+        return
       }
       setHasError(true)
       props.onNewLogs?.([
@@ -577,7 +578,7 @@ export const ConversationContainer = (props: Props) => {
         )
           setIsSending(true)
         const response = await executeClientSideAction({
-          socket : props.socket,
+          socket: props.socket,
           clientSideAction: action,
           context: {
             apiHost: props.context.apiHost,
@@ -593,55 +594,55 @@ export const ConversationContainer = (props: Props) => {
           setBlockedPopupUrl(response.blockedPopupUrl)
       }
     }
-    console.log("bot reply", data.messages );
+    console.log("bot reply", data.messages);
 
-    if ( sessionStorage.getItem("ticketId") &&  sessionStorage.getItem("ticketaccess")  ) {
+    if (sessionStorage.getItem("ticketId") && sessionStorage.getItem("ticketaccess")) {
       try {
-        
+
         let comments = [`User - /n ${message}`];
 
         let text = ["/n BoT - /n"];
-    for ( let i=0; i < data.messages.length ; i++ ) {
-       if ( data.messages[i].type == "text" ) {
-        // @ts-ignore
-          let plainText = computePlainText(data.messages[i]?.content?.richText);
-          text.push(plainText);
-       }
-    }
-    console.log("final text array", text );
-    let finalText = text.reduce( ( a , curr ) => a + "/n" + curr  );
+        for (let i = 0; i < data.messages.length; i++) {
+          if (data.messages[i].type == "text") {
+            // @ts-ignore
+            let plainText = computePlainText(data.messages[i]?.content?.richText);
+            text.push(plainText);
+          }
+        }
+        console.log("final text array", text);
+        let finalText = text.reduce((a, curr) => a + "/n" + curr);
 
-     comments.push(finalText);
+        comments.push(finalText);
 
-      await fetch( "https://quadz.arthink.ai/api/v1/tickets/addnote" , {
-        method : "POST" ,
-        // @ts-ignore
-        headers : {
-          "Content-type" : "application/json",
-          "accessToken" : sessionStorage.getItem("ticketaccess")
-        }, 
-        // body : JSON.stringify( {
-        //   _id : sessionStorage.getItem("ticketId"),
-        //   comment : comments,
-        //   note : false ,
-        //   ticketid : false 
-        // } )
-        body : JSON.stringify( {
+        await fetch("https://quadz.arthink.ai/api/v1/tickets/addnote", {
+          method: "POST",
           // @ts-ignore
-          ticketid : sessionStorage.getItem("ticketId") ,
-          note  : comments.join(" ")
-          
-         } )
-      } )
+          headers: {
+            "Content-type": "application/json",
+            "accessToken": sessionStorage.getItem("ticketaccess")
+          },
+          // body : JSON.stringify( {
+          //   _id : sessionStorage.getItem("ticketId"),
+          //   comment : comments,
+          //   note : false ,
+          //   ticketid : false 
+          // } )
+          body: JSON.stringify({
+            // @ts-ignore
+            ticketid: sessionStorage.getItem("ticketId"),
+            note: comments.join(" ")
+
+          })
+        })
 
 
 
-      } catch(err) {
-        console.log("error in creating comment on ticket", err );
+      } catch (err) {
+        console.log("error in creating comment on ticket", err);
       }
     }
 
-  
+
 
 
 
@@ -653,8 +654,8 @@ export const ConversationContainer = (props: Props) => {
         clientSideActions: data.clientSideActions,
       },
     ])
-    
-    console.log("updated chunks", 
+
+    console.log("updated chunks",
       [
         ...chatChunks(),
         {
@@ -663,7 +664,7 @@ export const ConversationContainer = (props: Props) => {
           clientSideActions: data.clientSideActions,
         },
       ]
-      );
+    );
 
   }
 
@@ -699,7 +700,7 @@ export const ConversationContainer = (props: Props) => {
         )
           setIsSending(true)
         const response = await executeClientSideAction({
-          socket : props.socket,
+          socket: props.socket,
           clientSideAction: action,
           context: {
             apiHost: props.context.apiHost,
@@ -725,24 +726,24 @@ export const ConversationContainer = (props: Props) => {
   const handleSkip = () => sendMessage(undefined)
 
   const toggleLiveAgent = () => {
-         if (!live()  ) {
-      
-      
+    if (!live()) {
+
+
       console.log("live agent enabled");
-      
+
       let chunks = [...chatChunks()];
       // @ts-ignore
-      setLastInput( chunks[ chunks.length -1 ].input );
-      sessionStorage.setItem("lastinput", JSON.stringify(chunks[ chunks.length -1 ].input) );
-      
-      console.log("last input",  chunks[ chunks.length -1 ].input );
-      
+      setLastInput(chunks[chunks.length - 1].input);
+      sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
+
+      console.log("last input", chunks[chunks.length - 1].input);
+
       chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
-      chunks[ chunks.length -1 ].input = undefined
-       
-       chunks.push(
+      chunks[chunks.length - 1].input = undefined
+
+      chunks.push(
         {
-          input:  {
+          input: {
             "id": "ow5y1j9yvsp7jo46qaswc38k",
             "groupId": "nb24en7liv3s8e959uxtz1h0",
             "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
@@ -757,12 +758,12 @@ export const ConversationContainer = (props: Props) => {
               "isLong": false
             },
             "prefilledValue": "Hi"
-          } ,
+          },
           messages: [
             {
               id: "unhxagqgd46929s701gnz5z8",
               // @ts-ignore
-              type : "text",
+              type: "text",
               content: {
                 richText: [
                   {
@@ -784,59 +785,59 @@ export const ConversationContainer = (props: Props) => {
           ],
           clientSideActions: undefined
         }
-       );
-      
+      );
+
 
       sessionStorage.removeItem("answer");
       console.log("before chat chunk");
-       setChatChunks(chunks); 
-       console.log("after chat chunk");
+      setChatChunks(chunks);
+      console.log("after chat chunk");
 
 
-      
 
-    } else  {
-     console.log("live agent disabled");
-     let chunks = [...chatChunks()];
-     chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
-     chunks[ chunks.length -1 ].input = undefined
-     chunks.push(
-      {
-        // @ts-ignore
-        input:  lastInput(),
-        messages: [
-          {
-            id: "unhxagqgd46929s701gnz5z8",
-            // @ts-ignore
-            type : "text",
-            content: {
-              richText: [
-                {
-                  "type": "variable",
-                  "children": [
-                    {
-                      "type": "p",
-                      "children": [
-                        {
-                          "text": "Exited live Agent"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+
+    } else {
+      console.log("live agent disabled");
+      let chunks = [...chatChunks()];
+      chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+      chunks[chunks.length - 1].input = undefined
+      chunks.push(
+        {
+          // @ts-ignore
+          input: lastInput(),
+          messages: [
+            {
+              id: "unhxagqgd46929s701gnz5z8",
+              // @ts-ignore
+              type: "text",
+              content: {
+                richText: [
+                  {
+                    "type": "variable",
+                    "children": [
+                      {
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "Exited live Agent"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
             }
-          }
-        ],
-        clientSideActions: undefined
-      }
-     );
-     sessionStorage.removeItem("answer");
-     setChatChunks(chunks);
+          ],
+          clientSideActions: undefined
+        }
+      );
+      sessionStorage.removeItem("answer");
+      setChatChunks(chunks);
     }
     console.log("live  changeeee");
     let l = live();
-    sessionStorage.setItem("live", `${!l}` );
+    sessionStorage.setItem("live", `${!l}`);
     setLive(!l);
   }
 
@@ -846,7 +847,7 @@ export const ConversationContainer = (props: Props) => {
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-    {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
+      {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
         
         <div style={{ display : "flex" , "flex-direction" : "row" , "align-items" : "center" , gap : "40" }} >
           <button> <img style={{ height : "25px" , "margin-right":  "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
@@ -860,31 +861,31 @@ toggleLiveAgent();
         </div> */}
       <For each={chatChunks()}>
         {(chatChunk, index) => {
-        console.log("chat chunk", chatChunk , index );
-        return (
-          <ChatChunk
-            inputIndex={index()}
-            messages={chatChunk.messages}
-            input={chatChunk.input}
-            theme={theme()}
-            settings={props.initialChatReply.typebot.settings}
-            streamingMessageId={chatChunk.streamingMessageId}
-            context={props.context}
-            hideAvatar={
-              !chatChunk.input &&
-              ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
-                chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
-                isSending())
-            }
-            hasError={hasError() && index() === chatChunks().length - 1}
-            onNewBubbleDisplayed={handleNewBubbleDisplayed}
-            onAllBubblesDisplayed={handleAllBubblesDisplayed}
-            onSubmit={sendMessage}
-            onScrollToBottom={autoScrollToBottom}
-            onSkip={handleSkip}
-          />
-        )
-        
+          console.log("chat chunk", chatChunk, index);
+          return (
+            <ChatChunk
+              inputIndex={index()}
+              messages={chatChunk.messages}
+              input={chatChunk.input}
+              theme={theme()}
+              settings={props.initialChatReply.typebot.settings}
+              streamingMessageId={chatChunk.streamingMessageId}
+              context={props.context}
+              hideAvatar={
+                !chatChunk.input &&
+                ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
+                  chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
+                  isSending())
+              }
+              hasError={hasError() && index() === chatChunks().length - 1}
+              onNewBubbleDisplayed={handleNewBubbleDisplayed}
+              onAllBubblesDisplayed={handleAllBubblesDisplayed}
+              onSubmit={sendMessage}
+              onScrollToBottom={autoScrollToBottom}
+              onSkip={handleSkip}
+            />
+          )
+
         }}
       </For>
       <Show when={isSending()}>
