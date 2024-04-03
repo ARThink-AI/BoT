@@ -310,7 +310,7 @@ export const ConversationContainer = (props: Props) => {
     // @ts-ignore
     sessionStorage.setItem("answer", message);
     if (!liveSocketInstance()) {
-      const socketInstance = io("http://172.178.92.219:3060", {
+      const socketInstance = io("http://localhost:3080", {
         reconnection: true, // Enable reconnection
         reconnectionAttempts: Infinity, // Retry indefinitely
         reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -847,18 +847,18 @@ export const ConversationContainer = (props: Props) => {
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-      {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
-        
-        <div style={{ display : "flex" , "flex-direction" : "row" , "align-items" : "center" , gap : "40" }} >
-          <button> <img style={{ height : "25px" , "margin-right":  "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
-          <button> <img style={{ height : "25px" ,  "margin-right":  "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
-          <button onClick={ () => {
-toggleLiveAgent();
+      <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
+
+        <div style={{ display: "flex", "flex-direction": "row", "align-items": "center", gap: "40" }} >
+          <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
+          <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
+          <button onClick={() => {
+            toggleLiveAgent();
             // let currentVal = liveAgent();
             // setLiveAgent( !currentVal );
-          } } > <img style={{ height : "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
+          }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
         </div>
-        </div> */}
+      </div>
       <For each={chatChunks()}>
         {(chatChunk, index) => {
           console.log("chat chunk", chatChunk, index);

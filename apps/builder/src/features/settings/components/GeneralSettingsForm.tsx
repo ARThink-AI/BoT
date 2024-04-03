@@ -53,6 +53,12 @@ export const GeneralSettingsForm = ({
       isVoiceEnabled,
     })
 
+  const handleLiveChatChange = (isLiveChatEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isLiveChatEnabled
+    })
+
 
 
 
@@ -86,6 +92,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isVoiceEnabled ?? true}
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
+      />
+      <SwitchWithLabel
+        label="Live chat on BoT"
+        initialValue={generalSettings.isLiveChatEnabled ?? true}
+        onCheckChange={handleLiveChatChange}
+        moreInfoContent="Toggle for live chat"
       />
 
 

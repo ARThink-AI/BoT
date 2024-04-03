@@ -9,8 +9,7 @@ const generalSettings = z.object({
   isInputPrefillEnabled: z.boolean().optional(),
   isHideQueryParamsEnabled: z.boolean().optional(),
   isVoiceEnabled : z.boolean().optional(),
- 
- 
+  isLiveChatEnabled:  z.boolean().optional(),
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({
