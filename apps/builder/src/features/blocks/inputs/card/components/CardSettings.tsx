@@ -1,5 +1,5 @@
 
-import { Text, VStack, Button } from '@chakra-ui/react'
+import { Text, VStack, Stack, Button, Checkbox } from '@chakra-ui/react'
 import {
   CardInputOptions,
   Variable,
@@ -128,6 +128,18 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               placeholder="Placeholder..."
               withVariableButton={false}
             />
+            <Stack spacing={2} flexDirection={"row"} >
+              <Checkbox
+                key={input.id + "checkbox"}
+                defaultChecked={input?.required ?? false}
+                onChange={(e) => {
+                  // @ts-ignore
+                  updateInput("required", e.target.checked, i)
+                }}
+              />
+              <Text> Required  </Text>
+            </Stack>
+
             {input.type != "text" && input.type != "email" && input.type != "phone" && input.type != "textarea" &&
               <VStack spacing={1} >
                 <FormLabel> Load dynamic data from variable</FormLabel>

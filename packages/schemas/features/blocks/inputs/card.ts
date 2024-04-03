@@ -6,7 +6,7 @@ import { InputBlockType } from './enums'
 export const cardOptionsBaseSchema = z.object({
   
 })
-export const cardInputTypes  = ["text","email","phone","dropdown","checkbox","textarea","button"]
+export const cardInputTypes  = ["text","email","phone","dropdown","checkbox","textarea","radio"]
 
 export const cardOptionsSchema = cardOptionsBaseSchema
   .merge(optionBaseSchema)
@@ -21,7 +21,8 @@ export const cardOptionsSchema = cardOptionsBaseSchema
          placeholder : z.string().optional(),
          dynamicDataVariableId : z.string().optional(),
          answerVariableId : z.string().optional(),
-         values: z.array(z.string()).optional()
+         values: z.array(z.string()).optional() ,
+         required : z.boolean().optional()
         
        
          
