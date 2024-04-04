@@ -14,6 +14,7 @@ import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
+import { TextInput } from '@/components/inputs'
 
 type Props = {
   generalSettings: GeneralSettings
@@ -59,6 +60,12 @@ export const GeneralSettingsForm = ({
       isLiveChatEnabled
     })
 
+  const handleTicketVariableNameChange = (ticketVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      ticketVariableName
+    })
+
 
 
 
@@ -95,9 +102,14 @@ export const GeneralSettingsForm = ({
       />
       <SwitchWithLabel
         label="Live chat on BoT"
-        initialValue={generalSettings.isLiveChatEnabled ?? true}
+        initialValue={generalSettings.isLiveChatEnabled ? generalSettings.isLiveChatEnabled : false}
         onCheckChange={handleLiveChatChange}
         moreInfoContent="Toggle for live chat"
+      />
+      <Text> Ticket Variable  </Text>
+      <TextInput
+        defaultValue={generalSettings.ticketVariableName ? generalSettings.ticketVariableName : ""}
+        onChange={e => handleTicketVariableNameChange(e)}
       />
 
 

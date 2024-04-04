@@ -10,6 +10,7 @@ const generalSettings = z.object({
   isHideQueryParamsEnabled: z.boolean().optional(),
   isVoiceEnabled : z.boolean().optional(),
   isLiveChatEnabled:  z.boolean().optional(),
+  ticketVariableName:  z.string().optional(),
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({
