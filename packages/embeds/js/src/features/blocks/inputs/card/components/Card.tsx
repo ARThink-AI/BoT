@@ -7,20 +7,34 @@ export const CardInput = (props: any) => {
   const [emailValid, setEmailValid] = createSignal(true);
   const [phoneValidation, setPhoneValidation] = createSignal(true);
 
-  createEffect(() => {
-    const emailInput = inputs().find((input: any) => input.type === "email");
-    if (emailInput) {
-      const isValid = validateEmail(emailInput.userInput);
-      setEmailValid(isValid);
-    }
-    const phoneInput = inputs().find((input: any) => input.type === "phone");
-    if (phoneInput) {
-      const isValid = validatePhone(phoneInput.userInput)
-      setPhoneValidation(isValid)
-    }
+  // createEffect(() => {
+  //   const emailInput = inputs().find((input: any) => input.type === "email");
+  //   if (emailInput) {
+  //     const isValid = validateEmail(emailInput.userInput);
+  //     setEmailValid(isValid);
+  //   }
+  //   const phoneInput = inputs().find((input: any) => input.type === "phone");
+  //   if (phoneInput) {
+  //     const isValid = validatePhone(phoneInput.userInput)
+  //     setPhoneValidation(isValid)
+  //   }
 
-  });
+  // });
 
+  const isAnyRequiredFieldEmpty = () => {
+    return inputs().some((input: any) => {
+      if (input.required) {
+        if (input.type === "email" && !validateEmail(input.userInput)) {
+          return true; // Email field is required and incomplete
+        }
+        if (input.type === "phone" && !validatePhone(input.userInput)) {
+          return true; // Phone field is required and incomplete
+        }
+        return !input.userInput; // Other required fields
+      }
+      return false;
+    });
+  };
 
   // function validateEmail() {
   //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,10 +46,24 @@ export const CardInput = (props: any) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  const validatePhone = (phoneNumber){
+  const validatePhone = (phoneNumber: string){
     const phoneRegex = /^\d{10}$/;
     return phoneRegex.test(phoneNumber)
   }
+
+  const handleInputChange = (e: any, index: number) => {
+    const { value } = e.target;
+    updateInput("userInput", value, index);
+
+    // Perform validation based on input type
+    const inputType = inputs()[index].type;
+    if (inputType === "email") {
+      setEmailValid(validateEmail(value));
+    } else if (inputType === "phone") {
+      setPhoneValidation(validatePhone(value));
+    }
+  }
+
 
   const updateInput = (property: string, value: any, index: number) => {
     // @ts-ignore
@@ -97,6 +125,11 @@ export const CardInput = (props: any) => {
 
 
 
+
+
+
+
+
                           required={input.required}
                         />
                       </>
@@ -110,9 +143,7 @@ export const CardInput = (props: any) => {
                           placeholder={input.placeholder}
                           // class={`border p-2 rounded-md w-full mb-2`}
                           value={input?.userInput ? input?.userInput : ""}
-                          onChange={(e) =>
-                            updateInput("userInput", e.target.value, i)
-                          }
+                          onChange={(e) => handleInputChange(e, i)}
                           class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
 
                           required={input.required}
@@ -132,9 +163,7 @@ export const CardInput = (props: any) => {
                           // class={`border p-2 rounded-md w-full mb-2`}
                           class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
                           value={input?.userInput ? input?.userInput : ""}
-                          onChange={(e) =>
-                            updateInput("userInput", e.target.value, i)
-                          }
+                          onChange={(e) => handleInputChange(e, i)}
 
                           required={input.required}
                         />
@@ -250,7 +279,7 @@ export const CardInput = (props: any) => {
                   ans[props?.block?.options?.inputs[i].answerVariableId] =
                 }
               }}  */}
-              <button onClick={handleSubmit} class="rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2">
+              <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
                 Submit
               </button>
             </div>
