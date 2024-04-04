@@ -1,12 +1,25 @@
-import { createSignal, For } from 'solid-js';
+import { createSignal, For, createEffect } from 'solid-js';
 import './style.css'
 
 export const CardInput = (props: any) => {
   const [inputs, setInputs] = createSignal(props?.block?.options?.inputs ? props?.block?.options?.inputs : [])
 
   const [emailValid, setEmailValid] = createSignal(true);
+  const [phoneValidation, setPhoneValidation] = createSignal(true);
 
+  createEffect(() => {
+    const emailInput = inputs().find((input: any) => input.type === "email");
+    if (emailInput) {
+      const isValid = validateEmail(emailInput.userInput);
+      setEmailValid(isValid);
+    }
+    const phoneInput = inputs().find((input: any) => input.type === "phone");
+    if (phoneInput) {
+      const isValid = validatePhone(phoneInput.userInput)
+      setPhoneValidation(isValid)
+    }
 
+  });
 
 
   // function validateEmail() {
@@ -15,7 +28,14 @@ export const CardInput = (props: any) => {
   //   setEmailValid(isValid);
 
   // }
-
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+  const validatePhone = (phoneNumber){
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phoneNumber)
+  }
 
   const updateInput = (property: string, value: any, index: number) => {
     // @ts-ignore
@@ -49,7 +69,7 @@ export const CardInput = (props: any) => {
 
     <>
       <div class="mx-auto">
-        <div class="p-6 lg-w-[450px] h-[400px] sm-w-full rounded-md shadow-lg shadow-black-50 overflow-hidden">
+        <div class="p-6 lg-w-[450px] h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50 overflow-hidden">
           <div class="flex flex-col h-full gap-2">
             <div id="headings">
               <p class="sticky top-0 bg-white text-xl">{props.block.options.heading}</p>
@@ -57,7 +77,7 @@ export const CardInput = (props: any) => {
                 {props.block.options.subHeading}
               </p>
             </div>
-            <div class="overflow-y-scroll hide-scrollbar flex-1 mb-2" id="input-container">
+            <div class="p-3 overflow-y-scroll hide-scrollbar flex-1 mb-2" id="input-container">
 
               {inputs().map((input: any, i: number) => {
                 switch (input.type) {
@@ -88,14 +108,18 @@ export const CardInput = (props: any) => {
                         <input
                           type={input.type}
                           placeholder={input.placeholder}
-                          class={`border p-2 rounded-md w-full mb-2`}
+                          // class={`border p-2 rounded-md w-full mb-2`}
                           value={input?.userInput ? input?.userInput : ""}
                           onChange={(e) =>
                             updateInput("userInput", e.target.value, i)
                           }
+                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
 
                           required={input.required}
                         />
+                        {input.type === 'email' && !emailValid() && (
+                          <p class="text-red-500 text-sm">Please enter a valid email address.</p>
+                        )}
                       </>
                     );
                   case "phone":
@@ -105,7 +129,8 @@ export const CardInput = (props: any) => {
                         <input
                           type={input.type}
                           placeholder={input.placeholder}
-                          class={`border p-2 rounded-md w-full mb-2`}
+                          // class={`border p-2 rounded-md w-full mb-2`}
+                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
                           value={input?.userInput ? input?.userInput : ""}
                           onChange={(e) =>
                             updateInput("userInput", e.target.value, i)
@@ -113,6 +138,10 @@ export const CardInput = (props: any) => {
 
                           required={input.required}
                         />
+                        {input.type === 'phone' && !phoneValidation() && (
+                          <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                        )}
+
                       </>
                     );
 
