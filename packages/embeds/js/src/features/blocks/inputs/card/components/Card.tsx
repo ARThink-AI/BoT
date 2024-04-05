@@ -30,6 +30,9 @@ export const CardInput = (props: any) => {
         if (input.type === "phone" && !validatePhone(input.userInput)) {
           return true; // Phone field is required and incomplete
         }
+        if (input.type === "checkbox" && (!input.userInput || input.userInput.length === 0)) {
+          return true; // Checkbox is required and no option is selected
+        }
         return !input.userInput; // Other required fields
       }
       return false;
@@ -255,6 +258,7 @@ export const CardInput = (props: any) => {
                                   updateInput("userInput", updatedValues, i);
                                 }}
                                 checked={input.userInput && input.userInput.includes(value)}
+                                required={input.required}
                               />
                               <label>{value}</label>
                             </div>
