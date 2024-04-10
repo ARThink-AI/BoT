@@ -219,10 +219,18 @@ export const ConversationContainer = (props: Props) => {
     console.log("chat chunks changed", chatChunks());
     if (sessionStorage.getItem("answer")) {
       let chunks = [...chatChunks()];
-      // @ts-ignore
-      chunks[chunks.length - 2].input.answer = sessionStorage.getItem("answer");
+      if (chunks[chunks.length - 2].input?.type == "card input") {
+        // @ts-ignore
+        chunks[chunks.length - 2].input.answer = "Submitted"
 
-      sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+      } else {
+        // @ts-ignore
+        chunks[chunks.length - 2].input.answer = sessionStorage.getItem("answer");
+
+        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+      }
+
     } else if (sessionStorage.getItem("chatchunks")) {
       sessionStorage.setItem("chatchunks", JSON.stringify(chatChunks()))
     }
