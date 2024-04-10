@@ -24,23 +24,27 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         select: { name: true, id: true, icon: true, plan: true },
       })
     const  typebot = await prisma.typebot.findUnique( {  where : { publicId : publicIdParam  }   } );
-      let ownerShip = workspaces.filter( w => w.id == typebot?.workspaceId  ).length == 1;
+      const  ownerShip = workspaces.filter( w => w.id == typebot?.workspaceId  ).length == 1;
       if ( ownerShip ) {
-        let results = await prisma.result.findMany({ skip  :skip
+        const  results = await prisma.result.findMany({ skip  :skip
          , take : take ,where : {  typebotId : typebot?.id  }  });
          console.log("results",  JSON.stringify(results) );
-         // @ts-ignore
-         let finalResuls = [];
+           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+         const  finalResuls = [];
          for ( let i=0; i < results.length;i++ ) {
-          let obj = {};
-          // @ts-ignore
+          const  obj = {};
+           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
          for ( let j =0;j < results[i].variables.length ; j++ ) {
-          // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
         obj[results[i].variables[j].name] = results[i].variables[j].value 
          }
-        let logs = await prisma.log.findMany({  where : { resultId : results[i].id   } , select : { status : true , description : true , details : true }  });
+        const  logs = await prisma.log.findMany({  where : { resultId : results[i].id   } , select : { status : true , description : true , details : true }  });
         if ( logs.length > 0 ) {
-  // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
   obj["logs"] = logs;
         }
       
@@ -51,7 +55,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
          
       }
          
-        // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
         return res.status(200).json({ results : finalResuls })
       } else {
         return res.status(500).send({ message: 'Typebot does not belong to user' })

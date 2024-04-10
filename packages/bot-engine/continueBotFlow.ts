@@ -222,9 +222,10 @@ const processAndSaveAnswer =
             newVariables.push(newVariable)
           }
         }
-       
-        let newSession =   updateVariablesInSession(state)(newVariables);
-        
+        console.log("new varaibles",newVariables);
+        let newState = await saveAnswer(state, block, itemId)("Submit")
+        let newSession =   updateVariablesInSession(newState)(newVariables);
+        console.log("new session val", JSON.stringify(newSession) );
         return newSession
        
        } catch (err) {

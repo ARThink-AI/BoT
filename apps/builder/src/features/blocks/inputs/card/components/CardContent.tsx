@@ -6,7 +6,7 @@ type Props = {
 }
 
 export const CardInputContent = ({ block }: Props) => {
-
+  console.log("block", block);
   return <Text color="gray.500">Configure Card...</Text>
 
 }

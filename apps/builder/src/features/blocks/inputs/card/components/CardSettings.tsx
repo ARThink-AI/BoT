@@ -7,7 +7,7 @@ import {
 
 
 } from '@typebot.io/schemas'
-import React, { ChangeEvent } from 'react'
+import React from 'react'
 
 import { TextInput } from '@/components/inputs'
 
@@ -34,13 +34,14 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
       subHeading,
     })
 
-  const updateInput = (property: string, value: string, index: Number) => {
+  const updateInput = (property: string, value: string, index: number) => {
 
     onOptionsChange({
       ...options,
       inputs: options.inputs.map((inp, ind) => {
         if (ind != index) return inp
-        let modified = { ...options.inputs[ind] };
+        const modified = { ...options.inputs[ind] };
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         modified[property] = value;
         return modified
@@ -54,13 +55,16 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
     })
   }
   const removeInput = (index: number) => {
-    let inputs = [...options.inputs];
+    const inputs = [...options.inputs];
     inputs.splice(index, 1)
     onOptionsChange({
       ...options,
       inputs: inputs
     })
   }
+  // const handleVariableChange = (variable?: Variable) =>
+
+  //   onOptionsChange({ ...options, variableId: variable?.id })
 
 
 
@@ -84,7 +88,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
       {options.inputs.map((input, i) => {
 
         return (
-          <VStack spacing={2} >
+          <VStack spacing={2} key={i} >
             <VStack spacing={1} >
               <FormLabel> Input type </FormLabel>
               <Select
@@ -109,6 +113,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
             <TextInput
               key={input.id + "label"}
               label="Label"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               onChange={(e) => {
                 updateInput("label", e, i)
@@ -120,6 +125,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
             <TextInput
               key={input.id + "placeholder"}
               label="Placeholder"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               onChange={(e) => {
                 updateInput("placeholder", e, i)
@@ -133,6 +139,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
                 key={input.id + "checkbox"}
                 defaultChecked={input?.required ?? false}
                 onChange={(e) => {
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
                   updateInput("required", e.target.checked, i)
                 }}
@@ -145,6 +152,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
                 <FormLabel> Load dynamic data from variable</FormLabel>
                 <VariableSearchInput
                   key={input.id + "dynamicDataVariableId"}
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
                   onSelectVariable={(v: Variable) => updateInput("dynamicDataVariableId", v?.id, i)}
                   placeholder="Search for a variable"
@@ -156,6 +164,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               <FormLabel>  Save answer  </FormLabel>
               <VariableSearchInput
                 key={input.id + "answerVariableId"}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 onSelectVariable={(v: Variable) => updateInput("answerVariableId", v?.id, i)}
                 placeholder="Search for a variable"
@@ -168,6 +177,24 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
 
       })}
       <Button onClick={addInput} > Add Input </Button>
+
+      {/* <Stack>
+
+        <FormLabel mb="0" htmlFor="variable">
+
+          Save status  in a variable:
+
+        </FormLabel>
+
+        <VariableSearchInput
+
+          initialVariableId={options.variableId}
+
+          onSelectVariable={handleVariableChange}
+
+        />
+
+      </Stack> */}
 
     </VStack>
   )

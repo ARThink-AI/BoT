@@ -3,17 +3,20 @@ import { methodNotAllowed } from '@typebot.io/lib/api'
 import prisma from '@typebot.io/lib/prisma'
 
 // import { Theme } from '@typebot.io/schemas';
-// @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
 function overwriteObjectValues(mainObject, inputObject) {
-  for (let key in inputObject) {
-     
-      if (mainObject.hasOwnProperty(key) && typeof inputObject[key] === 'object') {
+  for (const  key in inputObject) {
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+      if ( Object.prototype.hasOwnProperty.call(mainObject, key) && typeof inputObject[key] === 'object') {
           
-          for (let prop in inputObject[key]) {
-              
-              if (mainObject[key].hasOwnProperty(prop) && typeof inputObject[key][prop] === 'object' ) {
+          for (const  prop in inputObject[key]) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+              if ( Object.prototype.hasOwnProperty.call(mainObject[key], prop) && typeof inputObject[key][prop] === 'object' ) {
                  
-                  for ( let p in inputObject[key][prop] ) {
+                  for ( const  p in inputObject[key][prop] ) {
                       mainObject[key][prop][p] = inputObject[key][prop][p]
                       
                   }
@@ -61,11 +64,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
       const  typebot = await prisma.typebot.findUnique( {  where : { publicId : publicId  }   } );
-      let ownerShip = workspaces.filter( w => w.id == typebot?.workspaceId  ).length == 1;
+      const  ownerShip = workspaces.filter( w => w.id == typebot?.workspaceId  ).length == 1;
       if ( ownerShip ) {
-        let  prevtheme = typebot?.theme;
+        const   prevtheme = typebot?.theme;
         overwriteObjectValues(prevtheme ,theme  );
-        // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
         await prisma.typebot.update({ where : { id:  typebot?.id } , data:{  theme : prevtheme  }  });
         return res.status(200).json({ message : "Update Succesfull" })
       } else {
