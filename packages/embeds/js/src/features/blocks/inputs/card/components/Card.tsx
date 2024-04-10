@@ -1,25 +1,15 @@
 import { createSignal, For, createEffect } from 'solid-js';
 import './style.css'
 
+
 export const CardInput = (props: any) => {
   const [inputs, setInputs] = createSignal(props?.block?.options?.inputs ? props?.block?.options?.inputs : [])
 
   const [emailValid, setEmailValid] = createSignal(true);
   const [phoneValidation, setPhoneValidation] = createSignal(true);
 
-  // createEffect(() => {
-  //   const emailInput = inputs().find((input: any) => input.type === "email");
-  //   if (emailInput) {
-  //     const isValid = validateEmail(emailInput.userInput);
-  //     setEmailValid(isValid);
-  //   }
-  //   const phoneInput = inputs().find((input: any) => input.type === "phone");
-  //   if (phoneInput) {
-  //     const isValid = validatePhone(phoneInput.userInput)
-  //     setPhoneValidation(isValid)
-  //   }
 
-  // });
+
 
   const isAnyRequiredFieldEmpty = () => {
     return inputs().some((input: any) => {
@@ -39,17 +29,12 @@ export const CardInput = (props: any) => {
     });
   };
 
-  // function validateEmail() {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   const isValid = emailRegex.test(email());
-  //   setEmailValid(isValid);
 
-  // }
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  const validatePhone = (phoneNumber: string){
+  const validatePhone = (phoneNumber: any) => {
     const phoneRegex = /^\d{10}$/;
     return phoneRegex.test(phoneNumber)
   }
@@ -88,6 +73,7 @@ export const CardInput = (props: any) => {
     console.log("Submitted:", ans);
     if (props.onSubmit) {
       props.onSubmit({ label: "Submitted", value: JSON.stringify(ans) });
+
     } else {
       console.error("onSubmit prop is not provided.");
     }
@@ -125,12 +111,6 @@ export const CardInput = (props: any) => {
                           onChange={(e) =>
                             updateInput("userInput", e.target.value, i)
                           }
-
-
-
-
-
-
 
 
                           required={input.required}
@@ -267,6 +247,13 @@ export const CardInput = (props: any) => {
                         </div >
                       </>
                     )
+                  case "date":
+                    return (
+                      <input
+                        type="date"
+                        class='border p-2 rounded-md w-full mb-2'
+                      />
+                    )
 
 
 
@@ -274,16 +261,15 @@ export const CardInput = (props: any) => {
                     return null;
                 }
               })}
+              <input
+                type="date"
+                class='border p-2 rounded-md w-full mb-2'
+              />
             </div>
+
             <div id="buttons" class="flex justify-end mb-2 gap-2">
-              {/* onClick={() => {
-                // props.onSubmit({ label: "Submitted", value: JSON.stringify({ "vcdphidsm5nqdeiarvl11dj5g": "Dropdown1", "vj7dviiwtnnday3u8codhdzgc": "checkbox1" }) })
-                let ans = {};
-                for (let i = 0; i < props?.block?.options?.inputs?.length; i++) {
-                  ans[props?.block?.options?.inputs[i].answerVariableId] =
-                }
-              }}  */}
-              <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
+
+              <button type='submit' onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
                 Submit
               </button>
             </div>

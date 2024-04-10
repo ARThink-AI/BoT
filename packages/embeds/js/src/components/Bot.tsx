@@ -54,6 +54,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [isInitialized, setIsInitialized] = createSignal(false)
   const [error, setError] = createSignal<Error | undefined>()
 
+
+
+
+
+
   const initializeBot = async () => {
     const urlParams = new URLSearchParams(location.search)
     props.onInit?.()
@@ -168,6 +173,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   onCleanup(() => {
     setIsInitialized(false)
   })
+
 
   return (
     <>
@@ -525,9 +531,39 @@ const BotContent = (props: BotContentProps) => {
     }
 
   })
+  const [burgerMenu, setBurgerMenu] = createSignal(false)
+  const toggleBurgerIcon = () => {
+    setBurgerMenu(!burgerMenu())
+  }
 
   return (
     <>
+      <header class="bg-blue-500 text-white p-3 h-10  w-[100%]" >
+        <div class="flex justify-between items-center">
+          <div class="">
+            <button id="burgerIcon" onClick={toggleBurgerIcon} class="text-white focus:outline-none">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 18C3.71667 18 3.47917 17.9042 3.2875 17.7125C3.09583 17.5208 3 17.2833 3 17C3 16.7167 3.09583 16.4792 3.2875 16.2875C3.47917 16.0958 3.71667 16 4 16H15C15.2833 16 15.5208 16.0958 15.7125 16.2875C15.9042 16.4792 16 16.7167 16 17C16 17.2833 15.9042 17.5208 15.7125 17.7125C15.5208 17.9042 15.2833 18 15 18H4ZM18.9 16.3L15.3 12.7C15.1 12.5 15 12.2667 15 12C15 11.7333 15.1 11.5 15.3 11.3L18.9 7.7C19.0833 7.51667 19.3167 7.425 19.6 7.425C19.8833 7.425 20.1167 7.51667 20.3 7.7C20.4833 7.88333 20.575 8.11667 20.575 8.4C20.575 8.68333 20.4833 8.91667 20.3 9.1L17.4 12L20.3 14.9C20.4833 15.0833 20.575 15.3167 20.575 15.6C20.575 15.8833 20.4833 16.1167 20.3 16.3C20.1167 16.4833 19.8833 16.575 19.6 16.575C19.3167 16.575 19.0833 16.4833 18.9 16.3ZM4 13C3.71667 13 3.47917 12.9042 3.2875 12.7125C3.09583 12.5208 3 12.2833 3 12C3 11.7167 3.09583 11.4792 3.2875 11.2875C3.47917 11.0958 3.71667 11 4 11H12C12.2833 11 12.5208 11.0958 12.7125 11.2875C12.9042 11.4792 13 11.7167 13 12C13 12.2833 12.9042 12.5208 12.7125 12.7125C12.5208 12.9042 12.2833 13 12 13H4ZM4 8C3.71667 8 3.47917 7.90417 3.2875 7.7125C3.09583 7.52083 3 7.28333 3 7C3 6.71667 3.09583 6.47917 3.2875 6.2875C3.47917 6.09583 3.71667 6 4 6H15C15.2833 6 15.5208 6.09583 15.7125 6.2875C15.9042 6.47917 16 6.71667 16 7C16 7.28333 15.9042 7.52083 15.7125 7.7125C15.5208 7.90417 15.2833 8 15 8H4Z" fill="white" />
+              </svg>
+            </button>
+            {burgerMenu() && (
+              <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
+                <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
+                <ul>
+                  <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Download Chat</a></li>
+                  <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Email Chat</a></li>
+                  <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
+                  {/* Add more menu items as needed */}
+                </ul>
+                {/* <button onClick={closeBurgerMenu} class="text-black focus:outline-none mt-2">Close</button> */}
+              </div>
+
+            )}
+          </div>
+          <div />
+
+        </div>
+      </header>
       <div
         ref={botContainer}
         class={
@@ -547,6 +583,7 @@ const BotContent = (props: BotContentProps) => {
         </div>
         </div> */}
         <div ref={conversationContainer} class="flex w-full h-full justify-center">
+
 
           <ConversationContainer
             // liveAgent={liveAgent()}
@@ -589,7 +626,29 @@ const BotContent = (props: BotContentProps) => {
       </Show>
 
       {/* <div style={{ "margin-left": "70%", position: "relative" }} > */}
+      <Show when={props.initialChatReply.typebot.settings.general.isInputEnabled}>
+        <footer class="bg-blue-200 text-white  p-[10px] absolute bottom-[20px] w-full ">
+          <div class="container flex justify-center gap-2 lg:w-[70%] md:1/3 sm:w-full mx-auto">
+            <input placeholder='type your message' class="w-50 lg:w-2/3 md:w-2/3 sm:w-full rounded-md pl-2 text-[#364652]" type="text" />
+            <button class="rounded-full bg-blue-500 ml-2"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_63_137)">
+                <rect width="36" height="36" rx="18" fill="#0077CC" />
+                <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
+              </g>
+              <defs>
+                <clipPath id="clip0_63_137">
+                  <rect width="36" height="36" rx="18" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+            </button>
 
+
+          </div>
+          <div class="mt-[2px] text-center text-[10px] text-[#343741]">Quadz bot can make mistakes. Consider checking
+            <a class="text-blue-400 ml-[4px]" href="#">important information</a> .
+          </div>
+        </footer> </Show>
       <LiteBadge botContainer={botContainer} />
 
 

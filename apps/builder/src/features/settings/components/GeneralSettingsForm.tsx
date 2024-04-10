@@ -54,7 +54,13 @@ export const GeneralSettingsForm = ({
     })
 
 
+  const handleCustomInput = (isInputEnabled: boolean) => {
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isInputEnabled,
+    })
 
+  }
 
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
@@ -86,6 +92,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isVoiceEnabled ?? true}
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
+      />
+      <SwitchWithLabel
+        label="Custom Input"
+        initialValue={generalSettings.isInputEnabled ?? true}
+        onCheckChange={handleCustomInput}
+        moreInfoContent="Toggle for input"
       />
 
 
