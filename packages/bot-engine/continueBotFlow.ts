@@ -139,6 +139,7 @@ export const continueBotFlow = async (
   if ( block?.options?.provider == "Razorpay" ) {
       formattedReply = formattedReply?.split("payload")[0]
   }
+  
   const groupHasMoreBlocks = blockIndex < group.blocks.length - 1
 
   const nextEdgeId = getOutgoingEdgeId(newSessionState)(block, formattedReply)
@@ -204,6 +205,34 @@ const processAndSaveAnswer =
       let newState = await saveAnswer(state, block, itemId)(reply.split("payload")[1])
       newState = saveVariableValueIfAny(newState, block)(reply.split("payload")[1])
       return newState
+    } else if ( block?.type == InputBlockType.CARD ) {
+      
+       try {
+        let variables = JSON.parse(reply);
+        let newVariables  = [];
+        for ( const prop in variables  ) {
+          const existingVariable = state.typebotsQueue[0].typebot.variables.find(
+            byId(prop)
+          )
+          if ( existingVariable && variables[prop] ) {
+            const newVariable = {
+              ...existingVariable,
+              value: safeJsonParse(variables[prop]),
+            }
+            newVariables.push(newVariable)
+          }
+        }
+        console.log("new varaibles",newVariables);
+        let newState = await saveAnswer(state, block, itemId)("Submit")
+        let newSession =   updateVariablesInSession(newState)(newVariables);
+        console.log("new session val", JSON.stringify(newSession) );
+        return newSession
+       
+       } catch (err) {
+        console.log("error",err);
+        return state;
+       }
+     
     } else {
       let newState = await saveAnswer(state, block, itemId)(reply)
       newState = saveVariableValueIfAny(newState, block)(reply)
@@ -401,6 +430,11 @@ const parseReply =
         if (inputValue === 'fail') return { status: 'fail' }
         return { status: 'success', reply: inputValue }
         // return { status : 'success' , reply : inputValue.includes("payload") ?  inputValue.split("payload")[0] : inputValue }
+      }
+      case InputBlockType.CARD: {
+        if (!inputValue) return { status: 'fail' }
+        if (inputValue === 'fail') return { status: 'fail' }
+        return { status: 'success', reply: inputValue }
       }
       case InputBlockType.BARCODE_READER: {
         if (!inputValue) return { status: 'fail' }

@@ -45,7 +45,12 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
     case InputBlockType.BARCODE_READER:
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
       //@ts-ignore
-      return    <Text fontSize="sm">{scopedT('barCodeReader.label')}</Text>
+      return <Text fontSize="sm">{scopedT('barCodeReader.label')}</Text>
+    case InputBlockType.CARD:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+      //@ts-ignore
+      return <Text fontSize="sm">{scopedT('card.label')}</Text>
+
     case InputBlockType.PAYMENT:
       return <Text fontSize="sm">{scopedT('payment.label')}</Text>
     case InputBlockType.RATING:
@@ -93,6 +98,6 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
     case IntegrationBlockType.ZEMANTIC_AI:
       return <Text fontSize="sm">{scopedT('zemanticAi.label')}</Text>
     case IntegrationBlockType.FLOWWISE:
-        return <Text fontSize="sm">{scopedT('flowwise.label')}</Text>   
+      return <Text fontSize="sm">{scopedT('flowwise.label')}</Text>
   }
 }

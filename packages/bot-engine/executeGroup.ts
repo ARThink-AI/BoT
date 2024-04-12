@@ -18,6 +18,7 @@ import { executeLogic } from './executeLogic'
 import { executeIntegration } from './executeIntegration'
 import { computePaymentInputRuntimeOptions } from './blocks/inputs/payment/computePaymentInputRuntimeOptions'
 import { injectVariableValuesInButtonsInputBlock } from './blocks/inputs/buttons/injectVariableValuesInButtonsInputBlock'
+import { injectVariableValuesInCardInputBlock } from './blocks/inputs/card/injectVariableValuesInCardInputBlock' 
 import { injectVariableValuesInPictureChoiceBlock } from './blocks/inputs/pictureChoice/injectVariableValuesInPictureChoiceBlock'
 import { getPrefilledInputValue } from './getPrefilledValue'
 import { parseDateInput } from './blocks/inputs/date/parseDateInput'
@@ -200,6 +201,9 @@ export const parseInput =
     switch (block.type) {
       case InputBlockType.CHOICE: {
         return injectVariableValuesInButtonsInputBlock(state)(block)
+      }
+      case InputBlockType.CARD: {
+        return injectVariableValuesInCardInputBlock(state)(block)
       }
       case InputBlockType.PICTURE_CHOICE: {
         return injectVariableValuesInPictureChoiceBlock(

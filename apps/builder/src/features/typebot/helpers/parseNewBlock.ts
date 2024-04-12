@@ -46,6 +46,7 @@ import {
   BlockWithItems,
   defaultTypebotLinkOptions,
   zemanticAiDefaultOptions,
+  defaultCardInputOptions
 } from '@typebot.io/schemas'
 import { defaultPictureChoiceOptions } from '@typebot.io/schemas/features/blocks/inputs/pictureChoice'
 import { defaultBarCodeInputOptions } from "@typebot.io/schemas/features/blocks/inputs/barCode";
@@ -110,6 +111,8 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
       return defaultPictureChoiceOptions
     case InputBlockType.BARCODE_READER:
      return defaultBarCodeInputOptions
+    case InputBlockType.CARD:
+      return defaultCardInputOptions 
     case InputBlockType.PAYMENT:
       return defaultPaymentInputOptions
     case InputBlockType.RATING:

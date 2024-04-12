@@ -25,6 +25,7 @@ import {
   ratingInputBlockSchema,
   fileInputStepSchema,
   barCodeSchema,
+  cardSchema
 } from './inputs'
 import {
   chatwootBlockSchema,
@@ -104,6 +105,7 @@ export const inputBlockSchemas = [
   fileInputStepSchema,
   pictureChoiceBlockSchema,
   barCodeSchema,
+  cardSchema
 ] as const
 
 export const blockSchema = z.discriminatedUnion('type', [
