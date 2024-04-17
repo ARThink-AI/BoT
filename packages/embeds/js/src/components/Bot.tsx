@@ -81,6 +81,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     sessionStorage.removeItem("answer");
     sessionStorage.removeItem("live");
     sessionStorage.removeItem("liveChat");
+    // sessionStorage.removeItem("resultId");
 
 
     const typebotIdFromProps =
@@ -125,6 +126,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
         typebotIdFromProps,
         data.resultId
       )
+
+    // sessionStorage.setItem("resultId", data.resultId as string);
 
     setInitialChatReply(data);
     sessionStorage.setItem("intialize", JSON.stringify(data));

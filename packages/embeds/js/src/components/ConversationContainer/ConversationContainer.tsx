@@ -8,7 +8,7 @@ import {
   onMount,
   Show,
 } from 'solid-js'
-import { sendMessageQuery, storeLiveChatQuery } from '@/queries/sendMessageQuery'
+import { sendMessageQuery, storeLiveChatQuery, getTicketIdQuery } from '@/queries/sendMessageQuery'
 import { ChatChunk } from './ChatChunk'
 import {
   BotContext,
@@ -80,7 +80,7 @@ export const ConversationContainer = (props: Props) => {
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   // ])
-
+  console.log("props conversation container", JSON.stringify(props));
   const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
     {
       input: props.initialChatReply.input,
@@ -733,120 +733,157 @@ export const ConversationContainer = (props: Props) => {
 
   const handleSkip = () => sendMessage(undefined)
 
-  const toggleLiveAgent = () => {
-    if (!live()) {
+  const toggleLiveAgent = async () => {
+    try {
+      if (!live()) {
+        console.log("props resultId", props);
+        const ticketIdResponse = await getTicketIdQuery({
 
+          apiHost: props.context.apiHost,
 
-      console.log("live agent enabled");
-
-      let chunks = [...chatChunks()];
-      // @ts-ignore
-      setLastInput(chunks[chunks.length - 1].input);
-      sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
-
-      console.log("last input", chunks[chunks.length - 1].input);
-
-      chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
-      chunks[chunks.length - 1].input = undefined
-
-      chunks.push(
-        {
-          input: {
-            "id": "ow5y1j9yvsp7jo46qaswc38k",
-            "groupId": "nb24en7liv3s8e959uxtz1h0",
-            "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
-            // @ts-ignore
-            "type": "text input",
-            "options": {
-              "labels": {
-                "placeholder": "Ask question",
-                "button": "Send"
-              },
-              "variableId": "vb6co7ry0n84c9tuml9oae2ld",
-              "isLong": false
+          typebotId: props.context.typebot.id,
+          resultId: props.initialChatReply.resultId,
+          ticketIdVariable: props.context.typebot.settings.general.ticketVariableName,
+          accessTokenVariable: props.context.typebot.settings.general.accessTokenVariableName
+        });
+        console.log("ticket id response", ticketIdResponse);
+        // @ts-ignore
+        if (ticketIdResponse?.data?.ticketId && ticketIdResponse?.data?.accessToken && props.context.typebot.settings.general.quadzBaseUrl) {
+          let liveAgentConnection = await fetch(`${props.context.typebot.settings.general.quadzBaseUrl}/api/v1/livechat`, {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              // @ts-ignore
+              'accessToken': ticketIdResponse?.data?.accessToken
             },
-            "prefilledValue": "Hi"
-          },
-          messages: [
-            {
-              id: "unhxagqgd46929s701gnz5z8",
+            body: JSON.stringify({
               // @ts-ignore
-              type: "text",
-              content: {
-                richText: [
-                  {
-                    "type": "variable",
-                    "children": [
-                      {
-                        "type": "p",
-                        "children": [
-                          {
-                            "text": "Enabled live Agent"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ],
-          clientSideActions: undefined
-        }
-      );
+              ticketId: ticketIdResponse?.data?.ticketId,
+              roomId: props.initialChatReply.resultId,
+              message: 'abcd'
+            })
+          });
+          liveAgentConnection = await liveAgentConnection.json();
+          console.log("live agent connection response", liveAgentConnection);
+          console.log("live agent enabled");
 
-
-      sessionStorage.removeItem("answer");
-      console.log("before chat chunk");
-      setChatChunks(chunks);
-      console.log("after chat chunk");
-
-
-
-
-    } else {
-      console.log("live agent disabled");
-      let chunks = [...chatChunks()];
-      chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
-      chunks[chunks.length - 1].input = undefined
-      chunks.push(
-        {
+          let chunks = [...chatChunks()];
           // @ts-ignore
-          input: lastInput(),
-          messages: [
+          setLastInput(chunks[chunks.length - 1].input);
+          sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
+
+          console.log("last input", chunks[chunks.length - 1].input);
+
+          chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+          chunks[chunks.length - 1].input = undefined
+
+          chunks.push(
             {
-              id: "unhxagqgd46929s701gnz5z8",
-              // @ts-ignore
-              type: "text",
-              content: {
-                richText: [
-                  {
-                    "type": "variable",
-                    "children": [
+              input: {
+                "id": "ow5y1j9yvsp7jo46qaswc38k",
+                "groupId": "nb24en7liv3s8e959uxtz1h0",
+                "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+                // @ts-ignore
+                "type": "text input",
+                "options": {
+                  "labels": {
+                    "placeholder": "Ask question",
+                    "button": "Send"
+                  },
+                  "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+                  "isLong": false
+                },
+                "prefilledValue": "Hi"
+              },
+              messages: [
+                {
+                  id: "unhxagqgd46929s701gnz5z8",
+                  // @ts-ignore
+                  type: "text",
+                  content: {
+                    richText: [
                       {
-                        "type": "p",
+                        "type": "variable",
                         "children": [
                           {
-                            "text": "Exited live Agent"
+                            "type": "p",
+                            "children": [
+                              {
+                                "text": "Enabled live Agent"
+                              }
+                            ]
                           }
                         ]
                       }
                     ]
                   }
-                ]
-              }
+                }
+              ],
+              clientSideActions: undefined
             }
-          ],
-          clientSideActions: undefined
+          );
+
+
+          sessionStorage.removeItem("answer");
+          console.log("before chat chunk");
+          setChatChunks(chunks);
+          console.log("after chat chunk");
+        } else {
+          throw new Error("Improperly configured");
         }
-      );
-      sessionStorage.removeItem("answer");
-      setChatChunks(chunks);
+
+
+
+
+
+      } else {
+        console.log("live agent disabled");
+        let chunks = [...chatChunks()];
+        chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+        chunks[chunks.length - 1].input = undefined
+        chunks.push(
+          {
+            // @ts-ignore
+            input: lastInput(),
+            messages: [
+              {
+                id: "unhxagqgd46929s701gnz5z8",
+                // @ts-ignore
+                type: "text",
+                content: {
+                  richText: [
+                    {
+                      "type": "variable",
+                      "children": [
+                        {
+                          "type": "p",
+                          "children": [
+                            {
+                              "text": "Exited live Agent"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            clientSideActions: undefined
+          }
+        );
+        sessionStorage.removeItem("answer");
+        setChatChunks(chunks);
+      }
+      console.log("live  changeeee");
+      let l = live();
+      sessionStorage.setItem("live", `${!l}`);
+      setLive(!l);
+    } catch (err) {
+      console.log("error happened inside toggleLiveAgent");
     }
-    console.log("live  changeeee");
-    let l = live();
-    sessionStorage.setItem("live", `${!l}`);
-    setLive(!l);
+
   }
 
   return (
@@ -855,18 +892,22 @@ export const ConversationContainer = (props: Props) => {
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-      <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
+      {props.context.typebot.settings.general.isLiveChatEnabled && (
+        <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
 
-        <div style={{ display: "flex", "flex-direction": "row", "align-items": "center", gap: "40" }} >
-          <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
-          <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
-          <button onClick={() => {
-            toggleLiveAgent();
-            // let currentVal = liveAgent();
-            // setLiveAgent( !currentVal );
-          }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
+          <div style={{ display: "flex", "flex-direction": "row", "align-items": "center", gap: "40" }} >
+            <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
+            <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
+            <button onClick={() => {
+              toggleLiveAgent();
+              // let currentVal = liveAgent();
+              // setLiveAgent( !currentVal );
+            }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
+          </div>
         </div>
-      </div>
+      )}
+
+
       <For each={chatChunks()}>
         {(chatChunk, index) => {
           console.log("chat chunk", chatChunk, index);

@@ -84,6 +84,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
       variableId2: variable?.id
     })
   }
+  const handleVariableChange4 = (variable?: Variable) => {
+    onOptionsChange({
+      ...options,
+      variableId3: variable?.id
+    })
+  }
+
+
 
   const handleVariableChange2 = (variable?: Variable) => {
     onOptionsChange({
@@ -302,6 +310,14 @@ export const CreateTicket = ({ options, onOptionsChange }) => {
           onSelectVariable={handleVariableChange2}
           placeholder="Search for a variable"
           initialVariableId={options?.variableId1}
+        />
+      </VStack>
+      <VStack spacing={1} >
+        <FormLabel>Save Access Token  in variable</FormLabel>
+        <VariableSearchInput
+          onSelectVariable={handleVariableChange4}
+          placeholder="Search for a variable"
+          initialVariableId={options?.variableId3}
         />
       </VStack>
 

@@ -11,6 +11,8 @@ const generalSettings = z.object({
   isVoiceEnabled : z.boolean().optional(),
   isLiveChatEnabled:  z.boolean().optional(),
   ticketVariableName:  z.string().optional(),
+  accessTokenVariableName:  z.string().optional(),
+  quadzBaseUrl : z.string().optional(),
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({

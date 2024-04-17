@@ -27,3 +27,21 @@ export const sendMessageQuery = ({
       url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/typebots/${typebotId}/results/${resultId}`,
       body,
     })  
+
+export const getTicketIdQuery = ({
+    // @ts-ignore
+    apiHost ,
+    // @ts-ignore
+    typebotId ,
+    // @ts-ignore
+    resultId ,
+    // @ts-ignore
+    ticketIdVariable ,
+    // @ts-ignore 
+    accessTokenVariable 
+}) => 
+  sendRequest({
+    method : "GET",
+    url : `${isNotEmpty(apiHost) ? apiHost : guessApiHost() }/api/typebots/${typebotId}/results/${resultId}/ticket/${ticketIdVariable}/get?accessTokenVariable=${accessTokenVariable}`  
+    
+  })    

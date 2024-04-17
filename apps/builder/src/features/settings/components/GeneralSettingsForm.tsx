@@ -66,6 +66,22 @@ export const GeneralSettingsForm = ({
       ticketVariableName
     })
 
+  const handleAccessTokenVariableNameChange = (accessTokenVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      accessTokenVariableName
+    })
+
+  const handleQuadzBaseUrlChange = (quadzBaseUrl: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      quadzBaseUrl
+    })
+
+
+
+
+
 
 
 
@@ -106,11 +122,39 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleLiveChatChange}
         moreInfoContent="Toggle for live chat"
       />
-      <Text> Ticket Variable  </Text>
-      <TextInput
-        defaultValue={generalSettings.ticketVariableName ? generalSettings.ticketVariableName : ""}
-        onChange={e => handleTicketVariableNameChange(e)}
-      />
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Ticket Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.ticketVariableName ? generalSettings.ticketVariableName : ""}
+            onChange={e => handleTicketVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Access Token  Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.accessTokenVariableName ? generalSettings.accessTokenVariableName : ""}
+            onChange={e => handleAccessTokenVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Quadz Base Url   </Text>
+          <TextInput
+            defaultValue={generalSettings.quadzBaseUrl ? generalSettings.quadzBaseUrl : ""}
+            onChange={e => handleQuadzBaseUrlChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
 
 
 
