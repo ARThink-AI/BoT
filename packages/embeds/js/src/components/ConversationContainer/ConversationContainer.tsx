@@ -224,6 +224,11 @@ export const ConversationContainer = (props: Props) => {
         chunks[chunks.length - 2].input.answer = "Submitted"
 
         sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+      } else if (chunks[chunks.length - 2].input?.type == "file input") {
+        // @ts-ignore
+        chunks[chunks.length - 2].input.answer = "File uploaded"
+
+        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
       } else {
         // @ts-ignore
         chunks[chunks.length - 2].input.answer = sessionStorage.getItem("answer");

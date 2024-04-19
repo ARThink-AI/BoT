@@ -423,7 +423,7 @@ const parseReply =
           return block.options.isRequired
             ? { status: 'fail' }
             : { status: 'skip' }
-        return { status: 'success', reply: inputValue }
+        return { status: 'success', reply: inputValue.split("?").length > 0 ? inputValue.split("?")[0] : inputValue }
       }
       case InputBlockType.PAYMENT: {
         if (!inputValue) return { status: 'fail' }
