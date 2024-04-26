@@ -15,11 +15,18 @@ import { BubbleParams } from '../types'
 import { Bot, BotProps } from '../../../components/Bot'
 import { getPaymentInProgressInStorage } from '@/features/blocks/inputs/payment/helpers/paymentInProgressStorage'
 import { io } from "socket.io-client";
+// import { ConversationContainer } from '@/components/ConversationContainer'
+
+import jsPDF from 'jspdf/dist/jspdf.umd.js'
+import html2canvas from 'html2canvas';
+
 export type BubbleProps = BotProps &
   BubbleParams & {
     onOpen?: () => void
     onClose?: () => void
     onPreviewMessageClick?: () => void
+
+
   }
 
 export const Bubble = (props: BubbleProps) => {
@@ -50,7 +57,7 @@ export const Bubble = (props: BubbleProps) => {
   const [socketInstance, setSocketInstance] = createSignal(null);
   const [burgerMenu, setBurgerMenu] = createSignal(false)
   const [isClicked, setIsClicked] = createSignal(false);
-
+  let chatBubbleContainer;
   // Function to handle button click
   const handleClick = () => {
     setIsClicked(!isClicked());
@@ -160,6 +167,251 @@ export const Bubble = (props: BubbleProps) => {
     setIsPreviewMessageDisplayed(false)
   }
 
+  // function convertHTMLtoPDF(chatContainer) {
+  //   let doc = new jsPDF('l', 'mm', [1500, 1400]);
+
+  //   // Get the dimensions of the content
+  //   let containerWidth = chatContainer.offsetWidth;
+  //   let containerHeight = chatContainer.offsetHeight;
+
+  //   // Get the dimensions of the PDF page
+  //   let pageWidth = doc.internal.pageSize.getWidth();
+  //   let pageHeight = doc.internal.pageSize.getHeight();
+
+  //   // Set the desired margin from the top
+  //   let marginTop = 20;
+
+  //   // Calculate the position to center the content horizontally
+  //   let xPos = (pageWidth - containerWidth) / 2;
+
+  //   // Calculate the position to start the content vertically
+  //   let yPos = marginTop;
+
+  //   doc.html(chatContainer, {
+  //     callback: function (doc) {
+  //       doc.save("newpdf.pdf");
+  //     },
+  //     x: xPos,
+  //     y: yPos
+  //   });
+  // } l
+
+  // let chatContainer = document.getElementById('chatContainerDiv');
+  // function convertHTMLtoPDF(chatContainer: any) {
+  //   let doc = new jsPDF('l', 'mm', [1500, 1400]);
+
+  //   // Get the dimensions of the content
+
+  //   let containerWidth = chatContainer.offsetWidth;
+  //   let containerHeight = chatContainer.offsetHeight;
+  //   console.log("chat container div while calling pdf func", chatContainer)
+  //   // Get the dimensions of the PDF page
+  //   let pageWidth = doc.internal.pageSize.getWidth();
+  //   let pageHeight = doc.internal.pageSize.getHeight();
+
+  //   // Set the desired margin from the top
+  //   let marginTop = 20;
+
+  //   // Calculate the position to center the content horizontally
+  //   let xPos = (pageWidth - containerWidth) / 2;
+
+  //   // Calculate the position to start the content vertically
+  //   let yPos = marginTop;
+
+  //   doc.html(chatContainer, {
+  //     callback: function (doc) {
+  //       doc.save("chat_history.pdf");
+  //     },
+  //     x: xPos,
+  //     y: yPos
+  //   });
+  // }
+
+  // // Define the convertHTMLtoPDF function
+  // function convertHTMLtoPDF() {
+  //   // Select the typebot-standard element
+  //   const typebotStandard = document.querySelector('typebot-bubble');
+
+  //   // Check if the typebot-standard element exists
+  //   if (typebotStandard) {
+  //     // Access the shadow root of typebot-standard
+  //     const shadowRoot = typebotStandard.shadowRoot;
+
+  //     // Check if the shadow root exists
+  //     if (shadowRoot) {
+  //       // Select the chatContainerDiv element inside the shadow root
+  //       const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
+
+  //       // Check if the chatContainerDiv element exists
+  //       if (chatContainer) {
+  //         // Create a new jsPDF instance
+  //         let doc = new jsPDF('l', 'mm', [1500, 1400]);
+
+  //         // Get the dimensions of the content
+  //         let containerWidth = chatContainer.scrollWidth; // Use scrollWidth instead of offsetWidth
+  //         let containerHeight = chatContainer.scrollHeight; // Use scrollHeight instead of offsetHeight
+
+  //         // Get the dimensions of the PDF page
+  //         let pageWidth = doc.internal.pageSize.getWidth();
+  //         let pageHeight = doc.internal.pageSize.getHeight();
+
+  //         // Set the desired margin from the top
+  //         let marginTop = 20;
+
+  //         // Calculate the position to center the content horizontally
+  //         let xPos = (pageWidth - containerWidth) / 2;
+
+  //         // Calculate the position to start the content vertically
+  //         let yPos = marginTop;
+
+  //         // Save the chatContainerDiv content as HTML string
+  //         let chatContent = chatContainer;
+
+  //         console.log("chat pdf div html", chatContent)
+
+  //         // Add the chatContainerDiv content to PDF
+  //         doc.html(chatContent, {
+  //           callback: function (doc) {
+  //             doc.save("chat_history.pdf");
+  //           },
+  //           x: xPos,
+  //           y: yPos
+  //         });
+  //       } else {
+  //         console.log("chatContainerDiv not found inside shadow root");
+  //       }
+  //     } else {
+  //       console.log("Shadow root not found for typebot-standard");
+  //     }
+  //   } else {
+  //     console.log("typebot-standard not found in the DOM");
+  //   }
+  // }
+
+  // // Define the convertHTMLtoPDF function
+  // function convertHTMLtoPDF() {
+  //   // Select the typebot-standard element
+  //   const typebotStandard = document.querySelector('typebot-bubble');
+
+  //   // Check if the typebot-standard element exists
+  //   if (typebotStandard) {
+  //     // Access the shadow root of typebot-standard
+  //     const shadowRoot = typebotStandard.shadowRoot;
+
+  //     // Check if the shadow root exists
+  //     if (shadowRoot) {
+  //       // Select the chatContainerDiv element inside the shadow root
+  //       const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
+
+  //       // Check if the chatContainerDiv element exists
+  //       if (chatContainer) {
+  //         // Create a new jsPDF instance
+  //         let doc = new jsPDF('l', 'mm', [1500, 1400]);
+
+  //         // Get the dimensions of the content
+  //         let containerWidth = chatContainer.offsetWidth;
+  //         let containerHeight = chatContainer.offsetHeight;
+
+  //         // Get the dimensions of the PDF page
+  //         let pageWidth = doc.internal.pageSize.getWidth();
+  //         let pageHeight = doc.internal.pageSize.getHeight();
+
+  //         // Set the desired margin from the top
+  //         let marginTop = 20;
+
+  //         // Calculate the position to center the content horizontally
+  //         let xPos = (pageWidth - containerWidth) / 2;
+
+  //         // Calculate the position to start the content vertically
+  //         let yPos = marginTop;
+
+  //         // Save the chatContainerDiv content as HTML string
+  //         let chatContent = chatContainer;
+
+  //         console.log("chat pdf div html", chatContent)
+
+  //         // Add the chatContainerDiv content to PDF
+  //         doc.html(chatContent, {
+  //           callback: function (doc) {
+  //             doc.save("chat_history.pdf");
+  //           },
+  //           x: xPos,
+  //           y: yPos
+  //         });
+  //       } else {
+  //         console.log("chatContainerDiv not found inside shadow root");
+  //       }
+  //     } else {
+  //       console.log("Shadow root not found for typebot-standard");
+  //     }
+  //   } else {
+  //     console.log("typebot-standard not found in the DOM");
+  //   }
+  // }
+
+
+
+  // a4 pdf the convertHTMLtoPDF function
+  function convertHTMLtoPDF() {
+    // Select the typebot-standard element
+    const typebotStandard = document.querySelector('typebot-bubble');
+
+    // Check if the typebot-standard element exists
+    if (typebotStandard) {
+      // Access the shadow root of typebot-standard
+      const shadowRoot = typebotStandard.shadowRoot;
+
+      // Check if the shadow root exists
+      if (shadowRoot) {
+        // Select the chatContainerDiv element inside the shadow root
+        const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
+
+        // Check if the chatContainerDiv element exists
+        if (chatContainer) {
+          // Create a new jsPDF instance
+          let doc = new jsPDF('p', 'px', 'a4');
+
+          // Get the dimensions of the content
+          let containerWidth = chatContainer.offsetWidth;
+          let containerHeight = chatContainer.offsetHeight;
+
+          // Get the dimensions of the PDF page
+          let pageWidth = doc.internal.pageSize.getWidth();
+          let pageHeight = doc.internal.pageSize.getHeight();
+
+          // Set the desired margin from the top and sides
+          let marginTop = 20;
+          let marginLeft = 20;
+          let marginRight = 20;
+
+          // Calculate the position to center the content horizontally
+          // let xPos = marginLeft;
+          let xPos = marginLeft + ((pageWidth - marginLeft - marginRight - containerWidth) / 2);
+
+          // Calculate the position to start the content vertically
+          let yPos = marginTop;
+
+          // Add the chatContainerDiv content to PDF
+          doc.html(chatContainer, {
+            callback: function (doc) {
+              doc.save("chat_history.pdf");
+            },
+            x: xPos,
+            y: yPos,
+            width: pageWidth - marginLeft - marginRight
+          });
+        } else {
+          console.log("chatContainerDiv not found inside shadow root");
+        }
+      } else {
+        console.log("Shadow root not found for typebot-standard");
+      }
+    } else {
+      console.log("typebot-standard not found in the DOM");
+    }
+  }
+
+
   return (
     <>
       <style>{styles}</style>
@@ -174,6 +426,7 @@ export const Bubble = (props: BubbleProps) => {
           buttonSize={bubbleProps.theme?.button?.size}
           onClick={handlePreviewMessageClick}
           onCloseClick={hideMessage}
+
         />
       </Show>
       <BubbleButton
@@ -186,7 +439,9 @@ export const Bubble = (props: BubbleProps) => {
 
       <div
         part="bot"
+        // ref={chatBubbleContainer}
         style={{
+
 
           height: 'calc(100% - 48px)',
           transition:
@@ -223,7 +478,7 @@ export const Bubble = (props: BubbleProps) => {
                   <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
                     <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
                     <ul>
-                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Download Chat</a></li>
+                      <li><a onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Download Chat</a></li>
                       <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Email Chat</a></li>
                       <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
                       {/* Add more menu items as needed */}
@@ -250,7 +505,7 @@ export const Bubble = (props: BubbleProps) => {
               </div>
             </div>
           </header>
-          <footer class="bg-[#E6F1FA] h-[117px] text-white p-4 absolute bottom-[30px] z-10  w-[100%]">
+          <footer class="bg-[#E6F1FA] h-[100px] text-white p-4 absolute bottom-[30px] z-10  w-[100%]">
             <div class="container flex justify-center gap-2 sm:w-full mx-auto">
               <input placeholder='type your message' class="w-50 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" type="text" />
               <button class="rounded-full bg-[#0077CC]">
