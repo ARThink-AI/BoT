@@ -80,7 +80,7 @@ export const ConversationContainer = (props: Props) => {
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   // ])
-  console.log("props conversation container", JSON.stringify(props));
+  // console.log("props conversation container", JSON.stringify(props));
   const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
     {
       input: props.initialChatReply.input,
