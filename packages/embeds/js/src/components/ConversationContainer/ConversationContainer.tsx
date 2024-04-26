@@ -824,8 +824,8 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          // const socketInstance = io(`${props.context.typebot.settings.general.quadzBaseUrl}:3080`, {
-          const socketInstance = io(`http://localhost:3080`, {
+          const socketInstance = io(`${props.context.typebot.settings.general.quadzBaseUrl}:3080`, {
+            // const socketInstance = io(`http://localhost:3080`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
