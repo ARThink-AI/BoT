@@ -80,7 +80,7 @@ export const ConversationContainer = (props: Props) => {
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   // ])
-  console.log("props conversation container", JSON.stringify(props));
+  // console.log("props conversation container", JSON.stringify(props));
   const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
     {
       input: props.initialChatReply.input,
@@ -95,10 +95,14 @@ export const ConversationContainer = (props: Props) => {
     ChatReply['dynamicTheme']
   >(props.initialChatReply.dynamicTheme)
   const [theme, setTheme] = createSignal(props.initialChatReply.typebot.theme)
-  const [isSending, setIsSending] = createSignal(false)
+  const [isSending, setIsSending] = createSignal(false);
+
+  // const [userMessage, setMessage] = createSignal("");
+
   const [blockedPopupUrl, setBlockedPopupUrl] = createSignal<string>()
   const [hasError, setHasError] = createSignal(false)
   const [liveSocketInstance, setLiveSocketInstance] = createSignal(null);
+  const [userMessage, setUserMessage] = createSignal("");
   // @ts-ignore
   const [lastInput, setLastInput] = createSignal(sessionStorage.getItem("lastinput") ? JSON.parse(sessionStorage.getItem("lastinput")) : null);
   // @ts-ignore
@@ -237,6 +241,7 @@ export const ConversationContainer = (props: Props) => {
     //  sessionStorage.setItem("chatchunks", JSON.stringify( chatChunks() ) );
   },);
 
+
   onMount(() => {
     ; (async () => {
       // console.log("conversation container", JSON.stringify(props));
@@ -330,7 +335,7 @@ export const ConversationContainer = (props: Props) => {
         setLiveSocketInstance(socketInstance);
         socketInstance.emit("joinRoom", { sessionId: props.initialChatReply.resultId });
 
-        socketInstance.on("responseFromBot", ({ message, id }) => {
+        socketInstance.on("responseFromQuadz", ({ message, id }) => {
           console.log("reply", message);
           let chunks = [...chatChunks()];
           chunks.push(
@@ -393,7 +398,7 @@ export const ConversationContainer = (props: Props) => {
           })
 
 
-          socketInstance.off("responseFromBot")
+          socketInstance.off("responseFromQuadz")
         })
         socketInstance.emit("sendToQuadz", { message, id: "123", sessionId: props.initialChatReply.resultId });
         let livechatData = [];
@@ -545,6 +550,7 @@ export const ConversationContainer = (props: Props) => {
         sessionStorage.removeItem("initialize_css");
         sessionStorage.removeItem("bot_init");
         sessionStorage.removeItem("chatchunks");
+        sessionStorage.removeItem("live");
         props.initializeBot();
         return
       }
@@ -733,6 +739,280 @@ export const ConversationContainer = (props: Props) => {
 
   const handleSkip = () => sendMessage(undefined)
 
+  // main section
+  createEffect(async () => {
+    try {
+      console.log("live changedd", live());
+      if (live() && !liveSocketInstance()) {
+        console.log("live if statement");
+        const ticketIdResponse = await getTicketIdQuery({
+
+          apiHost: props.context.apiHost,
+
+          typebotId: props.context.typebot.id,
+          resultId: props.initialChatReply.resultId,
+          ticketIdVariable: props.context.typebot.settings.general.ticketVariableName,
+          accessTokenVariable: props.context.typebot.settings.general.accessTokenVariableName
+        });
+        console.log("ticket id response", ticketIdResponse);
+
+        // @ts-ignore
+        if (ticketIdResponse?.data?.ticketId && ticketIdResponse?.data?.accessToken && props.context.typebot.settings.general.quadzBaseUrl) {
+          let liveAgentConnection = await fetch(`${props.context.typebot.settings.general.quadzBaseUrl}/api/v1/livechat`, {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              // @ts-ignore
+              'accessToken': ticketIdResponse?.data?.accessToken
+            },
+            body: JSON.stringify({
+              // @ts-ignore
+              ticketId: ticketIdResponse?.data?.ticketId,
+              roomId: props.initialChatReply.resultId,
+              message: 'abcd'
+            })
+          });
+          liveAgentConnection = await liveAgentConnection.json();
+          console.log("live agent connection response", liveAgentConnection);
+          console.log("live agent enabled");
+
+          let chunks = [...chatChunks()];
+          // @ts-ignore
+          setLastInput(chunks[chunks.length - 1].input);
+          sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
+
+          console.log("last input", chunks[chunks.length - 1].input);
+
+          chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+          chunks[chunks.length - 1].input = undefined
+
+          chunks.push(
+            {
+
+              messages: [
+                {
+                  id: "unhxagqgd46929s701gnz5z8",
+                  // @ts-ignore
+                  type: "text",
+                  content: {
+                    richText: [
+                      {
+                        "type": "variable",
+                        "children": [
+                          {
+                            "type": "p",
+                            "children": [
+                              {
+                                "text": "Enabled live Agent"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              clientSideActions: undefined
+            }
+          );
+
+
+          sessionStorage.removeItem("answer");
+          console.log("before chat chunk");
+          setChatChunks(chunks);
+          console.log("after chat chunk");
+          setLive(true);
+          const socketInstance = io(`${props.context.typebot.settings.general.quadzBaseUrl}:3080`, {
+            // const socketInstance = io(`http://localhost:3080`, {
+            reconnection: true, // Enable reconnection
+            reconnectionAttempts: Infinity, // Retry indefinitely
+            reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
+            reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
+          });
+          socketInstance.on("connect", () => {
+            // @ts-ignore
+            setLiveSocketInstance(socketInstance);
+            socketInstance.emit("joinRoom", { sessionId: props.initialChatReply.resultId });
+
+            socketInstance.on("sessionRestarted", () => {
+              console.log("session restarting");
+              sessionStorage.removeItem("intialize");
+              sessionStorage.removeItem("initialize_css");
+              sessionStorage.removeItem("bot_init");
+              sessionStorage.removeItem("chatchunks");
+              sessionStorage.removeItem("live");
+              props.initializeBot()
+            })
+
+            socketInstance.on("responseFromQuadz", ({ message, id }) => {
+              console.log("response from quadz");
+              let chunks = [...chatChunks()];
+              chunks.push(
+                {
+                  messages: [
+                    {
+                      id: "unhxagqgd46929s701gnz5z8",
+                      // @ts-ignore
+                      type: "text",
+                      content: {
+                        richText: [
+                          {
+                            "type": "variable",
+                            "children": [
+                              {
+                                "type": "p",
+                                "children": [
+                                  {
+                                    "text": message
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  clientSideActions: undefined
+                }
+              );
+              setChatChunks(chunks);
+              // @ts-ignore
+              let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+              livechatData.push({ user: "Support", message: message })
+              // @ts-ignore
+              sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+              // @ts-ignore
+              storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+                console.log("error", err);
+              })
+              fetch(`${props.context.typebot.settings.general.quadzBaseUrl}/api/v1/tickets/addnote`, {
+                method: "POST",
+                // @ts-ignore
+                headers: {
+                  "Content-type": "application/json",
+                  // @ts-ignore
+                  "accessToken": ticketIdResponse?.data?.accessToken
+                },
+                // body : JSON.stringify( {
+                //   _id : sessionStorage.getItem("ticketId"),
+                //   comment : comments,
+                //   note : false ,
+                //   ticketid : false 
+                // } )
+                body: JSON.stringify({
+                  // @ts-ignore
+                  ticketid: ticketIdResponse?.data?.ticketId,
+                  note: `Live Chat Support ${message}`
+
+                })
+              }).then().catch(err => {
+                console.log("error", err);
+              })
+            });
+          });
+
+        } else {
+          throw new Error("Improperly configured");
+        }
+
+
+      }
+    } catch (err) {
+      console.log("error", err);
+    }
+
+  }, [live()]);
+
+  const userMessageLiveChat = async (message: string) => {
+
+    let socketInstance = liveSocketInstance();
+    // @ts-ignore
+    socketInstance.emit("sendToQuadz", { message, id: "123", sessionId: props.initialChatReply.resultId });
+    let chunks = [...chatChunks()];
+    chunks.push(
+      {
+        input: {
+          "id": "ow5y1j9yvsp7jo46qaswc38k",
+          "groupId": "nb24en7liv3s8e959uxtz1h0",
+          "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+          // @ts-ignore
+          "type": "text input",
+          "options": {
+            "labels": {
+              "placeholder": "Ask question",
+              "button": "Send"
+            },
+            "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+            "isLong": false
+          },
+          "prefilledValue": "Hi",
+          "answer": message
+        },
+        messages: [
+
+        ],
+        clientSideActions: undefined
+      }
+    );
+    setChatChunks(chunks);
+    setUserMessage("");
+
+    // @ts-ignore
+    let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+    livechatData.push({ user: "User", message: message })
+    // @ts-ignore
+    sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+    // @ts-ignore
+    storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+      console.log("error", err);
+    })
+
+    const ticketIdResponse = await getTicketIdQuery({
+
+      apiHost: props.context.apiHost,
+
+      typebotId: props.context.typebot.id,
+      resultId: props.initialChatReply.resultId,
+      ticketIdVariable: props.context.typebot.settings.general.ticketVariableName,
+      accessTokenVariable: props.context.typebot.settings.general.accessTokenVariableName
+    });
+
+    fetch(`${props.context.typebot.settings.general.quadzBaseUrl}/api/v1/tickets/addnote`, {
+      method: "POST",
+      // @ts-ignore
+      headers: {
+        "Content-type": "application/json",
+        // @ts-ignore
+        "accessToken": ticketIdResponse?.data?.accessToken
+      },
+      // body : JSON.stringify( {
+      //   _id : sessionStorage.getItem("ticketId"),
+      //   comment : comments,
+      //   note : false ,
+      //   ticketid : false 
+      // } )
+      body: JSON.stringify({
+        // @ts-ignore
+        ticketid: ticketIdResponse?.data?.ticketId,
+        note: `Live Chat User ${message}`
+
+      })
+    }).then().catch(err => {
+      console.log("error", err);
+    })
+
+
+
+
+  }
+
+
+
   const toggleLiveAgent = async () => {
     try {
       if (!live()) {
@@ -897,9 +1177,62 @@ export const ConversationContainer = (props: Props) => {
 
           <div style={{ display: "flex", "flex-direction": "row", "align-items": "center", gap: "40" }} >
             <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
-            <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
             <button onClick={() => {
-              toggleLiveAgent();
+              console.log("stop clicked restart");
+              sessionStorage.removeItem("intialize");
+              sessionStorage.removeItem("initialize_css");
+              sessionStorage.removeItem("bot_init");
+              sessionStorage.removeItem("chatchunks");
+              sessionStorage.removeItem("live");
+              props.initializeBot()
+            }} > <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
+            <button onClick={() => {
+              // toggleLiveAgent();
+              // setLive();
+              let liveVal = live();
+              // @ts-ignore
+              sessionStorage.setItem("live", !liveVal)
+              setLive(!liveVal);
+              if (liveVal) {
+                console.log("enrtered exitt")
+                let chunks = [...chatChunks()];
+                // chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+                // chunks[chunks.length - 1].input = undefined
+                console.log("last input", lastInput())
+                chunks.push(
+                  {
+                    // @ts-ignore
+                    input: lastInput(),
+                    messages: [
+                      {
+                        id: "unhxagqgd46929s701gnz5z8",
+                        // @ts-ignore
+                        type: "text",
+                        content: {
+                          richText: [
+                            {
+                              "type": "variable",
+                              "children": [
+                                {
+                                  "type": "p",
+                                  "children": [
+                                    {
+                                      "text": "Exited live Agent"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    clientSideActions: undefined
+                  }
+                );
+                sessionStorage.removeItem("answer");
+                setChatChunks(chunks);
+              }
               // let currentVal = liveAgent();
               // setLiveAgent( !currentVal );
             }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
@@ -950,6 +1283,12 @@ export const ConversationContainer = (props: Props) => {
           </div>
         )}
       </Show>
+      {live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-items": "center", width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
+        <div style={{ display: "flex", "flex-direction": "row", "gap": "4" }} >
+          <input value={userMessage()} type="text" style={{ border: "2px solid black" }} onChange={e => setUserMessage(e.target.value)} />
+          <button onClick={() => userMessageLiveChat(userMessage())} > Submit  </button>
+        </div>
+      </div>}
       <BottomSpacer />
     </div>
   )

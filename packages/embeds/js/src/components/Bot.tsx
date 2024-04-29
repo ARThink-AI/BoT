@@ -71,7 +71,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     }
     // @ts-ignore  
     if (!Object.hasOwn(prefilledVariables, 'reset') && sessionStorage.getItem("bot_init") && JSON.parse(sessionStorage.getItem("bot_init")) == true) {
-
+      console.log("return without initializing")
       return
     } else {
       sessionStorage.setItem("bot_init", "true");
