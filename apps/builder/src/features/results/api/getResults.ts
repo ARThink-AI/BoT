@@ -1,7 +1,7 @@
 import prisma from '@typebot.io/lib/prisma'
 import { authenticatedProcedure } from '@/helpers/server/trpc'
 import { TRPCError } from '@trpc/server'
-import { ResultWithAnswers, resultWithAnswersSchema } from '@typebot.io/schemas'
+import { ResultWithAnswers } from '@typebot.io/schemas'
 import { z } from 'zod'
 import { isReadTypebotForbidden } from '@/features/typebot/helpers/isReadTypebotForbidden'
 
@@ -24,12 +24,12 @@ export const getResults = authenticatedProcedure
       cursor: z.string().optional(),
     })
   )
-  .output(
-    z.object({
-      results: z.array(resultWithAnswersSchema),
-      nextCursor: z.string().nullish(),
-    })
-  )
+  // .output(
+  //   z.object({
+  //     results: z.array(resultWithAnswersSchema),
+  //     nextCursor: z.string().nullish(),
+  //   })
+  // )
   .query(async ({ input, ctx: { user } }) => {
     const limit = Number(input.limit)
     if (limit < 1 || limit > maxLimit)
@@ -70,7 +70,7 @@ export const getResults = authenticatedProcedure
       include: { answers: true },
     })) as ResultWithAnswers[]
 
-    let nextCursor: typeof cursor | undefined
+   let nextCursor: typeof cursor | undefined
     if (results.length > limit) {
       const nextResult = results.pop()
       nextCursor = nextResult?.id
