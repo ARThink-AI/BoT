@@ -741,6 +741,7 @@ export const ConversationContainer = (props: Props) => {
 
   // main section
   createEffect(async () => {
+    console.log("live chatttt messssssg", userMessage())
     try {
       console.log("live changedd", live());
       if (live() && !liveSocketInstance()) {
@@ -770,7 +771,7 @@ export const ConversationContainer = (props: Props) => {
               // @ts-ignore
               ticketId: ticketIdResponse?.data?.ticketId,
               roomId: props.initialChatReply.resultId,
-              message: 'abcd'
+              message: ''
             })
           });
           liveAgentConnection = await liveAgentConnection.json();
@@ -824,7 +825,7 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          const socketInstance = io(`${props.context.typebot.settings.general.quadzBaseUrl}:3080`, {
+          const socketInstance = io(`http://localhost:3080`, {
             // const socketInstance = io(`http://localhost:3080`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
@@ -967,6 +968,7 @@ export const ConversationContainer = (props: Props) => {
     livechatData.push({ user: "User", message: message })
     // @ts-ignore
     sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+
     // @ts-ignore
     storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
       console.log("error", err);
@@ -1166,6 +1168,8 @@ export const ConversationContainer = (props: Props) => {
 
   }
 
+
+
   return (
     <div
       ref={chatContainer}
@@ -1285,8 +1289,19 @@ export const ConversationContainer = (props: Props) => {
       </Show>
       {live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-items": "center", width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
         <div style={{ display: "flex", "flex-direction": "row", "gap": "4" }} >
-          <input value={userMessage()} type="text" style={{ border: "2px solid black" }} onChange={e => setUserMessage(e.target.value)} />
-          <button onClick={() => userMessageLiveChat(userMessage())} > Submit  </button>
+          <input value={userMessage()} type="text" placeholder='type your message' style={{ border: '1px solid black' }} class=" w-[200px] mr-2 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" onChange={e => setUserMessage(e.target.value)} />
+          <button class="rounded-full bg-[#0077CC]" onClick={() => userMessageLiveChat(userMessage())} >
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_63_137)">
+                <rect width="36" height="36" rx="18" fill="#0077CC" />
+                <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
+              </g>
+              <defs>
+                <clipPath id="clip0_63_137">
+                  <rect width="36" height="36" rx="18" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>  </button>
         </div>
       </div>}
       <BottomSpacer />
