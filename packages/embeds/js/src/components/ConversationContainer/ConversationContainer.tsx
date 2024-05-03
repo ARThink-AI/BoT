@@ -112,6 +112,11 @@ export const ConversationContainer = (props: Props) => {
   // @ts-ignore
   const [liveChatData, setLiveChatData] = createSignal(sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : []);
 
+
+  const [burgerMenu, setBurgerMenu] = createSignal(false)
+  const toggleBurgerIcon = () => {
+    setBurgerMenu(!burgerMenu())
+  }
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
@@ -742,6 +747,8 @@ export const ConversationContainer = (props: Props) => {
   // main section
   createEffect(async () => {
     console.log("live chatttt messssssg", userMessage())
+
+
     try {
       console.log("live changedd", live());
       if (live() && !liveSocketInstance()) {
@@ -771,6 +778,7 @@ export const ConversationContainer = (props: Props) => {
               // @ts-ignore
               ticketId: ticketIdResponse?.data?.ticketId,
               roomId: props.initialChatReply.resultId,
+              typebotId: props.context.typebot.id,
               message: ''
             })
           });
@@ -1170,18 +1178,23 @@ export const ConversationContainer = (props: Props) => {
 
 
 
+
   return (
+
+
     <div
       ref={chatContainer}
-      class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
+      class="flex flex-col overflow-y-scroll w-full min-h-full px-3  relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-      {props.context.typebot.settings.general.isLiveChatEnabled && (
-        <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
 
-          <div style={{ display: "flex", "flex-direction": "row", "align-items": "center", gap: "40" }} >
-            <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button>
-            <button onClick={() => {
+      <header class="bg-blue-500 text-white p-3 h-10  w-full" >
+        {props.context.typebot.settings.general.isLiveChatEnabled && (
+          // <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
+
+          < >
+            {/* <button> <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/maximize.png"} /> </button> */}
+            {/* <button onClick={() => {
               console.log("stop clicked restart");
               sessionStorage.removeItem("intialize");
               sessionStorage.removeItem("initialize_css");
@@ -1189,8 +1202,8 @@ export const ConversationContainer = (props: Props) => {
               sessionStorage.removeItem("chatchunks");
               sessionStorage.removeItem("live");
               props.initializeBot()
-            }} > <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button>
-            <button onClick={() => {
+            }} > <img style={{ height: "25px", "margin-right": "10px" }} src={"https://quadz.blob.core.windows.net/demo1/stop.png"} /> </button> */}
+            {/* <button onClick={() => {
               // toggleLiveAgent();
               // setLive();
               let liveVal = live();
@@ -1239,11 +1252,99 @@ export const ConversationContainer = (props: Props) => {
               }
               // let currentVal = liveAgent();
               // setLiveAgent( !currentVal );
-            }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
-          </div>
-        </div>
-      )}
+            }} > <img style={{ height: "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button> */}
+          </>
+          // </div>
+        )}
 
+        <div class="flex justify-between items-center">
+          <div class="">
+            <button id="burgerIcon" onClick={toggleBurgerIcon} class="text-white focus:outline-none">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 18C3.71667 18 3.47917 17.9042 3.2875 17.7125C3.09583 17.5208 3 17.2833 3 17C3 16.7167 3.09583 16.4792 3.2875 16.2875C3.47917 16.0958 3.71667 16 4 16H15C15.2833 16 15.5208 16.0958 15.7125 16.2875C15.9042 16.4792 16 16.7167 16 17C16 17.2833 15.9042 17.5208 15.7125 17.7125C15.5208 17.9042 15.2833 18 15 18H4ZM18.9 16.3L15.3 12.7C15.1 12.5 15 12.2667 15 12C15 11.7333 15.1 11.5 15.3 11.3L18.9 7.7C19.0833 7.51667 19.3167 7.425 19.6 7.425C19.8833 7.425 20.1167 7.51667 20.3 7.7C20.4833 7.88333 20.575 8.11667 20.575 8.4C20.575 8.68333 20.4833 8.91667 20.3 9.1L17.4 12L20.3 14.9C20.4833 15.0833 20.575 15.3167 20.575 15.6C20.575 15.8833 20.4833 16.1167 20.3 16.3C20.1167 16.4833 19.8833 16.575 19.6 16.575C19.3167 16.575 19.0833 16.4833 18.9 16.3ZM4 13C3.71667 13 3.47917 12.9042 3.2875 12.7125C3.09583 12.5208 3 12.2833 3 12C3 11.7167 3.09583 11.4792 3.2875 11.2875C3.47917 11.0958 3.71667 11 4 11H12C12.2833 11 12.5208 11.0958 12.7125 11.2875C12.9042 11.4792 13 11.7167 13 12C13 12.2833 12.9042 12.5208 12.7125 12.7125C12.5208 12.9042 12.2833 13 12 13H4ZM4 8C3.71667 8 3.47917 7.90417 3.2875 7.7125C3.09583 7.52083 3 7.28333 3 7C3 6.71667 3.09583 6.47917 3.2875 6.2875C3.47917 6.09583 3.71667 6 4 6H15C15.2833 6 15.5208 6.09583 15.7125 6.2875C15.9042 6.47917 16 6.71667 16 7C16 7.28333 15.9042 7.52083 15.7125 7.7125C15.5208 7.90417 15.2833 8 15 8H4Z" fill="white" />
+              </svg>
+            </button>
+            {burgerMenu() && (
+              <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50  left-0 rounded-r-2xl bg-white text-black p-4">
+                <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
+                <ul>
+                  <li>
+                    <button class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' onClick={() => {
+                      console.log("stop clicked restart");
+                      sessionStorage.removeItem("intialize");
+                      sessionStorage.removeItem("initialize_css");
+                      sessionStorage.removeItem("bot_init");
+                      sessionStorage.removeItem("chatchunks");
+                      sessionStorage.removeItem("live");
+                      props.initializeBot()
+                    }} >Restart  </button>
+                  </li>
+                  {/* <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="">Download Chat</a></li> */}
+                  <li><a ></a>
+                    <button class='rounded-xl w-full p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' onClick={() => {
+                      // toggleLiveAgent();
+                      // setLive();
+                      let liveVal = live();
+                      // @ts-ignore
+                      sessionStorage.setItem("live", !liveVal)
+                      setLive(!liveVal);
+                      if (liveVal) {
+                        console.log("enrtered exitt")
+                        let chunks = [...chatChunks()];
+                        // chunks[chunks.length - 1] = { ...chunks[chunks.length - 1] };
+                        // chunks[chunks.length - 1].input = undefined
+                        console.log("last input", lastInput())
+                        chunks.push(
+                          {
+                            // @ts-ignore
+                            input: lastInput(),
+                            messages: [
+                              {
+                                id: "unhxagqgd46929s701gnz5z8",
+                                // @ts-ignore
+                                type: "text",
+                                content: {
+                                  richText: [
+                                    {
+                                      "type": "variable",
+                                      "children": [
+                                        {
+                                          "type": "p",
+                                          "children": [
+                                            {
+                                              "text": "Exited live Agent"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            clientSideActions: undefined
+                          }
+                        );
+                        sessionStorage.removeItem("answer");
+                        setChatChunks(chunks);
+                      }
+                      // let currentVal = liveAgent();
+                      // setLiveAgent( !currentVal );
+                    }} >
+                      {!live() ? 'Live chat connect' : 'Live chat disconnect'}
+                    </button>
+                  </li>
+                  {/* Add more menu items as needed */}
+                </ul>
+
+              </div>
+
+            )}
+          </div>
+          <div />
+
+        </div>
+      </header>
 
       <For each={chatChunks()}>
         {(chatChunk, index) => {
@@ -1306,6 +1407,7 @@ export const ConversationContainer = (props: Props) => {
       </div>}
       <BottomSpacer />
     </div>
+
   )
 }
 

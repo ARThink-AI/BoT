@@ -15,6 +15,8 @@ import { BubbleParams } from '../types'
 import { Bot, BotProps } from '../../../components/Bot'
 import { getPaymentInProgressInStorage } from '@/features/blocks/inputs/payment/helpers/paymentInProgressStorage'
 import { io } from "socket.io-client";
+import jsPDF from 'jspdf/dist/jspdf.umd.js'
+
 export type BubbleProps = BotProps &
   BubbleParams & {
     onOpen?: () => void
@@ -65,7 +67,7 @@ export const Bubble = (props: BubbleProps) => {
 
   onMount(() => {
     console.log("checking socket connection");
-    const socketInstance = io("http://localhost:3050", {
+    const socketInstance = io("http://localhost:3080", {
       reconnection: true, // Enable reconnection
       reconnectionAttempts: Infinity, // Retry indefinitely
       reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -160,6 +162,69 @@ export const Bubble = (props: BubbleProps) => {
     setIsPreviewMessageDisplayed(false)
   }
 
+
+  // a4 pdf the convertHTMLtoPDF function
+  function convertHTMLtoPDF() {
+    // Select the typebot-standard element
+    const typebotStandard = document.querySelector('typebot-bubble');
+
+    // Check if the typebot-standard element exists
+    if (typebotStandard) {
+      // Access the shadow root of typebot-standard
+      const shadowRoot = typebotStandard.shadowRoot;
+
+      // Check if the shadow root exists
+      if (shadowRoot) {
+        // Select the chatContainerDiv element inside the shadow root
+        const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
+
+        // Check if the chatContainerDiv element exists
+        if (chatContainer) {
+          // Create a new jsPDF instance
+          let doc = new jsPDF('p', 'px', 'a4');
+
+          // Get the dimensions of the content
+          let containerWidth = chatContainer.offsetWidth;
+          let containerHeight = chatContainer.offsetHeight;
+
+          // Get the dimensions of the PDF page
+          let pageWidth = doc.internal.pageSize.getWidth();
+          let pageHeight = doc.internal.pageSize.getHeight();
+
+          // Set the desired margin from the top and sides
+          let marginTop = 20;
+          let marginLeft = 20;
+          let marginRight = 20;
+
+          // Calculate the position to center the content horizontally
+          // let xPos = marginLeft;
+          let xPos = marginLeft + ((pageWidth - marginLeft - marginRight - containerWidth) / 2);
+
+          // Calculate the position to start the content vertically
+          let yPos = marginTop;
+
+          // Add the chatContainerDiv content to PDF
+          doc.html(chatContainer, {
+            callback: function (doc) {
+              doc.save("chat_history.pdf");
+            },
+            x: xPos,
+            y: yPos,
+            width: pageWidth - marginLeft - marginRight
+          });
+        } else {
+          console.log("chatContainerDiv not found inside shadow root");
+        }
+      } else {
+        console.log("Shadow root not found for typebot-standard");
+      }
+    } else {
+      console.log("typebot-standard not found in the DOM");
+    }
+  }
+
+
+
   return (
     <>
       <style>{styles}</style>
@@ -215,9 +280,18 @@ export const Bubble = (props: BubbleProps) => {
                   <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
                     <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
                     <ul>
-                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Download Chat</a></li>
-                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Email Chat</a></li>
+                      <li><button onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' >Download Chat</button></li>
                       <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
+                      <li><button class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' onClick={() => {
+                        console.log("stop clicked restart");
+                        sessionStorage.removeItem("intialize");
+                        sessionStorage.removeItem("initialize_css");
+                        sessionStorage.removeItem("bot_init");
+                        sessionStorage.removeItem("chatchunks");
+                        sessionStorage.removeItem("live");
+
+                      }} >Restart  </button></li>
+                      {/* <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Restart</a></li> */}
                       {/* Add more menu items as needed */}
                     </ul>
                     {/* <button onClick={closeBurgerMenu} class="text-black focus:outline-none mt-2">Close</button> */}
@@ -242,27 +316,6 @@ export const Bubble = (props: BubbleProps) => {
               </div>
             </div>
           </header>
-          <footer class="bg-[#E6F1FA] h-[100px] text-white p-4 absolute bottom-[30px] z-10  w-[100%]">
-            <div class="container flex justify-center gap-2 sm:w-full mx-auto">
-              <input placeholder='type your message' class="w-50 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" type="text" />
-              <button class="rounded-full bg-[#0077CC]">
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_63_137)">
-                    <rect width="36" height="36" rx="18" fill="#0077CC" />
-                    <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_63_137">
-                      <rect width="36" height="36" rx="18" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </button>
-            </div>
-            <div class='mt-2 text-center text-[12px] text-[#343741]'>
-              Quadz bot can make mistakes. Consider checking <a class='text-blue-400' href="#">important information</a> .
-            </div>
-          </footer>
           <Bot
             {...botProps}
             socket1={socketInstance()}

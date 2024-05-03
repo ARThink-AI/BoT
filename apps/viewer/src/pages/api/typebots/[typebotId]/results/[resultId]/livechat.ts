@@ -14,7 +14,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('resultId', resultId)
     const result = await prisma.result.findUnique({ where: { id: resultId } })
     console.log('result', JSON.stringify(result))
-    return res.json({ success: true, data: result?.livechat })
+    return res.json({
+      success: true,
+      data: result?.livechat,
+      sessionDate: result?.createdAt,
+    })
   }
   return methodNotAllowed(res)
 }
