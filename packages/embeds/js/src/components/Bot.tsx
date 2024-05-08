@@ -213,8 +213,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
               onEnd={props.onEnd}
             />
             <Show when={initialChatReply.typebot.settings.general.isVoiceEnabled} >
-              <div style={!isMobile() ? { position: "relative", top: "-50%", left: "80%", width: "100px" } : { position: "relative", top: "-20%", left: "5%", width: "20px" }} >
-                <select value={selectedLanguage()} onChange={(evt) => {
+              <div style={!isMobile() ? { position: "fixed", top: "1.5%", left: "5%", width: "100px" } : { position: "fixed", top: "1.5%", left: "5%", width: "20px" }} >
+                <select class='p-[3px]' value={selectedLanguage()} onChange={(evt) => {
                   console.log("vall", evt?.target?.value);
                   setSelectedLanguage(evt?.target?.value);
                   initializeBot();
@@ -261,7 +261,7 @@ const BotContent = (props: BotContentProps) => {
   console.log("props context language", props.context.selectedLanguage)
   let botContainer: HTMLDivElement | undefined
   let conversationContainer: HTMLDivElement | undefined
-  let videoRef: HTMLVideoElement | undefined
+
   let audioQueue: Queue
   let textQueue: Queue
   let audioUrlQueue: Queue
@@ -386,7 +386,7 @@ const BotContent = (props: BotContentProps) => {
         const audioUrl = URL.createObjectURL(audioBlob);
 
         setAudioPlaying(true);
-        videoRef?.play()
+
 
 
 
@@ -399,7 +399,7 @@ const BotContent = (props: BotContentProps) => {
             const dequeued = textQueue.dequeue();
             console.log("dequeuued", dequeued);
           }
-          videoRef?.pause()
+
 
 
         });
@@ -434,7 +434,7 @@ const BotContent = (props: BotContentProps) => {
     currentAudio.pause();
     currentAudio.currentTime = 0;
     setAudioPlaying(false);
-    videoRef?.pause()
+
 
 
 
@@ -446,7 +446,7 @@ const BotContent = (props: BotContentProps) => {
       const dequeuedEnded = textQueue.dequeue();
       console.log("dequeuued endned", dequeuedEnded);
     }
-    videoRef?.pause()
+
 
 
     // currentAudio.removeEventListener("ended", ended);
@@ -492,10 +492,8 @@ const BotContent = (props: BotContentProps) => {
       invisibleButton.style.pointerEvents = 'none';
       invisibleButton.click();
     }
-    // console.log("video ref",videoRef);
-    if (videoRef) {
-      videoRef?.pause()
-    }
+
+
 
 
     // requestUserMedia();
@@ -566,19 +564,7 @@ const BotContent = (props: BotContentProps) => {
       </div>
 
       <Show when={props.initialChatReply.typebot.settings.general.isVoiceEnabled}>
-        <div style={!isMobile() ? { position: "relative", top: "-60%", left: "77%", width: "250px" } : { position: "relative", top: "-99%", left: "77%", width: "60px" }} >
-          <video
-            ref={videoRef}
-            loop
-            // autoplay
-            // muted={ audioRef().paused ? true : false }   
-            muted={true}
-            poster="background.jpg">
-            <source src="https://quadz.blob.core.windows.net/demo1/google-oauth2_104041984924534641720_tlk_krcymSptGbArjG0KNZ8Uy_1701406206825.mp4" type="video/mp4">
-              Your browser does not support the video tag.
-            </source>
-          </video>
-        </div>
+
         {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
       <select>
         <option> English  </option>

@@ -252,16 +252,16 @@ export const CardInput = (props: any) => {
   const isAnyRequiredFieldEmpty = () => {
     return inputs().some((input: any) => {
       if (input.required) {
-        if (input.type === "email" && !validateEmail(input.userInput)) {
+        if (input.type === "email" && !validateEmail(input.values)) {
           return true; // Email field is required and incomplete
         }
-        if (input.type === "phone" && !validatePhone(input.userInput)) {
+        if (input.type === "phone" && !validatePhone(input.values)) {
           return true; // Phone field is required and incomplete
         }
-        if (input.type === "checkbox" && (!input.userInput || input.userInput.length === 0)) {
+        if (input.type === "checkbox" && (!input.default)) {
           return true; // Checkbox is required and no option is selected
         }
-        return !input.userInput; // Other required fields
+        return !input.values; // Other required fields
       }
       return false;
     });
@@ -284,7 +284,7 @@ export const CardInput = (props: any) => {
 
   const handleInputChange = (e: any, index: number) => {
     const { value } = e.target;
-    updateInput("userInput", value, index);
+    updateInput("values", value, index);
 
     // Perform validation based on input type
     const inputType = inputs()[index].type;
@@ -311,7 +311,14 @@ export const CardInput = (props: any) => {
   const handleSubmit = () => {
     const ans = {};
     inputs().forEach(input => {
-      ans[input.answerVariableId] = input.userInput;
+      console.log("input", input)
+      // ans[input.answerVariableId] = input.userInput ? input?.default : input?.userInput;
+      if (input.type == "text" || input.type == "phone" || input.type == "email") {
+        ans[input.answerVariableId] = input.values
+      } else {
+        ans[input.answerVariableId] = input.default
+      }
+
     });
     console.log("Submitted:", ans);
     if (props.onSubmit) {
@@ -349,11 +356,8 @@ export const CardInput = (props: any) => {
                           type={input.type}
                           placeholder={input.placeholder}
                           class={`border p-2 rounded-md w-full mb-2`}
-                          value={input?.userInput ? input?.userInput : ""}
-                          onChange={(e) =>
-                            updateInput("userInput", e.target.value, i)
-                          }
-
+                          value={input?.values ? input?.values : ""}
+                          onChange={(e) => handleInputChange(e, i)}
 
 
 
@@ -373,7 +377,7 @@ export const CardInput = (props: any) => {
                           type={input.type}
                           placeholder={input.placeholder}
                           // class={`border p-2 rounded-md w-full mb-2`}
-                          value={input?.userInput ? input?.userInput : ""}
+                          value={input?.values ? input?.values : ""}
                           onChange={(e) => handleInputChange(e, i)}
                           class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
 
@@ -393,7 +397,7 @@ export const CardInput = (props: any) => {
                           placeholder={input.placeholder}
                           // class={`border p-2 rounded-md w-full mb-2`}
                           class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
-                          value={input?.userInput ? input?.userInput : ""}
+                          value={input?.values ? input?.values : ""}
                           onChange={(e) => handleInputChange(e, i)}
 
                           required={input.required}
@@ -411,14 +415,14 @@ export const CardInput = (props: any) => {
                         <label for="">{input.label}</label>
                         <select
                           class="w-full p-2 appearance-none border rounded-md mb-2"
-                          value={input?.userInput ? input?.userInput : ""}
-                          onChange={(e) => updateInput("userInput", e.target.value, i)}
+                          value={input?.default ? input?.default : ""}
+                          onChange={(e) => updateInput("default", e.target.value, i)}
                           required={input.required}
                         >
                           <option value="" disabled selected>
                             {input.placeholder}
                           </option>
-                          <For each={input.values}>{(value) => (
+                          <For each={JSON.parse(input.values)}>{(value) => (
                             <option value={value}>{value}</option>
                           )}</For>
                         </select >
@@ -444,14 +448,14 @@ export const CardInput = (props: any) => {
                       <><label for="">{input.label}</label>
                         <div class="flex justify-start gap-1 mt-2">
 
-                          <For each={input.values}>{(value) => (
+                          <For each={JSON.parse(input.values)}>{(value) => (
                             <>
                               <input
                                 id={value}
                                 type="radio"
                                 class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
                                 value={value}
-                                checked={input.userInput === value}
+                                checked={input.userInput === value || (!input.userInput && input.default === value)}
                                 onChange={(e) =>
                                   updateInput("userInput", e.target.value, i)}
                                 required={input.required}
@@ -467,7 +471,7 @@ export const CardInput = (props: any) => {
                       <>
                         <label for="">{input.label}</label>
                         <div class="flex justify-start flex-col gap-1">
-                          <For each={input.values}>{(value) => (
+                          <For each={JSON.parse(input.values)}>{(value) => (
                             <div class="flex justify-start gap-2">
                               <input
                                 type="checkbox"
@@ -485,7 +489,7 @@ export const CardInput = (props: any) => {
                                   }
                                   updateInput("userInput", updatedValues, i);
                                 }}
-                                checked={input.userInput && input.userInput.includes(value)}
+                                checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
                                 required={input.required}
                               />
                               <label>{value}</label>
