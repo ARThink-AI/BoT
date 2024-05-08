@@ -147,19 +147,34 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               <Text> Required  </Text>
             </Stack>
 
-            {input.type != "text" && input.type != "email" && input.type != "phone" && input.type != "textarea" &&
+            {/* {input.type != "text" && input.type != "email" && input.type != "phone" && input.type != "textarea" && */}
+            <VStack spacing={1} >
+              <FormLabel> Load dynamic data from variable</FormLabel>
+              <VariableSearchInput
+                key={input.id + "dynamicDataVariableId"}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+
+                onSelectVariable={(v: Variable) => updateInput("dynamicDataVariableId", v?.id, i)}
+                placeholder="Search for a variable"
+                initialVariableId={input?.dynamicDataVariableId}
+              />
+            </VStack>
+            {/* } */}
+            {(input.type == "dropdown" || input.type == "checkbox" || input.type == "radio") && (
               <VStack spacing={1} >
-                <FormLabel> Load dynamic data from variable</FormLabel>
+                <FormLabel> Default Value from variable</FormLabel>
                 <VariableSearchInput
-                  key={input.id + "dynamicDataVariableId"}
+                  key={input.id + "defaultValue"}
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
-                  onSelectVariable={(v: Variable) => updateInput("dynamicDataVariableId", v?.id, i)}
+
+                  onSelectVariable={(v: Variable) => updateInput("defaultValue", v?.id, i)}
                   placeholder="Search for a variable"
-                  initialVariableId={input?.dynamicDataVariableId}
+                  initialVariableId={input?.defaultValue}
                 />
               </VStack>
-            }
+            )}
             <VStack spacing={1} >
               <FormLabel>  Save answer  </FormLabel>
               <VariableSearchInput
