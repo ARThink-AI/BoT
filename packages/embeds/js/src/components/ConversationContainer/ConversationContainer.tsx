@@ -94,7 +94,9 @@ export const ConversationContainer = (props: Props) => {
   const [dynamicTheme, setDynamicTheme] = createSignal<
     ChatReply['dynamicTheme']
   >(props.initialChatReply.dynamicTheme)
-  const [theme, setTheme] = createSignal(props.initialChatReply.typebot.theme)
+  const [theme, setTheme] = createSignal(props.initialChatReply.typebot.theme);
+  const [sessionId, setSessionId] = createSignal(null);
+  const [userInput, setUserInput] = createSignal("");
   const [isSending, setIsSending] = createSignal(false)
   const [blockedPopupUrl, setBlockedPopupUrl] = createSignal<string>()
   const [hasError, setHasError] = createSignal(false)
@@ -215,35 +217,94 @@ export const ConversationContainer = (props: Props) => {
 
 
 
+  // createEffect(() => {
+  //   console.log("chat chunks changed", chatChunks());
+  //   if (sessionStorage.getItem("answer")) {
+  //     let chunks = [...chatChunks()];
+  //     if (chunks[chunks.length - 2]?.input?.type == "card input") {
+
+  //       if (chunks[chunks.length - 2]?.input) {
+  //         // @ts-ignore
+  //         chunks[chunks.length - 2]?.input?.answer = "Submitted"
+  //       }
+
+
+  //       sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+  //     } else if (chunks[chunks.length - 2]?.input?.type == "file input") {
+  //       if (chunks[chunks.length - 2]?.input) {
+  //         // @ts-ignore
+  //         chunks[chunks.length - 2]?.input?.answer = "File uploaded"
+  //       }
+
+  //       sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+  //     } else {
+  //       console.log("entereddd hererr", chunks[chunks.length - 2]?.input)
+  //       if (chunks[chunks.length - 2] && chunks[chunks.length - 2]?.input) {
+  //         // @ts-ignore
+  //         chunks[chunks.length - 2]?.input?.answer = sessionStorage.getItem("answer") ? sessionStorage.getItem("answer") : "";
+  //       }
+  //       console.log("no error")
+  //       sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+  //     }
+
+  //   } else if (sessionStorage.getItem("chatchunks")) {
+  //     sessionStorage.setItem("chatchunks", JSON.stringify(chatChunks()))
+  //   }
+
+  //   //  sessionStorage.setItem("chatchunks", JSON.stringify( chatChunks() ) );
+  // },);
+
   createEffect(() => {
     console.log("chat chunks changed", chatChunks());
     if (sessionStorage.getItem("answer")) {
       let chunks = [...chatChunks()];
-      if (chunks[chunks.length - 2].input?.type == "card input") {
-        // @ts-ignore
-        chunks[chunks.length - 2].input.answer = "Submitted"
+      const input = chunks[chunks.length - 2]?.input;
 
-        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
-      } else if (chunks[chunks.length - 2].input?.type == "file input") {
-        // @ts-ignore
-        chunks[chunks.length - 2].input.answer = "File uploaded"
+      if (input) {
+        if (input.type === "card input") {
+          input.answer = "Submitted";
+        } else if (input.type === "file input") {
+          input.answer = "File uploaded";
+        } else {
+          input.answer = sessionStorage.getItem("answer") || "";
+        }
 
-        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
-      } else {
-        // @ts-ignore
-        chunks[chunks.length - 2].input.answer = sessionStorage.getItem("answer");
-
-        sessionStorage.setItem("chatchunks", JSON.stringify(chunks))
+        sessionStorage.setItem("chatchunks", JSON.stringify(chunks));
+        console.log("no error");
       }
-
     } else if (sessionStorage.getItem("chatchunks")) {
-      sessionStorage.setItem("chatchunks", JSON.stringify(chatChunks()))
+      sessionStorage.setItem("chatchunks", JSON.stringify(chatChunks()));
     }
-    //  sessionStorage.setItem("chatchunks", JSON.stringify( chatChunks() ) );
-  },);
+  }, []);
 
   onMount(() => {
     ; (async () => {
+      if (props.initialChatReply.typebot.settings.general.isCustomInputEnabled) {
+        const response = await fetch("https://typebot.io/api/v1/typebots/openaibot/startChat", {
+          method: "POST",
+          // @ts-ignore
+          headers: {
+            "Content-type": "application/json"
+
+          },
+          // body : JSON.stringify( {
+          //   _id : sessionStorage.getItem("ticketId"),
+          //   comment : comments,
+          //   note : false ,
+          //   ticketid : false 
+          // } )
+          // body: JSON.stringify({
+          //   // @ts-ignore
+          //   ticketid: sessionStorage.getItem("ticketId"),
+          //   note: comments.join(" ")
+
+          // })
+        });
+        const sessionResponse = await response.json();
+        setSessionId(sessionResponse?.sessionId);
+        // console.log("session response", sessionResponse);
+        // console.log("session response", sessionResponse);
+      }
       // console.log("conversation container", JSON.stringify(props));
       // console.log("session Iddd", props.context.sessionId);
       //  console.log("conversation container mounted", chatChunks() );
@@ -853,6 +914,93 @@ export const ConversationContainer = (props: Props) => {
     sessionStorage.setItem("live", `${!l}`);
     setLive(!l);
   }
+  const userInputClicked = async () => {
+    console.log("user input clicked");
+
+    let chunks = [...chatChunks()];
+    chunks.push(
+      {
+        input: {
+          "id": "ow5y1j9yvsp7jo46qaswc38k",
+          "groupId": "nb24en7liv3s8e959uxtz1h0",
+          "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+          // @ts-ignore
+          "type": "text input",
+          "options": {
+            "labels": {
+              "placeholder": "Ask question",
+              "button": "Send"
+            },
+            "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+            "isLong": false
+          },
+          "prefilledValue": "Hi",
+          "answer": userInput()
+        },
+        messages: [
+
+        ],
+        clientSideActions: undefined
+      }
+    );
+    setChatChunks(chunks);
+
+    if (sessionId()) {
+      const response = await fetch(`https://typebot.io/api/v1/sessions/${sessionId()}/continueChat`, {
+        method: "POST",
+        // @ts-ignore
+        headers: {
+          "Content-type": "application/json"
+
+        },
+        body: JSON.stringify({
+          message: userInput()
+        })
+
+      });
+      const messageResp = await response.json();
+      console.log("message Resp", messageResp);
+      if (messageResp?.messages.length > 0 && messageResp?.messages[0]?.content?.richText.length > 0 && messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text) {
+        const botResp = messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text;
+        let chunks = [...chatChunks()];
+        chunks.push(
+          {
+            messages: [
+              {
+                id: "unhxagqgd46929s701gnz5z8",
+                // @ts-ignore
+                type: "text",
+                content: {
+                  richText: [
+                    {
+                      "type": "variable",
+                      "children": [
+                        {
+                          "type": "p",
+                          "children": [
+                            {
+                              "text": botResp
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            clientSideActions: undefined
+          }
+        );
+        setChatChunks(chunks);
+      }
+      setUserInput("");
+      sessionStorage.removeItem("answer");
+    } else {
+      sessionStorage.removeItem("answer");
+      setUserInput("");
+    }
+  }
 
   return (
     <div
@@ -914,6 +1062,27 @@ toggleLiveAgent();
           </div>
         )}
       </Show>
+      <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
+        <div style={{ position: "fixed", bottom: "50px", width: "50%" }} >
+          <div class="container flex justify-center gap-2 sm:w-full mx-auto">
+            <input placeholder='type your message' class="w-50 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" type="text" value={userInput()} onChange={(e) => setUserInput(e?.target?.value)} />
+            <button onClick={userInputClicked} class="rounded-full bg-[#0077CC]">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_63_137)">
+                  <rect width="36" height="36" rx="18" fill="#0077CC" />
+                  <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_63_137">
+                    <rect width="36" height="36" rx="18" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </Show>
+
       <BottomSpacer />
     </div>
   )

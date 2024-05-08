@@ -19,6 +19,7 @@ export const cardOptionsSchema = cardOptionsBaseSchema
          type : z.string().optional() ,
          label : z.string().optional() ,
          placeholder : z.string().optional(),
+         
          dynamicDataVariableId : z.string().optional(),
          answerVariableId : z.string().optional(),
          values: z.array(z.string()).optional() ,

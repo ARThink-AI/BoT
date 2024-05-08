@@ -53,6 +53,12 @@ export const GeneralSettingsForm = ({
       isVoiceEnabled,
     })
 
+  const handleCustomInputChange = (isCustomInputEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isCustomInputEnabled,
+    })
+
 
 
 
@@ -86,6 +92,13 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isVoiceEnabled ?? true}
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
+      />
+
+      <SwitchWithLabel
+        label="Custom Input Enabled on bot start"
+        initialValue={generalSettings.isCustomInputEnabled ?? false}
+        onCheckChange={handleCustomInputChange}
+        moreInfoContent="Toggle for Custom Input"
       />
 
 

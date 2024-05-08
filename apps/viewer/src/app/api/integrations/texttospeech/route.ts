@@ -55,8 +55,8 @@ export async function POST(req: Request) {
       console.log("translation", translation );
       const request = {
         input: { text:   translation },
-        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
-        audioConfig: { audioEncoding: 'MP3' }
+        voice: { languageCode:  langCode , ssmlGender: 'MALE'  },
+        audioConfig: { audioEncoding: 'MP3' , speakingRate: 1.2  }
     };
       console.log("request input", JSON.stringify(request));
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -74,8 +74,8 @@ export async function POST(req: Request) {
 
       const request = {
         input: { text },
-        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
-        audioConfig: { audioEncoding: 'MP3' }
+        voice: { languageCode:  langCode , ssmlGender: 'MALE'  },
+        audioConfig: { audioEncoding: 'MP3' , speakingRate: 1.2 }
     };
       console.log("request input", JSON.stringify(request));
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
