@@ -106,6 +106,10 @@ export const ConversationContainer = (props: Props) => {
   // @ts-ignore
   const [live, setLive] = createSignal(sessionStorage.getItem("live") ? JSON.parse(sessionStorage.getItem("live")) : false);
 
+  const [stream, setStream] = createSignal(null);
+  const [isRecording, setIsRecording] = createSignal(false);
+  const [recordedAudio, setRecordedAudio] = createSignal(null);
+  const [inputValue, setInputValue] = createSignal('')
 
   // @ts-ignore
   const [liveChatData, setLiveChatData] = createSignal(sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : []);
@@ -1002,10 +1006,7 @@ export const ConversationContainer = (props: Props) => {
     }
   }
 
-  const [stream, setStream] = createSignal(null);
-  const [isRecording, setIsRecording] = createSignal(false);
-  const [recordedAudio, setRecordedAudio] = createSignal(null);
-  const [inputValue, setInputValue] = createSignal('')
+
 
   const startRecordingUserVoice = async () => {
     try {
