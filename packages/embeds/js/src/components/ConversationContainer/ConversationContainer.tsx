@@ -1059,8 +1059,9 @@ export const ConversationContainer = (props: Props) => {
           //   let n = inputNode();
           //   n.value = result.transcription
           // }
-          const val = inputValue() + " " + result.message.transcription;
-          setInputValue(val);
+          const val = userInput() + " " + result.message.transcription;
+          // setInputValue(val);
+          setUserInput(val)
           console.log("microphone recorded", inputValue())
           // node.value = result.transcription;
           // setRecordedText(result.transcription);
@@ -1176,7 +1177,7 @@ toggleLiveAgent();
         <div style="position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width:45%;">
           <div class="container lg:w-full  flex justify-center gap-2 mx-auto shadow-lg p-2 ">
 
-            <input placeholder='type your message' class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput() ? userInput() : inputValue()} onChange={(e) => setUserInput(e?.target?.value)} />
+            <input placeholder='type your message' class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onChange={(e) => setUserInput(e?.target?.value)} />
             <div class='flex justify-center items-center'>
               {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
               {isRecording() && (
