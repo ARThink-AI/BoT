@@ -10,6 +10,7 @@ import {
 import React from 'react'
 
 import { TextInput } from '@/components/inputs'
+import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 
 import { createId } from '@paralleldrive/cuid2'
 import { Select, FormLabel } from "@chakra-ui/react";
@@ -33,6 +34,13 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
       ...options,
       subHeading,
     })
+
+  const updateVoiceFill = (isVoiceFill: boolean) =>
+    onOptionsChange({
+      ...options,
+      isVoiceFill,
+    })
+
 
   const updateInput = (property: string, value: string, index: number) => {
 
@@ -84,6 +92,12 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
         defaultValue={options.subHeading ?? ''}
         placeholder="SubHeading..."
         withVariableButton={false}
+      />
+      <SwitchWithLabel
+        label="Voice Fill Card"
+        initialValue={options.isVoiceFill ?? false}
+        onCheckChange={updateVoiceFill}
+        moreInfoContent="Inputs are automatically filled using voice to speech"
       />
       {options.inputs.map((input, i) => {
 

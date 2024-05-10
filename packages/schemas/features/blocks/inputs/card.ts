@@ -20,6 +20,7 @@ export const cardOptionsSchema = cardOptionsBaseSchema
     z.object({
       heading: z.string().optional(),
       subHeading: z.string().optional(),
+      isVoiceFill : z.boolean().optional(),
       inputs: z.array(
         z.object({
           id: z.string().optional(),

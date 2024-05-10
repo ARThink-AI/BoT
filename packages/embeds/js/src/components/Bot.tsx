@@ -19,7 +19,7 @@ export const AUDIO_PLAYING_KEY = "audio_playing";
 
 import { computePlainText } from '@/features/blocks/bubbles/textBubble/helpers/convertRichTextToPlainText'
 
-
+import singleTonTextQueue from "@/global/textQueue";
 export type BotProps = {
   socket?: any;
   socket1?: any;
@@ -473,7 +473,10 @@ const BotContent = (props: BotContentProps) => {
 
       // document.addEventListener('click', handleDocumentClick);
       document.addEventListener('mousedown', handleDocumentClick);
-      textQueue = new Queue();
+      // modified 
+      // textQueue = new Queue();
+      textQueue = singleTonTextQueue.getInstance();
+
       const audio = new Audio();
       audio.addEventListener('ended', ended);
       audioUrlQueue = new Queue();
