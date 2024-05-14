@@ -288,10 +288,21 @@ const BotContent = (props: BotContentProps) => {
     if (node.nodeType === Node.TEXT_NODE) {
 
       if (props.initialChatReply.typebot.settings.general.isVoiceEnabled && node.textContent.trim() != "") {
-        const textToSpeechText = node.textContent.trim();
-        console.log("text to speech text", textToSpeechText);
-        textQueue.enqueue(textToSpeechText);
-        console.log("text Queue print list", textQueue.printQueue())
+        let chatchunks = sessionStorage.getItem("chatchunks");
+        if (chatchunks && JSON.parse(chatchunks)[JSON.parse(chatchunks).length - 1]?.input?.type == "card input") {
+          console.log("text node of card input ignore");
+        } else {
+          const textToSpeechText = node.textContent.trim();
+          console.log("text to speech textttt", textToSpeechText);
+          textQueue.enqueue(textToSpeechText);
+
+          console.log("text Queue print list", textQueue.printQueue())
+        }
+        // const textToSpeechText = node.textContent.trim();
+        // console.log("text to speech textttt", textToSpeechText);
+        // textQueue.enqueue(textToSpeechText);
+
+        // console.log("text Queue print list", textQueue.printQueue())
       }
 
 
@@ -434,6 +445,7 @@ const BotContent = (props: BotContentProps) => {
     currentAudio.pause();
     currentAudio.currentTime = 0;
     setAudioPlaying(false);
+
 
 
 

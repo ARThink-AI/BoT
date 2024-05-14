@@ -226,9 +226,10 @@
 //   )
 // }
 
-import { createSignal, For, createEffect } from 'solid-js';
+import { createSignal, For, createEffect, onCleanup } from 'solid-js';
 import './style.css'
 import singleTonTextQueue from "@/global/textQueue";
+import { env } from "@typebot.io/env";
 import Queue from '@/utils/queue';
 
 export const CardInput = (props: any) => {
@@ -238,9 +239,23 @@ export const CardInput = (props: any) => {
   const [phoneValidation, setPhoneValidation] = createSignal(true);
   const [voiceArray, setVoiceArray] = createSignal([]);
   const [audioRef, setAudioRef] = createSignal();
+  const [currentPlayIndex, setCurrentPlayIndex] = createSignal(null);
+  const [isRecording, setIsRecording] = createSignal(false);
+  const [stream, setStream] = createSignal(null);
+  const [timeoutId, setTimeoutId] = createSignal(null);
   createEffect(() => {
     console.log("card component rendered", JSON.stringify(props));
     if (props?.block?.options?.isVoiceFill) {
+
+      // const audioElements = document.querySelectorAll("audio");
+      // console.log("audio elements", audioElements);
+      // audioElements.forEach(audio => {
+      //   audio.pause();
+      // });
+      const audio = new Audio();
+      audio.addEventListener('ended', ended);
+
+      setAudioRef(audio);
       setTimeout(() => {
         console.log("timeout called");
         let textQueue = singleTonTextQueue.getInstance();
@@ -257,8 +272,20 @@ export const CardInput = (props: any) => {
             console.log("not entered anything")
           }
         }
-        // console.log("arr validation", arr);
-        setVoiceArray(arr);
+        console.log("arr validation", arr);
+        if (arr.length > 0) {
+          setTimeout(() => {
+            setVoiceArray(arr);
+
+            setCurrentPlayIndex(0);
+            playAudio();
+          }, 200)
+
+
+
+        }
+
+
       }, 200);
 
 
@@ -268,6 +295,176 @@ export const CardInput = (props: any) => {
   createEffect(() => {
     console.log("voice array changed", voiceArray());
   }, [voiceArray()]);
+
+  const ended = async () => {
+    try {
+      console.log("audio ended");
+      let index = currentPlayIndex();
+      if (index == voiceArray().length) {
+        console.log("index return ");
+        return
+      }
+
+      console.log("start recording called");
+
+
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: "default",
+          sampleRate: 48000, // Adjust to your requirement
+          sampleSize: 16,
+          channelCount: 1,
+        },
+        video: false,
+      });
+
+      setStream(audioStream);
+      const mediaRecorder = new MediaRecorder(audioStream);
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        console.log("on data aviaalble", event);
+        chunks.push(event.data);
+
+      };
+      mediaRecorder.onstop = async () => {
+        console.log("on stop");
+        const blob = new Blob(chunks, { type: 'audio/wav' });
+        // setRecordedAudio(URL.createObjectURL(blob));
+
+        // Convert the recorded audio to text using Google Cloud Speech-to-Text API
+        const audioData = await blob.arrayBuffer();
+        const base64Audio = Buffer.from(audioData).toString('base64');
+        console.log("audio data", audioData);
+        try {
+          const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            // body: JSON.stringify({ audio: base64Audio }),
+            body: JSON.stringify({ audio: base64Audio, type: "speechtotext", text: "Hii" }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Error converting audio to text');
+          }
+
+          const result = await response.json();
+          console.log("result transcription", result.message.transcription);
+          // if ( inputNode() ) {
+          //   let n = inputNode();
+          //   n.value = result.transcription
+          // }
+
+          // set card input 
+          // const val = inputValue() + " " +result.message.transcription;
+          // setInputValue(val);
+          // const index = currentPlayIndex();
+          const val = result.message.transcription;
+          const inputIndex = voiceArray()[index].index;
+          console.log("input index", inputIndex);
+          handleInputChange2(val, inputIndex);
+          // setIsRecording(false);
+          stopRecordingUserVoice();
+          if (timeoutId()) {
+            console.log("terminate manually");
+            clearTimeout(timeoutId());
+            setTimeoutId(null);
+          }
+
+
+          let newIndex = index + 1;
+          setCurrentPlayIndex(newIndex);
+          playAudio();
+          // node.value = result.transcription;
+          // setRecordedText(result.transcription);
+        } catch (error) {
+          console.error('Error calling Speech-to-Text API:', error);
+        }
+      };
+      // mediaRecorder.onstop = () => {
+      //   console.log("on stop");
+      //   const blob = new Blob(chunks, { type: 'audio/wav' });
+      //   setRecordedAudio(URL.createObjectURL(blob));
+      // };
+      console.log("media recorder", mediaRecorder);
+      mediaRecorder.start()
+
+      setIsRecording(true);
+
+      //  Handle Edge Case: Stop recording after 10 seconds (adjust as needed)
+      let id = setTimeout(() => {
+        console.log("automatic terminate called");
+        if (isRecording()) {
+          setTimeoutId(null);
+          stopRecordingUserVoice();
+          // mediaRecorder.stop();
+          // setIsRecording(false);
+        }
+      }, 9000);
+      setTimeoutId(id);
+
+
+
+    } catch (err) {
+      console.log("error accessing microphone", err);
+    }
+
+
+  }
+  const base64toBlob = (base64, type) => {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return new Blob([bytes], { type: type });
+  }
+  const playAudio = async () => {
+
+    try {
+      const currentAudio = audioRef();
+      const index = currentPlayIndex();
+      console.log("current index", index);
+      // if (index == voiceArray().length) {
+      //   console.log("index return ");
+      //   return
+      // }
+      if (!voiceArray()[index]) {
+        console.log("this is empty");
+        return
+      }
+      const text = voiceArray()[index].label;
+      console.log("text", text);
+      const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, type: "translate", langCode: "en-IN" }),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const audioBlob = base64toBlob(result.message.audioData, 'audio/mp3');
+        const audioUrl = URL.createObjectURL(audioBlob);
+        currentAudio.src = audioUrl;
+        currentAudio.play().catch((err) => {
+          console.log("error playing ", err);
+
+
+
+        });
+
+      }
+    } catch (err) {
+      console.log("error playing audio", err);
+    }
+
+  }
 
 
   // createEffect(() => {
@@ -332,6 +529,19 @@ export const CardInput = (props: any) => {
     }
 
   }
+  const handleInputChange2 = (value: string, index: any) => {
+    updateInput("values", value, index);
+    console.log("handle change index", index)
+
+    // Perform validation based on input type
+    const inputType = inputs()[index].type;
+    console.log("input typeeee", inputType)
+    if (inputType === "email") {
+      setEmailValid(validateEmail(value));
+    } else if (inputType === "phone") {
+      setPhoneValidation(validatePhone(value));
+    }
+  }
 
 
   const updateInput = (property: string, value: any, index: number) => {
@@ -368,6 +578,26 @@ export const CardInput = (props: any) => {
 
 
   console.log("card props", props)
+
+  const stopRecordingUserVoice = async () => {
+    console.log("stop recording callled");
+    if (stream()) {
+      stream().getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    setIsRecording(false);
+  }
+
+
+  onCleanup(() => {
+
+    if (props?.block?.options?.isVoiceFill && audioRef()) {
+      const audio = audioRef()
+      audio.removeEventListener("ended", ended);
+    }
+
+  })
 
   return (
 
@@ -700,8 +930,14 @@ export const CardInput = (props: any) => {
                   ans[props?.block?.options?.inputs[i].answerVariableId] =
                 }
               }}  */}
-              {props?.block?.options?.isVoiceFill && (
+              {/* {props?.block?.options?.isVoiceFill && (
                 <button> Disable Voice </button>
+              )} */}
+              {props?.block?.options?.isVoiceFill && isRecording() && (
+                <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
+                  <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
+                  <div style={{ "font-size": "8px" }} > Listening... </div>
+                </div>
               )}
               <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
                 Submit
