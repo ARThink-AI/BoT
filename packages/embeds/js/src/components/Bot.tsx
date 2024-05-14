@@ -19,7 +19,7 @@ export const AUDIO_PLAYING_KEY = "audio_playing";
 
 import { computePlainText } from '@/features/blocks/bubbles/textBubble/helpers/convertRichTextToPlainText'
 
-
+import singleTonTextQueue from "@/global/textQueue";
 export type BotProps = {
   socket?: any;
   socket1?: any;
@@ -288,10 +288,21 @@ const BotContent = (props: BotContentProps) => {
     if (node.nodeType === Node.TEXT_NODE) {
 
       if (props.initialChatReply.typebot.settings.general.isVoiceEnabled && node.textContent.trim() != "") {
-        const textToSpeechText = node.textContent.trim();
-        console.log("text to speech text", textToSpeechText);
-        textQueue.enqueue(textToSpeechText);
-        console.log("text Queue print list", textQueue.printQueue())
+        let chatchunks = sessionStorage.getItem("chatchunks");
+        if (chatchunks && JSON.parse(chatchunks)[JSON.parse(chatchunks).length - 1]?.input?.type == "card input") {
+          console.log("text node of card input ignore");
+        } else {
+          const textToSpeechText = node.textContent.trim();
+          console.log("text to speech textttt", textToSpeechText);
+          textQueue.enqueue(textToSpeechText);
+
+          console.log("text Queue print list", textQueue.printQueue())
+        }
+        // const textToSpeechText = node.textContent.trim();
+        // console.log("text to speech textttt", textToSpeechText);
+        // textQueue.enqueue(textToSpeechText);
+
+        // console.log("text Queue print list", textQueue.printQueue())
       }
 
 
@@ -439,6 +450,7 @@ const BotContent = (props: BotContentProps) => {
 
 
 
+
   };
   const ended = () => {
     console.log("audio ended for text");
@@ -473,7 +485,10 @@ const BotContent = (props: BotContentProps) => {
 
       // document.addEventListener('click', handleDocumentClick);
       document.addEventListener('mousedown', handleDocumentClick);
-      textQueue = new Queue();
+      // modified 
+      // textQueue = new Queue();
+      textQueue = singleTonTextQueue.getInstance();
+
       const audio = new Audio();
       audio.addEventListener('ended', ended);
       audioUrlQueue = new Queue();
