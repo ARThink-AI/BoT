@@ -213,7 +213,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
               onEnd={props.onEnd}
             />
             <Show when={initialChatReply.typebot.settings.general.isVoiceEnabled} >
-              <div style={!isMobile() ? { position: "fixed", top: "1%", left: "50%", width: "100px" } : { position: "fixed", top: "1%", left: "50%", width: "20px" }} >
+              <div style={!isMobile() ? { position: "fixed", top: "1%", left: "50%" } : { position: "fixed", top: "1%", left: "50%" }} >
                 <select class='p-[3px]' value={selectedLanguage()} onChange={(evt) => {
                   console.log("vall", evt?.target?.value);
                   setSelectedLanguage(evt?.target?.value);

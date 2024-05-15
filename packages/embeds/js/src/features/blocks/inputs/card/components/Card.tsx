@@ -335,7 +335,7 @@ export const CardInput = (props: any) => {
 
     <>
       <div class="mx-auto">
-        <div class="p-6 lg-w-[450px] h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50 overflow-hidden">
+        <div class="p-6 lg:min-w-[450px] min-h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50">
           <div class="flex flex-col h-full gap-2">
             <div id="headings">
               <p class="sticky top-0 bg-white text-xl">{props.block.options.heading}</p>
@@ -343,9 +343,9 @@ export const CardInput = (props: any) => {
                 {props.block.options.subHeading}
               </p>
             </div>
-            <div class="p-3 overflow-y-scroll hide-scrollbar flex-1 mb-2" id="input-container">
+            <div class="p-3  flex-1 mb-2" id="input-container">
 
-              {inputs().map((input: any, i: number) => {
+              {/* {inputs().map((input: any, i: number) => {
                 switch (input.type) {
                   case "text":
                     return (
@@ -505,7 +505,152 @@ export const CardInput = (props: any) => {
                   default:
                     return null;
                 }
-              })}
+              })} */}
+              <For each={inputs()}>{(input, i) => {
+                switch (input.type) {
+                  case "text":
+                    return (
+                      <>
+                        <label for="">{input.label}</label>
+                        <input
+                          type={input.type}
+                          placeholder={input.placeholder}
+                          class={`border p-2 rounded-md w-full mb-2`}
+                          value={input?.values ? input?.values : ""}
+                          onChange={(e) => handleInputChange(e, i())}
+                          required={input.required}
+                        />
+                      </>
+                    );
+                  case "email":
+                    return (
+                      <>
+                        <label for="">{input.label}</label>
+                        <input
+                          type={input.type}
+                          placeholder={input.placeholder}
+                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
+                          value={input?.values ? input?.values : ""}
+                          onChange={(e) => handleInputChange(e, i())}
+                          required={input.required}
+                        />
+                        {input.type === 'email' && !emailValid() && (
+                          <p class="text-red-500 text-sm">Please enter a valid email address.</p>
+                        )}
+                      </>
+                    );
+                  case "phone":
+                    return (
+                      <>
+                        <label for="">{input.label}</label>
+                        <input
+                          type={input.type}
+                          placeholder={input.placeholder}
+                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
+                          value={input?.values ? input?.values : ""}
+                          onChange={(e) => handleInputChange(e, i())}
+                          required={input.required}
+                        />
+                        {input.type === 'phone' && !phoneValidation() && (
+                          <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                        )}
+                      </>
+                    );
+                  case "dropdown":
+                    return (
+                      <>
+                        <label for="">{input.label}</label>
+                        <select
+                          class="w-full p-2 appearance-none border rounded-md mb-2"
+                          value={input?.default ? input?.default : ""}
+                          onChange={(e) => updateInput("default", e.target.value, i())}
+                          required={input.required}
+                        >
+                          <option value="" disabled selected>
+                            {input.placeholder}
+                          </option>
+                          <For each={JSON.parse(input.values)}>{(value) => (
+                            <option value={value}>{value}</option>
+                          )}</For>
+                        </select >
+                      </>
+                    )
+                  case "textarea":
+                    return (
+                      <>
+                        <label>{input.label}</label>
+                        < textarea
+                          class="border p-2 rounded-md w-full"
+                          placeholder={input.placeholder}
+                          value={input?.userInput ? input?.userInput : ""}
+                          onChange={(e) =>
+                            updateInput("userInput", e.target.value, i())}
+                          required={input.required}
+                        />
+                      </>
+                    )
+                  case "radio":
+                    return (
+                      <><label for="">{input.label}</label>
+                        <div class="flex justify-start gap-1 mt-2">
+
+                          <For each={JSON.parse(input.values)}>{(value) => (
+                            <>
+                              <input
+                                id={value}
+                                type="radio"
+                                class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                value={value}
+                                checked={input.userInput === value || (!input.userInput && input.default === value)}
+                                onChange={(e) =>
+                                  updateInput("userInput", e.target.value, i())}
+                                required={input.required}
+                              />
+                              <label for={value}>{value}</label>
+                            </>
+                          )}</For>
+                        </div>
+                      </>)
+                  case "checkbox":
+                    return (
+                      <>
+                        <label for="">{input.label}</label>
+                        <div class="flex justify-start flex-col gap-1">
+                          <For each={JSON.parse(input.values)}>{(value) => (
+                            <div class="flex justify-start gap-2">
+                              <input
+                                type="checkbox"
+                                class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                value={value}
+                                onChange={(e) => {
+                                  const isChecked = e.target.checked;
+                                  let updatedValues;
+                                  if (!input.userInput) {
+                                    updatedValues = isChecked ? [value] : [];
+                                  } else {
+                                    updatedValues = isChecked
+                                      ? [...input.userInput, value]
+                                      : input.userInput.filter((item) => item !== value);
+                                  }
+                                  updateInput("userInput", updatedValues, i());
+                                }}
+                                checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
+                                required={input.required}
+                              />
+                              <label>{value}</label>
+                            </div>
+                          )}</For>
+
+                        </div >
+                      </>
+                    )
+
+                  // Other cases omitted for brevity
+
+                  default:
+                    return null;
+                }
+              }}</For>
             </div>
             <div id="buttons" class="flex justify-end mb-2 gap-2">
               {/* onClick={() => {

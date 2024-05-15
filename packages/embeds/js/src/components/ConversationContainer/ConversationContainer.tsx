@@ -1061,8 +1061,20 @@ export const ConversationContainer = (props: Props) => {
           // }
           const val = userInput() + " " + result.message.transcription;
           // setInputValue(val);
-          setUserInput(val)
-          console.log("microphone recorded", inputValue())
+
+          console.log("microphone recorded", userInput())
+
+          if (val.length > 1) {
+            setUserInput(val)
+          }
+
+          setTimeout(() => {
+            if (val.length > 1) {
+              console.log("user voice", val.length)
+              userInputClicked()
+            }
+          }, 4000)
+
           // node.value = result.transcription;
           // setRecordedText(result.transcription);
         } catch (error) {
@@ -1095,6 +1107,10 @@ export const ConversationContainer = (props: Props) => {
           // setInputValue('')
           // mediaRecorder.stop();
           // setIsRecording(false);
+
+
+
+
         }
       }, 4000);
 
@@ -1108,9 +1124,19 @@ export const ConversationContainer = (props: Props) => {
     if (stream()) {
       stream().getTracks().forEach((track) => {
         track.stop();
+
       });
     }
     setIsRecording(false);
+
+    // if (userInput()) {
+    //   console.log("userInput value", isRecording())
+    //   userInputClicked()
+
+    // }
+
+
+    // userInputClicked()
   }
   return (
     <div
@@ -1174,10 +1200,10 @@ toggleLiveAgent();
       </Show>
       <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
-        <div style="position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width:45%;">
-          <div class="container lg:w-full  flex justify-center gap-2 mx-auto shadow-lg p-2 ">
+        <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
+          <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
 
-            <input placeholder='type your message' class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onChange={(e) => setUserInput(e?.target?.value)} />
+            <input placeholder='type your message' class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
             <div class='flex justify-center items-center'>
               {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
               {isRecording() && (
@@ -1186,7 +1212,7 @@ toggleLiveAgent();
                 // {/* <div style={{ "font-size": "8px" }} > Listening... </div> */}
 
               )}
-              <button onClick={userInputClicked} class="rounded-full bg-[#0077CC]">
+              <button disabled={userInput() ? false : true} onClick={userInputClicked} class={`${!userInput() ? 'cursor-not-allowed opacity-50' : ''} rounded-full bg-[#0077CC]`}>
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_63_137)">
                     <rect width="36" height="36" rx="18" fill="#0077CC" />
