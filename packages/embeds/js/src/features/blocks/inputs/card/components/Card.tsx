@@ -603,7 +603,7 @@ export const CardInput = (props: any) => {
 
     <>
       <div class="mx-auto">
-        <div class="p-6 min-w-[450px] min-h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50 ">
+        <div class="p-6 lg:min-w-[450px] min-h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50">
           <div class="flex flex-col h-full gap-2">
             <div id="headings">
               <p class="sticky top-0 bg-white text-xl">{props.block.options.heading}</p>
