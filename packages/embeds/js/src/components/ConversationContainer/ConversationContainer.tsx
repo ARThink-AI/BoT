@@ -33,6 +33,12 @@ import { computePlainText } from '@/features/blocks/bubbles/textBubble/helpers/c
 import { io } from "socket.io-client";
 import { guessApiHost } from '@/utils/guessApiHost'
 
+declare global {
+  interface Window {
+    webkitAudioContext: any; // Define the type of webkitSpeechRecognition
+  }
+}
+
 const parseDynamicTheme = (
   initialTheme: Theme,
   dynamicTheme: ChatReply['dynamicTheme']
@@ -66,6 +72,8 @@ type Props = {
   onNewLogs?: (logs: OutgoingLog[]) => void
   socket: any,
   initializeBot: any,
+  selectedLanguage: any;
+  setSelectedLanguage: any;
   // liveAgent : Boolean,
 
 }
@@ -1025,6 +1033,7 @@ export const ConversationContainer = (props: Props) => {
       const mediaRecorder = new MediaRecorder(audioStream);
       const chunks = [];
 
+      console.log("audio streammmmmmmm", audioStream)
       mediaRecorder.ondataavailable = (event) => {
         console.log("on data aviaalble", event);
         chunks.push(event.data);
@@ -1089,6 +1098,8 @@ export const ConversationContainer = (props: Props) => {
       console.log("media recorder", mediaRecorder);
       mediaRecorder.start()
 
+
+
       setIsRecording(true);
       // const stopRecordingUserVoice = async () => {
       //   console.log("stop recording callled");
@@ -1129,15 +1140,18 @@ export const ConversationContainer = (props: Props) => {
     }
     setIsRecording(false);
 
-    // if (userInput()) {
-    //   console.log("userInput value", isRecording())
-    //   userInputClicked()
 
-    // }
-
-
-    // userInputClicked()
   }
+
+
+
+
+
+
+
+
+
+
   return (
     <div
       ref={chatContainer}
@@ -1155,7 +1169,27 @@ toggleLiveAgent();
             // setLiveAgent( !currentVal );
           } } > <img style={{ height : "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
         </div>
+        
         </div> */}
+
+      <Show when={props?.initialChatReply.typebot.settings.general.isVoiceEnabled} >
+        <div style={{ position: "absolute", top: "1%", left: "45%" }} >
+          <select class='p-[3px]' value={props?.selectedLanguage()} onChange={(evt) => {
+            console.log("vall", evt?.target?.value);
+            props?.setSelectedLanguage(evt?.target?.value);
+            props?.initializeBot();
+          }} >
+            <option value="en-IN" > English  </option>
+            <option value="hi-IN" > Hindi  </option>
+            <option value="te-IN" > Telugu  </option>
+            <option value="ta-IN">  Tamil </option>
+            <option value="mr-IN" > Marathi  </option>
+            <option value="kn-IN" > Kannada  </option>
+            <option value="ml-IN" > Malayalam  </option>
+            <option value="bn-IN" > Bengali </option>
+          </select>
+        </div>
+      </Show>
       <For each={chatChunks()}>
         {(chatChunk, index) => {
           console.log("chat chunk", chatChunk, index);
