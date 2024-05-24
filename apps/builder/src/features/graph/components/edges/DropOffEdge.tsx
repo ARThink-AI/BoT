@@ -75,6 +75,8 @@ export const DropOffEdge = ({
       currentBlock.blockId,
       totalAnswersInBlocks
     )
+    console.log("previous totallllll", previousTotal)
+    console.log("answer totallllll", totalAnswers)
     if (previousTotal === 0)
       return { previousTotal: undefined, dropOffRate: undefined }
     const totalDroppedUser = previousTotal - totalAnswers
@@ -162,9 +164,8 @@ export const DropOffEdge = ({
         <Tooltip
           label={
             isWorkspaceProPlan
-              ? `At this input, ${totalDroppedUser} user${
-                  (totalDroppedUser ?? 2) > 1 ? 's' : ''
-                } left. This represents ${dropOffRate}% of the users who saw this input.`
+              ? `At this input, ${totalDroppedUser} user${(totalDroppedUser ?? 2) > 1 ? 's' : ''
+              } left. This represents ${dropOffRate}% of the users who saw this input.`
               : 'Upgrade your plan to PRO to reveal drop-off rate.'
           }
           placement="top"

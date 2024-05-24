@@ -186,8 +186,8 @@ export const Graph = ({
       newScale >= maxScale
         ? maxScale
         : newScale <= minScale
-        ? minScale
-        : newScale
+          ? minScale
+          : newScale
 
     const xs = (mouseX - graphPosition.x) / graphPosition.scale
     const ys = (mouseY - graphPosition.y) / graphPosition.scale
@@ -225,7 +225,7 @@ export const Graph = ({
 
   const zoomIn = () => zoom({ delta: zoomButtonsScaleBlock })
   const zoomOut = () => zoom({ delta: -zoomButtonsScaleBlock })
-
+  // console.log("graphhhhhh", typebot)
   return (
     <Flex
       ref={graphContainerRef}
@@ -294,14 +294,14 @@ const useAutoMoveBoard = (
           autoMoveDirection === 'right'
             ? prev.x - 5
             : autoMoveDirection === 'left'
-            ? prev.x + 5
-            : prev.x,
+              ? prev.x + 5
+              : prev.x,
         y:
           autoMoveDirection === 'bottom'
             ? prev.y - 5
             : autoMoveDirection === 'top'
-            ? prev.y + 5
-            : prev.y,
+              ? prev.y + 5
+              : prev.y,
       }))
     }, 5)
 

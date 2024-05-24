@@ -29,6 +29,10 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   const startBlockId = publishedTypebot?.groups
     .find((group) => group.blocks.at(0)?.type === 'start')
     ?.blocks.at(0)?.id
+  console.log("statssssss", stats)
+  console.log("dataaaaa", data)
+
+
 
   return (
     <Flex
@@ -45,9 +49,9 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
       justifyContent="center"
     >
       {publishedTypebot &&
-      data?.totalAnswersInBlocks &&
-      stats &&
-      startBlockId ? (
+        data?.totalAnswersInBlocks &&
+        stats &&
+        startBlockId ? (
         <GraphProvider isReadOnly>
           <GroupsCoordinatesProvider groups={publishedTypebot?.groups}>
             <Graph
@@ -57,12 +61,12 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
               totalAnswersInBlocks={
                 startBlockId
                   ? [
-                      {
-                        blockId: startBlockId,
-                        total: stats.totalViews,
-                      },
-                      ...data.totalAnswersInBlocks,
-                    ]
+                    {
+                      blockId: startBlockId,
+                      total: stats.totalViews,
+                    },
+                    ...data.totalAnswersInBlocks,
+                  ]
                   : []
               }
             />
