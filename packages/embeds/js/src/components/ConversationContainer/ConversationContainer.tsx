@@ -1164,7 +1164,16 @@ export const ConversationContainer = (props: Props) => {
     setPhoneValidation(validatePhone(value))
 
   }
+  const inputPhoneTenDigitHandle = (e: any) => {
+    let { value } = e.target;
+    const maxLength = 9; // Maximum allowed length
 
+    if (value.length > maxLength) {
+      e.preventDefault()
+
+      return;
+    }
+  };
   return (
     <div
       ref={chatContainer}
@@ -1278,7 +1287,7 @@ toggleLiveAgent();
               {!phoneValidation() && (
                 <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
               )}
-              <input maxlength="10" onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
+              <input onKeyPress={inputPhoneTenDigitHandle} onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
               {/* <p class="mb-8">Modal content goes here.</p> */}
               <div class="flex justify-end">
                 <button class="mr-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all duration-500 transform" onClick={closeModal}>
