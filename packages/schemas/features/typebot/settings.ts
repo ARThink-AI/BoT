@@ -9,6 +9,9 @@ const generalSettings = z.object({
   isInputPrefillEnabled: z.boolean().optional(),
   isHideQueryParamsEnabled: z.boolean().optional(),
   isVoiceEnabled : z.boolean().optional(),
+  isTwilioEnabled : z.boolean().optional(),
+  twilioPhoneNumber : z.string().optional(),
+  
   isCustomInputEnabled : z.boolean().optional(),
  
  
