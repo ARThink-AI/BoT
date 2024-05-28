@@ -8,42 +8,74 @@ import {
 import Cors from 'cors'
 import prisma from '@typebot.io/lib/prisma'
 import { env } from '@typebot.io/env'
+import twilio from "twilio";
 const cors = initMiddleware(Cors())
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await cors(req, res);
 
   if (req.method === 'GET') {
-    console.log( JSON.stringify(req.query) );
+    
     let AccountSid = req.query.AccountSid;
     let workspaceId = req.query.state;
     if ( !AccountSid || !workspaceId ) {
    return badRequest(res)
     }
-
-    // const typebot = await prisma.typebot.findUnique({
-    //   where: {
-    //     // @ts-ignore
-    //     id : typebotId
-    //   }
-    // });
-    // console.log("typebot details",typebotDetails);
-    await prisma.workspace.update({
-      where: {
+    let buyPhone = null;
+    const workspace = await prisma.workspace.findUnique({
+      where : {
         // @ts-ignore
         id : workspaceId
-      },
-      data : {
-        // @ts-ignore
-        twilioId:  AccountSid
       }
-    })
-     // @ts-ignore
-    res.redirect(env.NEXT_PUBLIC_BUILDER_URL[0]);
+    });
+   
+    // @ts-ignore
+    if ( ! workspace.twilioPhoneNumber ) {
+    
+ // @ts-ignore
+ const client = twilio( AccountSid , env.TWILIO_AUTH_TOKEN );
 
+ const phoneNumbers = await client.availablePhoneNumbers('US')
+ .local
+ .list({inRegion: 'AR', limit: 20});
+ 
+ 
+ if ( phoneNumbers.length > 0 ) {
+   buyPhone = phoneNumbers[0].phoneNumber;
+   await client.incomingPhoneNumbers.create( {phoneNumber: buyPhone } );
+   await prisma.workspace.update({
+    where: {
+      // @ts-ignore
+      id : workspaceId
+    },
+    data : {
+      // @ts-ignore
+      twilioId:  AccountSid ,
+      twilioPhoneNumber : buyPhone
+    }
+  })
+   // @ts-ignore
+  res.redirect(env.NEXT_PUBLIC_BUILDER_URL[0]);
+ }
 
+    } else {
+      
+      await prisma.workspace.update({
+        where: {
+          // @ts-ignore
+          id : workspaceId
+        },
+        data : {
+          // @ts-ignore
+          twilioId:  AccountSid 
+          
+        }
+      })
+       // @ts-ignore
+      res.redirect(env.NEXT_PUBLIC_BUILDER_URL[0]);
+    }
+   
 
-    // res.status(200).json({ message : "Hello World" })
   }
 
   return methodNotAllowed(res);

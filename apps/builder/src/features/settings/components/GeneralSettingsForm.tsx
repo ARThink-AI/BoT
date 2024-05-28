@@ -116,7 +116,7 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleTwilioChange}
         moreInfoContent="Toggle to Enable Twilio"
       />
-      {generalSettings.isTwilioEnabled && (
+      {/* {generalSettings.isTwilioEnabled && (
         <TextInput
           label="Twilio Phone Number"
           onChange={handlePhoneNumberChange}
@@ -124,7 +124,7 @@ export const GeneralSettingsForm = ({
           placeholder="Phone Number"
           withVariableButton={false}
         />
-      )}
+      )} */}
       {/* {
         generalSettings.isTwilioEnabled && !generalSettings.twilioAccountId && (
           <>

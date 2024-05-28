@@ -20,7 +20,8 @@ export const updateWorkspace = authenticatedProcedure
       name: z.string().optional(),
       icon: z.string().optional(),
       workspaceId: z.string(),
-      twilioId : z.string().optional().nullable()
+      twilioId : z.string().optional().nullable(),
+      twilioPhoneNumber: z.string().optional().nullable()
     })
   )
   .output(
