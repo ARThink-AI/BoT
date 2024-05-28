@@ -49,9 +49,6 @@
 /* Firefox */
 /* } */
 
-.scrollable-container::-webkit-scrollbar {
-  width: 2px;
-}
 .scrollable-container::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
@@ -106,6 +103,14 @@
   100% {
     transform: translateY(0);
   }
+}
+.call-input::-webkit-outer-spin-button,
+.call-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.scrollable-container::-webkit-scrollbar {
+  width: 2px;
 }
 
 button,
