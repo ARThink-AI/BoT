@@ -16,23 +16,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (req.method === 'GET') {
     
-    let AccountSid = req.query.AccountSid;
-    let workspaceId = req.query.state;
+    const  AccountSid = req.query.AccountSid;
+    const  workspaceId = req.query.state;
     if ( !AccountSid || !workspaceId ) {
    return badRequest(res)
     }
     let buyPhone = null;
     const workspace = await prisma.workspace.findUnique({
       where : {
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         id : workspaceId
       }
     });
    
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
     if ( ! workspace.twilioPhoneNumber ) {
     
- // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
  const client = twilio( AccountSid , env.TWILIO_AUTH_TOKEN );
 
  const phoneNumbers = await client.availablePhoneNumbers('US')
@@ -45,16 +48,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
    await client.incomingPhoneNumbers.create( {phoneNumber: buyPhone } );
    await prisma.workspace.update({
     where: {
-      // @ts-ignore
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
       id : workspaceId
     },
     data : {
-      // @ts-ignore
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
       twilioId:  AccountSid ,
       twilioPhoneNumber : buyPhone
     }
   })
-   // @ts-ignore
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
   res.redirect(env.NEXT_PUBLIC_BUILDER_URL[0]);
  }
 
@@ -62,16 +68,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       
       await prisma.workspace.update({
         where: {
-          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
           id : workspaceId
         },
         data : {
-          // @ts-ignore
+           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
           twilioId:  AccountSid 
           
         }
       })
-       // @ts-ignore
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
       res.redirect(env.NEXT_PUBLIC_BUILDER_URL[0]);
     }
    

@@ -22,6 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     const typebot = await prisma.typebot.findUnique({
       where: {
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         id : typebotId
       }
@@ -32,9 +33,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         id : workspaceId
       }
     });
-    // @ts-ignore
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
     const accountId = workspace?.twilioId;
-    // @ts-ignore
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
     const twilioPhone = workspace?.twilioPhoneNumber;
     if ( !accountId || !twilioPhone ) {
       return badRequest(res)
@@ -42,10 +45,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const client = twilio( accountId , env.TWILIO_AUTH_TOKEN );
     
     await client.calls.create( {
-      url : "https://viewer.arthink.ai/twilio/voice",
+      // url : "https://viewer.arthink.ai/twilio",
+      // url : "https://7786-139-167-50-142.ngrok-free.app/voice",
+      url : "http://172.178.92.219:1338/voice",
        to : req.body.phoneNumber,
-       // @ts-ignore
-       from : twilioPhone
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+       from : twilioPhone ,
+       record : true 
 
     } );
 

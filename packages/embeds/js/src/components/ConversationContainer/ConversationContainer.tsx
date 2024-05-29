@@ -8,7 +8,7 @@ import {
   onMount,
   Show,
 } from 'solid-js'
-import { sendMessageQuery, storeLiveChatQuery } from '@/queries/sendMessageQuery'
+import { initiateCall, sendMessageQuery, storeLiveChatQuery } from '@/queries/sendMessageQuery'
 import { ChatChunk } from './ChatChunk'
 import {
   BotContext,
@@ -118,7 +118,7 @@ export const ConversationContainer = (props: Props) => {
 
   // @ts-ignore
   const [liveChatData, setLiveChatData] = createSignal(sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : []);
-
+  const [phoneNumber, setPhoneNumber] = createSignal("")
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
@@ -1146,12 +1146,24 @@ export const ConversationContainer = (props: Props) => {
 
 
   const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const closeModal = () => {
+    setPhoneNumber("");
+    setPhoneValidation(true);
+    setIsOpen(false);
+  }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Logic for handling submit action
-    console.log("Submit clicked!");
-    closeModal();
+    try {
+      // console.log("Submit clicked!");
+      await initiateCall({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, phoneNumber: `+91${phoneNumber()}` })
+      setPhoneNumber("");
+      closeModal();
+    } catch (err) {
+      console.log("error", err);
+    }
+
+
   };
   const validatePhone = (phoneNumber: string) => {
     const phoneRegex = /^\d{10}$/;
@@ -1160,6 +1172,7 @@ export const ConversationContainer = (props: Props) => {
 
   const handleInputChange = (e: any) => {
     const { value } = e.target;
+    setPhoneNumber(value)
     // console.log("call inputttttttttttttt", value)
     setPhoneValidation(validatePhone(value))
 
@@ -1268,7 +1281,7 @@ toggleLiveAgent();
           </div>
         </div>
       </Show>
-      <Show when={props.initialChatReply.typebot.settings.general.isTwilioEnabled}>
+      <Show when={props.initialChatReply.typebot.settings.general?.isTwilioEnabled}>
         <div class='fixed bottom-[100px] right-[40px]'>
           <button onclick={openModal} class='transition-all duration-500 transform'>
             <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1287,13 +1300,13 @@ toggleLiveAgent();
               {!phoneValidation() && (
                 <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
               )}
-              <input onKeyPress={inputPhoneTenDigitHandle} onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
+              <input onKeyPress={inputPhoneTenDigitHandle} value={phoneNumber()} onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
               {/* <p class="mb-8">Modal content goes here.</p> */}
               <div class="flex justify-end">
                 <button class="mr-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all duration-500 transform" onClick={closeModal}>
-                  Close
+                  Cancel
                 </button>
-                <button class="px-4 py-2 transition-all duration-500 transform bg-blue-500 text-white hover:bg-blue-600 rounded" onClick={handleSubmit}>
+                <button disabled={!phoneNumber()} class="px-4 py-2 transition-all duration-500 transform bg-blue-500 text-white hover:bg-blue-600 rounded" onClick={handleSubmit}>
                   Submit
                 </button>
               </div>

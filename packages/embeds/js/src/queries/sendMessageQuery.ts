@@ -27,3 +27,16 @@ export const sendMessageQuery = ({
       url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/typebots/${typebotId}/results/${resultId}`,
       body,
     })  
+
+    export const initiateCall = ({
+      // @ts-ignore
+     apiHost ,
+   
+     // @ts-ignore
+     ...body
+   }) =>
+     sendRequest({
+       method: 'POST',
+       url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/integrations/twilio/call`,
+       body,
+     })  

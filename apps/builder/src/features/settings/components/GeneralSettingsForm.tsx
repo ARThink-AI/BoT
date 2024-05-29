@@ -14,7 +14,7 @@ import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
-import { TextInput } from '@/components/inputs'
+// import { TextInput } from '@/components/inputs'
 // import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 type Props = {
   generalSettings: GeneralSettings
@@ -68,11 +68,11 @@ export const GeneralSettingsForm = ({
       isCustomInputEnabled,
     })
 
-  const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
-    onGeneralSettingsChange({
-      ...generalSettings,
-      twilioPhoneNumber,
-    })
+  // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
+  //   onGeneralSettingsChange({
+  //     ...generalSettings,
+  //     twilioPhoneNumber,
+  //   })
 
 
 
