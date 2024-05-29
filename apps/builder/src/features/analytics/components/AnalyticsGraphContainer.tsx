@@ -15,6 +15,8 @@ import { GroupsCoordinatesProvider } from '@/features/graph/providers/GroupsCoor
 import { useI18n } from '@/locales'
 import { trpc } from '@/lib/trpc'
 import { isDefined } from '@typebot.io/lib'
+import { AnalyticChart } from './graphs/components/AnalyticChart'
+
 
 export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   const t = useI18n()
@@ -31,8 +33,63 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
     ?.blocks.at(0)?.id
   console.log("statssssss", stats)
   console.log("dataaaaa", data)
+  // console.log("groupssss", publishedTypebot?.groups)
+
+  const blocks = publishedTypebot?.groups
+  const counts = data?.totalAnswersInBlocks
+  // function summarizeCounts(blocks: any, counts: any) {
+  //   const blockTypes: any = {};
+
+  //   counts.forEach(({ blockId, total }) => {
+  //     blocks.forEach(group => {
+  //       group.blocks.forEach(block => {
+  //         if (block.id === blockId) {
+  //           const type = block.type;
+  //           if (!blockTypes[type]) {
+  //             blockTypes[type] = 0;
+  //           }
+  //           blockTypes[type] += total;
+  //         }
+  //       });
+  //     });
+  //   });
+
+  //   return blockTypes;
+  // }
+
+  // const summary = summarizeCounts(blocks, counts);
+  // console.log("type based input dataaaaaaa", summary);
+  console.log("data blockkkkkk", blocks)
 
 
+  function summarizeCounts(blocks: any, counts: any) {
+    const blockTypes: any = {};
+    if (blocks && counts) {
+      counts.forEach(({ blockId, total }) => {
+        blocks.forEach(group => {
+          group.blocks.forEach(block => {
+            if (block.id === blockId) {
+              const type = block.type;
+              if (!blockTypes[type]) {
+                blockTypes[type] = { total: 0, blocks: [] };
+              }
+              blockTypes[type].total += total;
+              blockTypes[type].blocks.push({ blockId, total });
+            }
+          });
+        });
+      });
+    }
+    //   const summary = Object.keys(blockTypes).map(type => ({
+    //     type: type,
+    //     total: blockTypes[type].total
+    // }));
+
+    return blockTypes;
+  }
+
+  const summary = summarizeCounts(blocks, counts);
+  console.log("summary data based on input type..", summary)
 
   return (
     <Flex
@@ -89,6 +146,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
         excludedPlans={['STARTER']}
       />
       <StatsCards stats={stats} pos="absolute" />
+      <AnalyticChart data={summary} multipleSelect={data?.totalContentInBlock} />
     </Flex>
   )
 }
