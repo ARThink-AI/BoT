@@ -70,6 +70,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
           group.blocks.forEach(block => {
             if (block.id === blockId) {
               const type = block.type;
+
               if (!blockTypes[type]) {
                 blockTypes[type] = { total: 0, blocks: [] };
               }
@@ -109,26 +110,28 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
         data?.totalAnswersInBlocks &&
         stats &&
         startBlockId ? (
-        <GraphProvider isReadOnly>
-          <GroupsCoordinatesProvider groups={publishedTypebot?.groups}>
-            <Graph
-              flex="1"
-              typebot={publishedTypebot}
-              onUnlockProPlanClick={onOpen}
-              totalAnswersInBlocks={
-                startBlockId
-                  ? [
-                    {
-                      blockId: startBlockId,
-                      total: stats.totalViews,
-                    },
-                    ...data.totalAnswersInBlocks,
-                  ]
-                  : []
-              }
-            />
-          </GroupsCoordinatesProvider>
-        </GraphProvider>
+        <>
+        </>
+        // <GraphProvider isReadOnly>
+        //   <GroupsCoordinatesProvider groups={publishedTypebot?.groups}>
+        //     <Graph
+        //       flex="1"
+        //       typebot={publishedTypebot}
+        //       onUnlockProPlanClick={onOpen}
+        //       totalAnswersInBlocks={
+        //         startBlockId
+        //           ? [
+        //             {
+        //               blockId: startBlockId,
+        //               total: stats.totalViews,
+        //             },
+        //             ...data.totalAnswersInBlocks,
+        //           ]
+        //           : []
+        //       }
+        //     />
+        //   </GroupsCoordinatesProvider>
+        // </GraphProvider>
       ) : (
         <Flex
           justify="center"
@@ -138,7 +141,8 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
         >
           <Spinner color="gray" />
         </Flex>
-      )}
+      )
+      }
       <ChangePlanModal
         onClose={onClose}
         isOpen={isOpen}
@@ -146,7 +150,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
         excludedPlans={['STARTER']}
       />
       <StatsCards stats={stats} pos="absolute" />
-      <AnalyticChart data={summary} multipleSelect={data?.totalContentInBlock} />
-    </Flex>
+      <AnalyticChart data={summary} multipleSelect={data?.totalContentInBlock} rating={data?.totalRatingInput} />
+    </Flex >
   )
 }

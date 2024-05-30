@@ -12,5 +12,18 @@ export const totalContentInBlock = z.object({
   total: z.number(),
 })
 
+export const totalTextInput = z.object({
+  text: z.string(),
+  total: z.number(),
+})
+
+export const totalRatingInput = z.object({
+  rating: z.string(),
+  total: z.number(),
+})
+
+export type TotalTextInput = z.infer<typeof totalTextInput>
+export type TotalRatingInput = z.infer<typeof totalRatingInput>
+
 export type TotalContentInBlock = z.infer<typeof totalContentInBlock>
 export type TotalAnswersInBlock = z.infer<typeof totalAnswersInBlock>

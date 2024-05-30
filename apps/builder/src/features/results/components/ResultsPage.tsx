@@ -50,8 +50,8 @@ export const ResultsPage = () => {
               ? `${typebot.name} | Analytics`
               : 'Analytics'
             : typebot?.name
-            ? `${typebot.name} | Results`
-            : 'Results'
+              ? `${typebot.name} | Results`
+              : 'Results'
         }
       />
       <TypebotHeader />
@@ -94,6 +94,15 @@ export const ResultsPage = () => {
               size="sm"
             >
               Analytics
+            </Button>
+            <Button
+              as={Link}
+              colorScheme={isAnalytics ? 'blue' : 'gray'}
+              variant={isAnalytics ? 'outline' : 'ghost'}
+              href={`/typebots/${typebot?.id}/results/abc`}
+              size="sm"
+            >
+              Respondent journey
             </Button>
           </HStack>
         </Flex>

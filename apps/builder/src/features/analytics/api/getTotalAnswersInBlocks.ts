@@ -7,6 +7,8 @@ import { canReadTypebots } from '@/helpers/databaseRules'
 import {
   totalAnswersInBlock,
   totalContentInBlock,
+  totalRatingInput,
+  totalTextInput,
 } from '@typebot.io/schemas/features/analytics'
 
 export const getTotalAnswersInBlocks = authenticatedProcedure
@@ -28,6 +30,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     z.object({
       totalAnswersInBlocks: z.array(totalAnswersInBlock),
       totalContentInBlock: z.array(totalContentInBlock),
+      totalTextInput: z.array(totalTextInput),
+      totalRatingInput: z.array(totalRatingInput),
     })
   )
   .query(async ({ input: { typebotId }, ctx: { user } }) => {
@@ -128,74 +132,117 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     // console.log(totalCounts)
 
     const inputType = [
-      'choice input',
-      'number input',
-      'email input',
-      'date input',
-      'phone number input',
+      // 'choice input',
+      // 'number input',
+      // 'email input',
+      // 'date input',
+      // 'phone number input',
       'text input',
-      'url input',
+      // 'url input',
+      'rating input',
+      // 'card input',
     ]
 
-    // const totalAnswersPerInputTypes = await prisma.answer.groupBy({
-    //   by: ['blockId', 'content'], // Group by blockId and content
-    //   where: {
-    //     result: {
-    //       typebotId: typebot.publishedTypebot.typebotId,
-    //     },
-    //     blockId: {
-    //       in: publishedTypebot.groups.flatMap((group) =>
-    //         group.blocks
-    //           .filter((block) => inputType.includes(block.type))
-    //           .map((block) => block.id)
-    //       ),
-    //     },
-    //   },
-    //   _count: {
-    //     _all: true,
-    //     // Count the number of answers
-    //   },
-    // })
-
-    // function getTotalCounts(totalAnswersPerInputTypes) {
-    //   const contentTotals = {}
-
-    //   totalAnswersPerInputTypes.forEach((item) => {
-    //     const contents = item.content
-    //       .split(',')
-    //       .map((content) => content.trim())
-
-    //     contents.forEach((content) => {
-    //       if (!contentTotals[content]) {
-    //         contentTotals[content] = 0
-    //       }
-    //       contentTotals[content] += item._count._all
-    //     })
-    //   })
-
-    //   return contentTotals
-    // }
-
-    // // Get the total counts for each unique content type
-    // const totalCounts = getTotalCounts(totalAnswersPerInputTypes)
-
-    // console.log('base on type', totalCounts)
-
-    const totalAnswersInputPerBlock = await prisma.answer.groupBy({
-      by: ['itemId', 'blockId'],
+    const totalAnswersPerInputTypes = await prisma.answer.groupBy({
+      by: ['blockId', 'content'], // Group by blockId and content
       where: {
         result: {
           typebotId: typebot.publishedTypebot.typebotId,
         },
         blockId: {
           in: publishedTypebot.groups.flatMap((group) =>
-            group.blocks.map((block) => block.id)
+            group.blocks
+              .filter((block) => block.type === 'text input')
+              .map((block) => block.id)
           ),
         },
       },
-
-      _count: { _all: true },
+      _count: {
+        _all: true,
+        // Count the number of answers
+      },
     })
+
+    function getTotalCounts(totalAnswersPerInputTypes) {
+      const contentTotals = {}
+
+      totalAnswersPerInputTypes.forEach((item) => {
+        const contents = item.content
+          .split(',')
+          .map((content) => content.trim())
+
+        contents.forEach((content) => {
+          if (!contentTotals[content]) {
+            contentTotals[content] = 0
+          }
+          contentTotals[content] += item._count._all
+        })
+      })
+
+      const totalInp = Object.keys(contentTotals).map((type) => ({
+        text: type,
+        total: contentTotals[type], // Corrected this line
+      }))
+
+      return totalInp
+    }
+
+    // Get the total counts for each unique content type
+    const totalCounts = getTotalCounts(totalAnswersPerInputTypes)
+
+    // console.log('base on type', totalCounts)
+
+    // rating count calculation
+    const totalAnswersPerInputRating = await prisma.answer.groupBy({
+      by: ['blockId', 'content'], // Group by blockId and content
+      where: {
+        result: {
+          typebotId: typebot.publishedTypebot.typebotId,
+        },
+        blockId: {
+          in: publishedTypebot.groups.flatMap((group) =>
+            group.blocks
+              .filter((block) => block.type === 'rating input')
+              .map((block) => block.id)
+          ),
+        },
+      },
+      _count: {
+        _all: true,
+        // Count the number of answers
+      },
+    })
+
+    function getInputRatingTotalCounts(totalAnswersPerInputRating) {
+      const contentTotals = {}
+
+      totalAnswersPerInputRating.forEach((item) => {
+        const contents = item.content
+          .split(',')
+          .map((content) => content.trim())
+
+        contents.forEach((content) => {
+          if (!contentTotals[content]) {
+            contentTotals[content] = 0
+          }
+          contentTotals[content] += item._count._all
+        })
+      })
+
+      const totalRatingInput = Object.keys(contentTotals).map((type) => ({
+        rating: type,
+        total: contentTotals[type],
+      }))
+
+      return totalRatingInput
+    }
+
+    // Get the total counts for each unique content type
+    const inputRatingTotalCounts = getInputRatingTotalCounts(
+      totalAnswersPerInputRating
+    )
+
+    // console.log('rating', checkrating)
 
     return {
       totalAnswersInBlocks: totalAnswersPerBlock.map((answer) => ({
@@ -208,5 +255,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         content: answer.content,
         total: answer._count._all,
       })),
+      totalTextInput: totalCounts,
+      totalRatingInput: inputRatingTotalCounts,
     }
   })
