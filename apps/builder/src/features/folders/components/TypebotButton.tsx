@@ -26,7 +26,8 @@ import { TypebotInDashboard } from '@/features/dashboard/types'
 import { isMobile } from '@/helpers/isMobile'
 import { trpc, trpcVanilla } from '@/lib/trpc'
 import { duplicateName } from '@/features/typebot/helpers/duplicateName'
-
+import { WorkspaceRole } from '@typebot.io/prisma'
+import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 type Props = {
   typebot: TypebotInDashboard
   isReadOnly?: boolean
@@ -40,6 +41,11 @@ export const TypebotButton = ({
   onTypebotUpdated,
   onMouseDown,
 }: Props) => {
+  const { currentRole, workspace } = useWorkspace();
+  console.log("workpsace", workspace);
+  const hasFullAccess =
+    (currentRole && currentRole !== WorkspaceRole.GUEST) || false
+
   const scopedT = useScopedI18n('folders.typebotButton')
   const router = useRouter()
   const { draggedTypebot } = useTypebotDnd()
@@ -81,9 +87,10 @@ export const TypebotButton = ({
     })
 
   const handleTypebotClick = () => {
+
     if (draggedTypebotDebounced) return
     router.push(
-      isMobile
+      (isMobile || !hasFullAccess)
         ? `/typebots/${typebot.id}/results`
         : `/typebots/${typebot.id}/edit`
     )
