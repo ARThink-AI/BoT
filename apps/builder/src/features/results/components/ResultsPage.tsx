@@ -95,7 +95,7 @@ export const ResultsPage = () => {
             >
               Analytics
             </Button>
-            <Button
+            {/* <Button
               as={Link}
               colorScheme={isAnalytics ? 'blue' : 'gray'}
               variant={isAnalytics ? 'outline' : 'ghost'}
@@ -103,7 +103,7 @@ export const ResultsPage = () => {
               size="sm"
             >
               Respondent journey
-            </Button>
+            </Button> */}
           </HStack>
         </Flex>
         <Flex pt={['10px', '60px']} w="full" justify="center">
