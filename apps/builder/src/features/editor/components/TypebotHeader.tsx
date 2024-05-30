@@ -265,7 +265,7 @@ export const TypebotHeader = () => {
             {scopedT('previewButton.label')}
           </Button>
         )}
-        <PublishButton size="sm" />
+        {hasFullAccess && <PublishButton size="sm" />}
       </HStack>
     </Flex>
   )
