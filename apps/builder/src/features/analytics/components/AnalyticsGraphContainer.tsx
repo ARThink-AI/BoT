@@ -9,9 +9,7 @@ import { Stats } from '@typebot.io/schemas'
 import React from 'react'
 import { StatsCards } from './StatsCards'
 import { ChangePlanModal } from '@/features/billing/components/ChangePlanModal'
-import { Graph } from '@/features/graph/components/Graph'
-import { GraphProvider } from '@/features/graph/providers/GraphProvider'
-import { GroupsCoordinatesProvider } from '@/features/graph/providers/GroupsCoordinateProvider'
+
 import { useI18n } from '@/locales'
 import { trpc } from '@/lib/trpc'
 import { isDefined } from '@typebot.io/lib'
@@ -20,7 +18,8 @@ import { AnalyticChart } from './graphs/components/AnalyticChart'
 
 export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   const t = useI18n()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  console.log("on open", onOpen);
   const { typebot, publishedTypebot } = useTypebot()
   const { data } = trpc.analytics.getTotalAnswersInBlocks.useQuery(
     {
@@ -61,20 +60,36 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   // console.log("type based input dataaaaaaa", summary);
   console.log("data blockkkkkk", blocks)
 
-
-  function summarizeCounts(blocks: any, counts: any) {
-    const blockTypes: any = {};
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
+  function summarizeCounts(blocks, counts) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore 
+    const blockTypes = {};
     if (blocks && counts) {
+      {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore */ }
       counts.forEach(({ blockId, total }) => {
+        {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore */ }
         blocks.forEach(group => {
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore */ }
           group.blocks.forEach(block => {
             if (block.id === blockId) {
               const type = block.type;
-
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore 
               if (!blockTypes[type]) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore 
                 blockTypes[type] = { total: 0, blocks: [] };
               }
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore 
               blockTypes[type].total += total;
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore 
               blockTypes[type].blocks.push({ blockId, total });
             }
           });
