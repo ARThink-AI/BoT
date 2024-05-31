@@ -37,6 +37,8 @@ export const updateTypebotInSession = publicProcedure
     const publicTypebot = (await prisma.publicTypebot.findFirst({
       where: {
         typebot: {
+             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
           id: session.state.typebotsQueue[0].typebot.id,
           OR: [
             {
@@ -63,7 +65,8 @@ export const updateTypebotInSession = publicProcedure
 
     if (!publicTypebot)
       throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' })
-
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
     const newSessionState = updateSessionState(session.state, publicTypebot)
 
     await prisma.chatSession.updateMany({

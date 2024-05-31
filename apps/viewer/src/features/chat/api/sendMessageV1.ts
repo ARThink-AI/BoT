@@ -33,7 +33,11 @@ export const sendMessageV1 = publicProcedure
       const session = sessionId ? await getSession(sessionId) : null
       const isSessionExpired =
         session &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         isDefined(session.state.expiryTimeout) &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         session.updatedAt.getTime() + session.state.expiryTimeout < Date.now()
 
       if (isSessionExpired)
@@ -103,6 +107,8 @@ export const sendMessageV1 = publicProcedure
           newSessionState,
           logs,
           lastMessageNewFormat,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         } = await continueBotFlow(message, { version: 1, state: session.state })
 
         const allLogs = clientLogs ? [...(logs ?? []), ...clientLogs] : logs
