@@ -603,15 +603,15 @@ export const CardInput = (props: any) => {
 
     <>
       <div class="mx-auto">
-        <div class="p-6 lg:min-w-[450px] min-h-[480px] sm-w-full rounded-md shadow-lg shadow-black-50">
+        <div class="p-6 lg:min-w-[450px] min-h-[480px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
           <div class="flex flex-col h-full gap-2">
             <div id="headings">
-              <p class="sticky top-0 bg-white text-xl">{props.block.options.heading}</p>
-              <p class="sticky top-[48px] bg-white text-md">
+              <p class="sticky top-0 bg-[#f7f8ff] text-xl">{props.block.options.heading}</p>
+              <p class="sticky top-[48px] bg-[#f7f8ff] text-lg">
                 {props.block.options.subHeading}
               </p>
             </div>
-            <div class="p-3  flex-1 mb-2" id="input-container">
+            <div class="p-4  flex-1 mb-2" id="input-container">
 
               {/* {inputs().map((input: any, i: number) => {
                 switch (input.type) {
@@ -779,7 +779,7 @@ export const CardInput = (props: any) => {
                   case "text":
                     return (
                       <>
-                        <label for="">{input.label}</label>
+                        <label class='text-[18px]' for="">{input.label}</label>
                         <input
                           type={input.type}
                           placeholder={input.placeholder}
@@ -793,7 +793,7 @@ export const CardInput = (props: any) => {
                   case "email":
                     return (
                       <>
-                        <label for="">{input.label}</label>
+                        <label class='text-[18px]' for="">{input.label}</label>
                         <input
                           type={input.type}
                           placeholder={input.placeholder}
@@ -810,7 +810,7 @@ export const CardInput = (props: any) => {
                   case "phone":
                     return (
                       <>
-                        <label for="">{input.label}</label>
+                        <label class='text-[18px]' for="">{input.label}</label>
                         <input
                           type={input.type}
                           placeholder={input.placeholder}
@@ -827,7 +827,7 @@ export const CardInput = (props: any) => {
                   case "dropdown":
                     return (
                       <>
-                        <label for="">{input.label}</label>
+                        <label class='text-[18px]' for="">{input.label}</label>
                         <select
                           class="w-full p-2 appearance-none border rounded-md mb-2"
                           value={input?.default ? input?.default : ""}
@@ -846,7 +846,7 @@ export const CardInput = (props: any) => {
                   case "textarea":
                     return (
                       <>
-                        <label>{input.label}</label>
+                        <label class='text-[18px]'>{input.label}</label>
                         < textarea
                           class="border p-2 rounded-md w-full"
                           placeholder={input.placeholder}
@@ -859,8 +859,8 @@ export const CardInput = (props: any) => {
                     )
                   case "radio":
                     return (
-                      <><label for="">{input.label}</label>
-                        <div class="flex justify-start gap-1 mt-2">
+                      <><label class='text-[18px]' for="">{input.label}</label>
+                        <div class="flex flex-wrap justify-start gap-[10px] p-[6px] mt-2">
 
                           <For each={JSON.parse(input.values)}>{(value) => (
                             <>
@@ -882,8 +882,8 @@ export const CardInput = (props: any) => {
                   case "checkbox":
                     return (
                       <>
-                        <label for="">{input.label}</label>
-                        <div class="flex justify-start flex-col gap-1">
+                        <label class='text-[18px]' for="">{input.label}</label>
+                        <div class="flex justify-start flex-col gap-[10px] p-[6px]">
                           <For each={JSON.parse(input.values)}>{(value) => (
                             <div class="flex justify-start gap-2">
                               <input
