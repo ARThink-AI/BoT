@@ -30,8 +30,8 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   const startBlockId = publishedTypebot?.groups
     .find((group) => group.blocks.at(0)?.type === 'start')
     ?.blocks.at(0)?.id
-  console.log("statssssss", stats)
-  console.log("dataaaaa", data)
+
+  console.log("trpcccccccccccccccccc", trpc)
   // console.log("groupssss", publishedTypebot?.groups)
 
   const blocks = publishedTypebot?.groups
@@ -68,13 +68,13 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
     const blockTypes = {};
     if (blocks && counts) {
       {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore */ }
+  // @ts-ignore */ }
       counts.forEach(({ blockId, total }) => {
         {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore */ }
+  // @ts-ignore */ }
         blocks.forEach(group => {
           {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore */ }
+  // @ts-ignore */ }
           group.blocks.forEach(block => {
             if (block.id === blockId) {
               const type = block.type;
@@ -103,6 +103,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
 
     return blockTypes;
   }
+
 
   const summary = summarizeCounts(blocks, counts);
   console.log("summary data based on input type..", summary)

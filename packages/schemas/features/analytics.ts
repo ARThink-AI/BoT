@@ -18,6 +18,7 @@ export const totalTextInput = z.object({
 })
 
 export const totalRatingInput = z.object({
+  blockId: z.string(),
   rating: z.string(),
   total: z.number(),
 })

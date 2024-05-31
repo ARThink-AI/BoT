@@ -1,3 +1,130 @@
+// import { Seo } from '@/components/Seo'
+// import { AnalyticsGraphContainer } from '@/features/analytics/components/AnalyticsGraphContainer'
+// import { TypebotHeader } from '@/features/editor/components/TypebotHeader'
+// import { useTypebot } from '@/features/editor/providers/TypebotProvider'
+// import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+// import { useToast } from '@/hooks/useToast'
+// import {
+//   Flex,
+//   HStack,
+//   Button,
+//   Tag,
+//   Text,
+//   useColorModeValue,
+// } from '@chakra-ui/react'
+// import Link from 'next/link'
+// import { useRouter } from 'next/router'
+// import { useMemo } from 'react'
+// import { useStats } from '../hooks/useStats'
+// import { ResultsProvider } from '../ResultsProvider'
+// import { ResultsTableContainer } from './ResultsTableContainer'
+
+// export const ResultsPage = () => {
+//   const router = useRouter()
+//   const { workspace } = useWorkspace()
+//   const { typebot, publishedTypebot } = useTypebot()
+//   const isAnalytics = useMemo(
+//     () => router.pathname.endsWith('analytics'),
+//     [router.pathname]
+//   )
+//   const { showToast } = useToast()
+
+//   const { stats, mutate } = useStats({
+//     typebotId: publishedTypebot?.typebotId,
+//     onError: (err) => showToast({ title: err.name, description: err.message }),
+//   })
+
+//   const handleDeletedResults = (total: number) => {
+//     if (!stats) return
+//     mutate({
+//       stats: { ...stats, totalStarts: stats.totalStarts - total },
+//     })
+//   }
+
+//   return (
+//     <Flex overflow="hidden" h="100vh" flexDir="column">
+//       <Seo
+//         title={
+//           router.pathname.endsWith('analytics')
+//             ? typebot?.name
+//               ? `${typebot.name} | Analytics`
+//               : 'Analytics'
+//             : typebot?.name
+//               ? `${typebot.name} | Results`
+//               : 'Results'
+//         }
+//       />
+//       <TypebotHeader />
+//       <Flex
+//         h="full"
+//         w="full"
+//         bgColor={useColorModeValue(
+//           router.pathname.endsWith('analytics') ? '#f4f5f8' : 'white',
+//           router.pathname.endsWith('analytics') ? 'gray.850' : 'gray.900'
+//         )}
+//       >
+//         <Flex
+//           pos="absolute"
+//           zIndex={2}
+//           w="full"
+//           justifyContent="center"
+//           h="60px"
+//           display={['none', 'flex']}
+//         >
+//           <HStack maxW="1600px" w="full" px="4">
+//             <Button
+//               as={Link}
+//               colorScheme={!isAnalytics ? 'blue' : 'gray'}
+//               variant={!isAnalytics ? 'outline' : 'ghost'}
+//               size="sm"
+//               href={`/typebots/${typebot?.id}/results`}
+//             >
+//               <Text>Submissions</Text>
+//               {(stats?.totalStarts ?? 0) > 0 && (
+//                 <Tag size="sm" colorScheme="blue" ml="1">
+//                   {stats?.totalStarts}
+//                 </Tag>
+//               )}
+//             </Button>
+//             <Button
+//               as={Link}
+//               colorScheme={isAnalytics ? 'blue' : 'gray'}
+//               variant={isAnalytics ? 'outline' : 'ghost'}
+//               href={`/typebots/${typebot?.id}/results/analytics`}
+//               size="sm"
+//             >
+//               Analytics
+//             </Button>
+//             <Button
+//               as={Link}
+//               // colorScheme={isAnalytics ? 'blue' : 'gray'}
+//               variant={isAnalytics ? 'outline' : 'ghost'}
+//               href={`/typebots/${typebot?.id}/results/respondentjourney`}
+//               size="sm"
+//             >
+//               Respondent journey
+//             </Button>
+//           </HStack>
+//         </Flex>
+//         <Flex pt={['10px', '60px']} w="full" justify="center">
+//           {workspace &&
+//             publishedTypebot &&
+//             (isAnalytics ? (
+//               <AnalyticsGraphContainer stats={stats} />
+//             ) : (
+//               <ResultsProvider
+//                 typebotId={publishedTypebot.typebotId}
+//                 totalResults={stats?.totalStarts ?? 0}
+//                 onDeleteResults={handleDeletedResults}
+//               >
+//                 <ResultsTableContainer />
+//               </ResultsProvider>
+//             ))}
+//         </Flex>
+//       </Flex>
+//     </Flex>
+//   )
+// }
 import { Seo } from '@/components/Seo'
 import { AnalyticsGraphContainer } from '@/features/analytics/components/AnalyticsGraphContainer'
 import { TypebotHeader } from '@/features/editor/components/TypebotHeader'
@@ -18,6 +145,8 @@ import { useMemo } from 'react'
 import { useStats } from '../hooks/useStats'
 import { ResultsProvider } from '../ResultsProvider'
 import { ResultsTableContainer } from './ResultsTableContainer'
+import { RespondentJourney } from '@/features/analytics/components/RespondentJourney'
+// Import the RespondentJourney component
 
 export const ResultsPage = () => {
   const router = useRouter()
@@ -25,6 +154,10 @@ export const ResultsPage = () => {
   const { typebot, publishedTypebot } = useTypebot()
   const isAnalytics = useMemo(
     () => router.pathname.endsWith('analytics'),
+    [router.pathname]
+  )
+  const isRespondentJourney = useMemo(
+    () => router.pathname.endsWith('respondentjourney'),
     [router.pathname]
   )
   const { showToast } = useToast()
@@ -49,9 +182,13 @@ export const ResultsPage = () => {
             ? typebot?.name
               ? `${typebot.name} | Analytics`
               : 'Analytics'
-            : typebot?.name
-              ? `${typebot.name} | Results`
-              : 'Results'
+            : router.pathname.endsWith('respondentjourney')
+              ? typebot?.name
+                ? `${typebot.name} | Respondent Journey`
+                : 'Respondent Journey'
+              : typebot?.name
+                ? `${typebot.name} | Results`
+                : 'Results'
         }
       />
       <TypebotHeader />
@@ -59,8 +196,8 @@ export const ResultsPage = () => {
         h="full"
         w="full"
         bgColor={useColorModeValue(
-          router.pathname.endsWith('analytics') ? '#f4f5f8' : 'white',
-          router.pathname.endsWith('analytics') ? 'gray.850' : 'gray.900'
+          router.pathname.endsWith('analytics') || router.pathname.endsWith('respondentjourney') ? '#f4f5f8' : 'white',
+          router.pathname.endsWith('analytics') || router.pathname.endsWith('respondentjourney') ? 'gray.850' : 'gray.900'
         )}
       >
         <Flex
@@ -74,8 +211,8 @@ export const ResultsPage = () => {
           <HStack maxW="1600px" w="full" px="4">
             <Button
               as={Link}
-              colorScheme={!isAnalytics ? 'blue' : 'gray'}
-              variant={!isAnalytics ? 'outline' : 'ghost'}
+              colorScheme={!isAnalytics && !isRespondentJourney ? 'blue' : 'gray'}
+              variant={!isAnalytics && !isRespondentJourney ? 'outline' : 'ghost'}
               size="sm"
               href={`/typebots/${typebot?.id}/results`}
             >
@@ -95,15 +232,15 @@ export const ResultsPage = () => {
             >
               Analytics
             </Button>
-            {/* <Button
+            <Button
               as={Link}
-              colorScheme={isAnalytics ? 'blue' : 'gray'}
-              variant={isAnalytics ? 'outline' : 'ghost'}
-              href={`/typebots/${typebot?.id}/results/abc`}
+              colorScheme={isRespondentJourney ? 'blue' : 'gray'}
+              variant={isRespondentJourney ? 'outline' : 'ghost'}
+              href={`/typebots/${typebot?.id}/results/respondentjourney`}
               size="sm"
             >
-              Respondent journey
-            </Button> */}
+              Respondent Analytics
+            </Button>
           </HStack>
         </Flex>
         <Flex pt={['10px', '60px']} w="full" justify="center">
@@ -111,6 +248,8 @@ export const ResultsPage = () => {
             publishedTypebot &&
             (isAnalytics ? (
               <AnalyticsGraphContainer stats={stats} />
+            ) : isRespondentJourney ? (
+              <RespondentJourney stats={stats} />
             ) : (
               <ResultsProvider
                 typebotId={publishedTypebot.typebotId}

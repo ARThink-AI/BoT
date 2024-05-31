@@ -163,29 +163,29 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       },
     })
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+    // @ts-ignore
     function getTotalCounts(totalAnswersPerInputTypes) {
       const contentTotals = {}
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       totalAnswersPerInputTypes.forEach((item) => {
         const contents = item.content
           .split(',')
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+          // @ts-ignore
           .map((content) => content.trim())
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         contents.forEach((content) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+          // @ts-ignore
           if (!contentTotals[content]) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+            // @ts-ignore
             contentTotals[content] = 0
           }
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+          // @ts-ignore
           contentTotals[content] += item._count._all
         })
       })
@@ -193,7 +193,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       const totalInp = Object.keys(contentTotals).map((type) => ({
         text: type,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+        // @ts-ignore
         total: contentTotals[type], // Corrected this line
       }))
 
@@ -225,50 +225,86 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         // Count the number of answers
       },
     })
-     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // // @ts-ignore
+    // function getInputRatingTotalCounts(totalAnswersPerInputRating) {
+    //   const contentTotals = {}
+    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //   // @ts-ignore
+    //   totalAnswersPerInputRating.forEach((item) => {
+    //     const contents = item.content
+    //       .split(',')
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       .map((content) => content.trim())
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     contents.forEach((content) => {
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       if (!contentTotals[content]) {
+    //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //         // @ts-ignore
+    //         contentTotals[content] = 0
+    //       }
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       contentTotals[content] += item._count._all
+    //     })
+    //   })
+
+    //   const totalRatingInput = Object.keys(contentTotals).map((type) => ({
+    //     rating: type,
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     total: contentTotals[type],
+    //   }))
+
+    //   return totalRatingInput
+    // }
+
+    // // Get the total counts for each unique content type
+    // const inputRatingTotalCounts = getInputRatingTotalCounts(
+    //   totalAnswersPerInputRating
+    // )
+
+    // console.log('rating', checkrating)
     function getInputRatingTotalCounts(totalAnswersPerInputRating) {
-      const contentTotals = {}
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+      const blockIdTotals = {}
+
       totalAnswersPerInputRating.forEach((item) => {
         const contents = item.content
           .split(',')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
           .map((content) => content.trim())
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
+        if (!blockIdTotals[item.blockId]) {
+          blockIdTotals[item.blockId] = {}
+        }
+
         contents.forEach((content) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
-          if (!contentTotals[content]) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
-            contentTotals[content] = 0
+          if (!blockIdTotals[item.blockId][content]) {
+            blockIdTotals[item.blockId][content] = 0
           }
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
-          contentTotals[content] += item._count._all
+          blockIdTotals[item.blockId][content] += item._count._all
         })
       })
 
-      const totalRatingInput = Object.keys(contentTotals).map((type) => ({
-        rating: type,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore 
-        total: contentTotals[type],
-      }))
+      const totalRatingInput = Object.keys(blockIdTotals).flatMap((blockId) =>
+        Object.keys(blockIdTotals[blockId]).map((content) => ({
+          blockId,
+          rating: content,
+          total: blockIdTotals[blockId][content],
+        }))
+      )
 
       return totalRatingInput
     }
 
-    // Get the total counts for each unique content type
+    // Get the total counts for each unique content type and blockId
     const inputRatingTotalCounts = getInputRatingTotalCounts(
       totalAnswersPerInputRating
     )
 
-    // console.log('rating', checkrating)
+    console.log(inputRatingTotalCounts)
 
     return {
       totalAnswersInBlocks: totalAnswersPerBlock.map((answer) => ({

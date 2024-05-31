@@ -18,44 +18,117 @@ ChartJS.register(
 
 
 
+
+
 {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore */ }
 export const AnalyticChart = ({ data, multipleSelect, rating }) => {
   console.log("textttttttttttttttt", rating)
   console.log("dddddddddddd", data)
+
+  function combineRatings(rating) {
+    // Create a map to store combined ratings
+    const map = new Map();
+
+    // Iterate over each entry in the data
+    rating && rating.forEach(item => {
+      const { blockId, rating, total } = item;
+
+      // Check if the blockId already exists in the map
+      if (map.has(blockId)) {
+        // If it exists, update the existing entry
+        const existingEntry = map.get(blockId);
+        existingEntry.ratings.push(rating);
+        existingEntry.totals.push(total);
+      } else {
+        // If it doesn't exist, create a new entry
+        map.set(blockId, { ratings: [rating], totals: [total] });
+      }
+    });
+
+
+
+    // Convert the map back to an array of objects
+    return Array.from(map.entries()).map(([blockId, { ratings, totals }]) => ({
+      blockId,
+      ratings,
+      totals
+    }));
+  }
+
+  const RatingData = combineRatings(rating)
+
+  console.log("dataaaaaaaaaaa ratinggggggggg gggg", combineRatings(rating))
+
   const ratingData = rating
   {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore */ }
-  function calculateNPS(ratingData) {
-    let promoters = 0;
-    let passives = 0;
-    let detractors = 0;
+  // function calculateNPS(RatingData) {
+  //   let promoters = 0;
+  //   let passives = 0;
+  //   let detractors = 0;
 
-    // Loop through the ratingData to count promoters, passives, and detractors
-    if (ratingData) {
-      for (let i = 0; i < ratingData.length; i++) {
-        const rating = parseInt(ratingData[i].rating);
+  //   // Loop through the ratingData to count promoters, passives, and detractors
+  //   if (RatingData) {
+  //     for (let i = 0; i < RatingData.length; i++) {
+  //       const rating = parseInt(RatingData[i].rating);
 
-        if (rating >= 9 && rating <= 10) {
-          promoters += ratingData[i].total;
-        } else if (rating >= 7 && rating <= 8) {
-          passives += ratingData[i].total;
+  //       if (rating >= 9 && rating <= 10) {
+  //         promoters += RatingData[i].total;
+  //       } else if (rating >= 7 && rating <= 8) {
+  //         passives += RatingData[i].total;
+  //       } else {
+  //         detractors += RatingData[i].total;
+  //       }
+  //     }
+  //   }
+
+
+  //   // Calculate NPS
+  //   const totalResponses = promoters + passives + detractors;
+  //   const nps = ((promoters - detractors) / totalResponses) * 100;
+
+  //   return nps;
+  // }
+  function calculateNPS(RatingData) {
+    let npsResults = {};
+
+    RatingData.forEach(item => {
+      let promoters = 0;
+      let passives = 0;
+      let detractors = 0;
+      let totalResponses = 0;
+
+      // Calculate total responses
+      totalResponses = item.totals.reduce((a, b) => a + b, 0);
+
+      // Calculate promoters, passives, and detractors
+      item.ratings.forEach((rating, index) => {
+        let count = item.totals[index];
+        rating = parseInt(rating);
+        if (rating >= 9) {
+          promoters += count;
+        } else if (rating >= 7) {
+          passives += count;
         } else {
-          detractors += ratingData[i].total;
+          detractors += count;
         }
-      }
-    }
+      });
 
+      // Calculate NPS
+      let nps = ((promoters - detractors) / totalResponses) * 100;
 
-    // Calculate NPS
-    const totalResponses = promoters + passives + detractors;
-    const nps = ((promoters - detractors) / totalResponses) * 100;
+      // Store NPS result for this blockId
+      npsResults[item.blockId] = nps;
+    });
 
-    return nps;
+    return npsResults;
   }
 
-  const nps = calculateNPS(ratingData)
-  console.log("npsssss",)
+
+  const nps = calculateNPS(RatingData)
+
+  console.log("npsssss", nps)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore 
@@ -86,6 +159,9 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
         });
       });
     }
+
+
+
 
 
 
@@ -290,27 +366,55 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
     }
 
     // Rating
-    if (data['rating input']) {
-      const phoneNumberInputData = {
-        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        datasets: [
-          {
-            label: `NPS ${nps.toFixed(2)}%`,
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore 
-            data: rating.map(rating => parseInt(rating.rating)),
-            backgroundColor: 'rgba(255,159,64,0.6)'
-          }
-        ]
-      };
-      charts.push(<div key="ratingInputChart"><Bar data={phoneNumberInputData} /></div>);
+    if (RatingData && Array.isArray(RatingData)) {
+      RatingData.forEach(item => {
+        const ratings = item.ratings.map(rating => parseInt(rating));
+        const totaloFRating = item.totals.map(total => parseInt(total));
+        const blockId = item.blockId;
+        const npsData = nps[blockId]; // Assuming you have a function to calculate NPS
+
+        const chartData = {
+          // labels:[0,1,2,3,4,5,6,7,8,9],
+          labels: ratings,
+          datasets: [
+            {
+              label: `NPS ${npsData.toFixed(2)}%`,
+              // data:ratings,
+              data: totaloFRating,
+              backgroundColor: 'rgba(255, 159, 64, 0.6)'
+            }
+          ]
+        };
+
+        charts.push(
+          <div key={blockId}>
+            <h3>Rating</h3>
+            <Bar data={chartData} />
+          </div>
+        );
+      });
     }
+    // if (data['rating input']) {
+    //   const phoneNumberInputData = {
+    //     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    //     datasets: [
+    //       {
+    //         label: `NPS ${nps.toFixed(2)}%`,
+    //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //         // @ts-ignore 
+    //         data: rating.map(rating => parseInt(rating.rating)),
+    //         backgroundColor: 'rgba(255,159,64,0.6)'
+    //       }
+    //     ]
+    //   };
+    //   charts.push(<div key="ratingInputChart"><Bar data={phoneNumberInputData} /></div>);
+    // }
 
     return charts;
   };
   return (
 
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '25px', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', marginTop: '5%', justifyContent: 'center', alignItems: 'center', gap: '25px', flexWrap: 'wrap' }}>
       {renderCharts()}
     </div>
 
