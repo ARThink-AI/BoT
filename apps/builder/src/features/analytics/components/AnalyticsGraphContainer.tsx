@@ -31,7 +31,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
     .find((group) => group.blocks.at(0)?.type === 'start')
     ?.blocks.at(0)?.id
 
-  console.log("trpcccccccccccccccccc", trpc)
+  console.log("trpcccccccccccccccccc", data)
   // console.log("groupssss", publishedTypebot?.groups)
 
   const blocks = publishedTypebot?.groups

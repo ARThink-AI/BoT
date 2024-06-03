@@ -59,6 +59,7 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
     }));
   }
 
+
   const RatingData = combineRatings(rating)
 
   console.log("dataaaaaaaaaaa ratinggggggggg gggg", combineRatings(rating))
@@ -140,52 +141,134 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore 
+  // function getTotalCounts(multipleSelect) {
+  //   const contentTotals = {};
+  //   if (multipleSelect) {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore 
+  //     multipleSelect.forEach((item) => {
+  //       const contents = item.content
+  //         .split(',')
+  //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //         // @ts-ignore 
+  //         .map((content) => content.trim());
+  //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //       // @ts-ignore 
+  //       contents.forEach((content) => {
+  //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //         // @ts-ignore 
+  //         if (!contentTotals[content]) {
+  //           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //           // @ts-ignore 
+  //           contentTotals[content] = 0;
+  //         }
+  //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //         // @ts-ignore 
+  //         contentTotals[content] += item.total;
+  //       });
+  //     });
+  //   }
+
+
+
+
+
+
+
+  //   // Convert object to array of objects with content and total
+  //   const totalCountsArray = Object.keys(contentTotals).map((content) => ({
+  //     content: content,
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore 
+  //     total: contentTotals[content]
+  //   }));
+
+  //   return totalCountsArray;
+  // }
   function getTotalCounts(multipleSelect) {
     const contentTotals = {};
+
     if (multipleSelect) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore 
       multipleSelect.forEach((item) => {
+        const blockId = item.blockId;
         const contents = item.content
           .split(',')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore 
           .map((content) => content.trim());
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore 
+
         contents.forEach((content) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore 
           if (!contentTotals[content]) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore 
-            contentTotals[content] = 0;
+            contentTotals[content] = {};
           }
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore 
-          contentTotals[content] += item.total;
+          if (!contentTotals[content][blockId]) {
+            contentTotals[content][blockId] = 0;
+          }
+          contentTotals[content][blockId] += item.total;
         });
       });
     }
 
+    // Convert object to array of objects with content, blockId, and total
+    const totalCountsArray = [];
 
-
-
-
-
-
-    // Convert object to array of objects with content and total
-    const totalCountsArray = Object.keys(contentTotals).map((content) => ({
-      content: content,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore 
-      total: contentTotals[content]
-    }));
+    Object.keys(contentTotals).forEach((content) => {
+      Object.keys(contentTotals[content]).forEach((blockId) => {
+        totalCountsArray.push({
+          content: content,
+          blockId: blockId,
+          total: contentTotals[content][blockId]
+        });
+      });
+    });
 
     return totalCountsArray;
   }
   const dataMultipleSelectWise = getTotalCounts(multipleSelect)
-  // console.log("mmmmmmmmmmmmm", dataMultipleSelectWise)
+  console.log("mmmmmmmmmmmmm", dataMultipleSelectWise)
+
+
+
+
+  function multipleSelectCombineRatings(dataMultipleSelectWise) {
+    // Create a map to store combined ratings
+    const map = new Map();
+
+    // Iterate over each entry in the data
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore 
+    dataMultipleSelectWise && dataMultipleSelectWise.forEach(item => {
+      const { blockId, content, total } = item;
+
+      // Check if the blockId already exists in the map
+      if (map.has(blockId)) {
+        // If it exists, update the existing entry
+        const existingEntry = map.get(blockId);
+        existingEntry.contents.push(content);
+        existingEntry.totals.push(total);
+      } else {
+        // If it doesn't exist, create a new entry
+        map.set(blockId, { contents: [content], totals: [total] });
+      }
+    });
+
+
+
+    // Convert the map back to an array of objects
+    return Array.from(map.entries()).map(([blockId, { contents, totals }]) => ({
+      blockId,
+      contents,
+      totals
+    }));
+  }
+
+
+
+  const combineMultipleSelect = multipleSelectCombineRatings(dataMultipleSelectWise)
+
+  console.log("multiple selectssssssssss combine", multipleSelectCombineRatings(dataMultipleSelectWise))
+
+
+
+
   // console.log("checkkkkkkkkkkkkkkkkkkkkkkkkkkk",);
   const renderCharts = () => {
     const charts = [];
@@ -213,18 +296,54 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
       };
       charts.push(<div key="dateInputChart"><h2>Date/Time Input</h2><Line data={dateInputData} /></div>);
     }
-    if (multipleSelect && data['choice input']) {
-      const multiSelectData = {
-        labels: dataMultipleSelectWise.map(select => select.content),
-        datasets: [
-          {
-            label: 'Multiselect',
-            data: dataMultipleSelectWise.map(select => select.total),
-            backgroundColor: 'rgba(75,192,192,0.6)'
-          }
-        ]
-      };
-      charts.push(<div key="multiSelectChart"><h2>Multiple Select</h2><Bar data={multiSelectData} /></div>);
+    // if (multipleSelect && data['choice input']) {
+    //   const multiSelectData = {
+    //     labels: dataMultipleSelectWise.map(select => select.content),
+    //     datasets: [
+    //       {
+    //         label: 'Multiselect',
+    //         data: dataMultipleSelectWise.map(select => select.total),
+    //         backgroundColor: 'rgba(75,192,192,0.6)'
+    //       }
+    //     ]
+    //   };
+    //   charts.push(<div key="multiSelectChart"><h2>Multiple Select</h2><Bar data={multiSelectData} /></div>);
+    // }
+    if (combineMultipleSelect && Array.isArray(combineMultipleSelect)) {
+      combineMultipleSelect.forEach(item => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore 
+        const contents = item.contents.map(content => content);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore 
+        const totaloFContent = item.totals.map(total => parseInt(total));
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore 
+        const blockId = item.blockId;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore 
+
+
+        const chartData = {
+          // labels:[0,1,2,3,4,5,6,7,8,9],
+          labels: contents,
+          datasets: [
+            {
+              label: `Multiple Select`,
+              // data:ratings,
+              data: totaloFContent,
+              backgroundColor: 'rgba(255, 159, 64, 0.6)'
+            }
+          ]
+        };
+
+        charts.push(
+          <div key={blockId}>
+            <h3>Multiple Select</h3>
+            <Bar data={chartData} />
+          </div>
+        );
+      });
     }
     // Text Input: Bar Chart
     if (data['text input']) {
