@@ -226,12 +226,60 @@
 //   )
 // }
 
-import { createSignal, For, createEffect, onCleanup } from 'solid-js';
+import { createSignal, For, createEffect, onCleanup, Match, Switch } from 'solid-js';
 import './style.css'
 import singleTonTextQueue from "@/global/textQueue";
 import { env } from "@typebot.io/env";
 import Queue from '@/utils/queue';
-
+const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`
+import { isDefined, isEmpty, isNotDefined } from '@typebot.io/lib'
+import type { RatingInputBlock, RatingInputOptions } from '@typebot.io/schemas'
+import { Button } from '@/components/Button'
+// import { createSignal, For, Match, Switch } from 'solid-js'
+type RatingButtonProps = {
+  rating?: number
+  idx: number
+  onClick: (rating: number) => void
+} & RatingInputOptions
+const RatingButton = (props: RatingButtonProps) => {
+  const handleClick = (e: MouseEvent) => {
+    e.preventDefault()
+    props.onClick(props.idx)
+  }
+  return (
+    <Switch>
+      <Match when={props.buttonType === 'Numbers'}>
+        <Button
+          on:click={handleClick}
+          class={
+            props.isOneClickSubmitEnabled ||
+              (isDefined(props.rating) && props.idx <= props.rating)
+              ? ''
+              : 'selectable'
+          }
+        >
+          {props.idx}
+        </Button>
+      </Match>
+      <Match when={props.buttonType !== 'Numbers'}>
+        <div
+          class={
+            'flex justify-center items-center rating-icon-container cursor-pointer ' +
+            (isDefined(props.rating) && props.idx <= props.rating
+              ? 'selected'
+              : '')
+          }
+          innerHTML={
+            props.customIcon.isEnabled && !isEmpty(props.customIcon.svg)
+              ? props.customIcon.svg
+              : defaultIcon
+          }
+          on:click={() => props.onClick(props.idx)}
+        />
+      </Match>
+    </Switch>
+  )
+}
 export const CardInput = (props: any) => {
   const [inputs, setInputs] = createSignal(props?.block?.options?.inputs ? props?.block?.options?.inputs : [])
 
@@ -561,7 +609,7 @@ export const CardInput = (props: any) => {
     inputs().forEach(input => {
       console.log("input", input)
       // ans[input.answerVariableId] = input.userInput ? input?.default : input?.userInput;
-      if (input.type == "text" || input.type == "phone" || input.type == "email") {
+      if (input.type == "text" || input.type == "phone" || input.type == "email" || input.type == "rating") {
         ans[input.answerVariableId] = input.values
       } else {
         ans[input.answerVariableId] = input.default
@@ -776,6 +824,47 @@ export const CardInput = (props: any) => {
               })} */}
               <For each={inputs()}>{(input, i) => {
                 switch (input.type) {
+                  case "rating":
+                    return (
+                      <>
+                        <label class='text-[18px]' for="">{input.label}</label>
+                        {input.labels.left && (
+                          <span class="text-sm w-full rating-label">
+                            {input.labels.left}
+                          </span>
+                        )}
+                        <div class="flex flex-wrap justify-center gap-2">
+                          <For
+                            each={Array.from(
+                              Array(
+                                input.length +
+                                (input.buttonType === 'Numbers' ? 1 : 0)
+                              )
+                            )}
+                          >
+                            {(_, idx) => (
+                              <RatingButton
+                                {...input}
+                                rating={input?.values}
+                                // rating={input?.values ? input?.values : 5}
+                                idx={
+                                  idx() + (input.buttonType === 'Numbers' ? 0 : 1)
+                                }
+                                onClick={(rating) => {
+                                  // console.log("rating", rating);
+                                  updateInput("values", rating, i());
+                                }}
+                              />
+                            )}
+                          </For>
+                        </div>
+                        {input.labels.right && (
+                          <span class="text-sm w-full text-right pr-2 rating-label">
+                            {input.labels.right}
+                          </span>
+                        )}
+                      </>
+                    );
                   case "text":
                     return (
                       <>
