@@ -172,7 +172,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               {input?.buttonType === 'Icons' && (
                 <SwitchWithLabel
                   label="Custom icon?"
-                  initialValue={input.customIcon.isEnabled}
+                  initialValue={input?.customIcon?.isEnabled ?? false}
                   onCheckChange={(val) => {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
@@ -181,7 +181,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
                   }}
                 />
               )}
-              {input?.buttonType === 'Icons' && input?.customIcon.isEnabled && (
+              {input?.buttonType === 'Icons' && input?.customIcon?.isEnabled && (
                 <TextInput
                   label="Icon SVG:"
                   defaultValue={input?.customIcon.svg}
@@ -196,7 +196,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               )}
               <TextInput
                 label={`${input.buttonType === 'Icons' ? '1' : '0'} label:`}
-                defaultValue={input.labels.left}
+                defaultValue={input?.labels?.left}
                 onChange={(val) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
@@ -207,7 +207,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               />
               <TextInput
                 label={`${input.length} label:`}
-                defaultValue={input.labels.right}
+                defaultValue={input?.labels?.right}
                 onChange={(val) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
@@ -229,7 +229,7 @@ export const CardInputSettings = ({ options, onOptionsChange }: Props) => {
               {!input.isOneClickSubmitEnabled && (
                 <TextInput
                   label="Button label:"
-                  defaultValue={input.labels.button}
+                  defaultValue={input?.labels?.button}
                   onChange={(val) => {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
