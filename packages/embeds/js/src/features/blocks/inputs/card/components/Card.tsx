@@ -827,11 +827,11 @@ export const CardInput = (props: any) => {
                   case "rating":
                     return (
                       <>
-                        <label class='text-[18px]' for="">{input.label}</label>
+                        <label class='text-[18px] mb-4' for="">{input.label}</label>
                         {input.labels.left && (
-                          <span class="text-sm w-full rating-label">
+                          <div class="text-sm w-full rating-label mt-2">
                             {input.labels.left}
-                          </span>
+                          </div>
                         )}
                         <div class="flex flex-wrap justify-center gap-2">
                           <For
@@ -859,9 +859,9 @@ export const CardInput = (props: any) => {
                           </For>
                         </div>
                         {input.labels.right && (
-                          <span class="text-sm w-full text-right pr-2 rating-label">
+                          <div class="text-sm w-full text-right pr-2 rating-label">
                             {input.labels.right}
-                          </span>
+                          </div>
                         )}
                       </>
                     );
