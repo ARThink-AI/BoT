@@ -2,6 +2,8 @@
 import React from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ArcElement } from 'chart.js';
+import { useTypebot } from '@/features/editor/providers/TypebotProvider';
+import { title } from 'process';
 
 
 ChartJS.register(
@@ -23,6 +25,91 @@ ChartJS.register(
 {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore */ }
 export const AnalyticChart = ({ data, multipleSelect, rating }) => {
+  const { typebot, publishedTypebot } = useTypebot()
+
+  const blocks = publishedTypebot?.groups
+
+
+
+  // function Options() {
+  //   const option = []
+  //   multipleOptionss?.forEach(group => {
+  //     group.blocks.forEach((block) => {
+  //       if (block.type === "choice input") {
+  //         block.items.map((item) => option.push(item.content))
+  //       }
+  //     })
+  //   });
+  //   return option
+  // }
+
+  // function getItemsAndText(blocks) {
+  //   const results = [];
+
+  //   blocks.forEach(group => {
+  //     const groupResult = {
+  //       title: group.title,
+  //       itemsContent: [],
+  //       lastTextContent: group.title // Default to title if no text block is found
+  //     };
+
+  //     group.blocks.forEach(block => {
+  //       if (block.type === 'choice input') {
+  //         block.items.forEach(item => {
+  //           groupResult.itemsContent.push({content: item.content});
+  //         });
+  //       } else if (block.type === 'text') {
+  //         const textBlocks = block.content.richText;
+  //         const lastTextBlock = textBlocks[textBlocks.length - 1];
+
+  //         if (lastTextBlock && lastTextBlock.children) {
+  //           groupResult.lastTextContent = lastTextBlock.children.map(child => child.text).join(' ');
+  //         }
+  //       }
+  //     });
+
+  //     results.push(groupResult);
+  //   });
+
+  //   return results;
+  // }
+  function getItemsAndText(blocks) {
+    return blocks.map(group => {
+      const result = {
+        blockId: '',
+        title: group.title,
+        items: [],
+        lastTextContent: '' // Default to title if no text block is found
+      };
+
+      group.blocks.forEach(block => {
+        result.blockId = block.id
+        if (block.type === 'rating input') {
+
+
+        } else if (block.type === 'choice input') {
+          block.items.forEach(item => {
+            result.items.push({ content: item.content });
+          });
+        }
+        else if (block.type === 'text') {
+          const richText = block.content.richText;
+          if (richText.length > 0) {
+            const lastTextBlock = richText[richText.length - 1];
+            if (lastTextBlock.children) {
+              result.lastTextContent = lastTextBlock.children.map(child => child.text).join(' ');
+            }
+          }
+        }
+      });
+
+      return result;
+    });
+  }
+  const items = getItemsAndText(blocks)
+  console.log("all optionsssssssss", getItemsAndText(blocks))
+
+
   console.log("textttttttttttttttt", rating)
   console.log("dddddddddddd", data)
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -94,6 +181,8 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
 
   //   return nps;
   // }
+
+
   function calculateNPS(RatingData) {
     const npsResults = {};
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -323,13 +412,29 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore 
 
+        //  const title = items.map((content)=>{if(content.blockId===item.blockId){
+        //   return content.title
+
+        //  }})
+        const title = items.map((content) => {
+          if (content.blockId === item.blockId) {
+            return content.lastTextContent ? content.lastTextContent : content.title
+
+          }
+        })
+        const name = items.map((content) => {
+          if (content.blockId === item.blockId) {
+            return content.items
+
+          }
+        })
 
         const chartData = {
           // labels:[0,1,2,3,4,5,6,7,8,9],
           labels: contents,
           datasets: [
             {
-              label: `Multiple Select`,
+              label: `${title}`,
               // data:ratings,
               data: totaloFContent,
               backgroundColor: 'rgba(255, 159, 64, 0.6)'
@@ -339,7 +444,7 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
 
         charts.push(
           <div key={blockId}>
-            <h3>Multiple Select</h3>
+            <h3>{title}</h3>
             <Bar data={chartData} />
           </div>
         );
@@ -507,7 +612,12 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore 
         const npsData = nps[blockId]; // Assuming you have a function to calculate NPS
+        const title = items.map((content) => {
+          if (content.blockId === item.blockId) {
+            return content.lastTextContent ? content.lastTextContent : content.title
 
+          }
+        })
         const chartData = {
           // labels:[0,1,2,3,4,5,6,7,8,9],
           labels: ratings,
@@ -523,7 +633,7 @@ export const AnalyticChart = ({ data, multipleSelect, rating }) => {
 
         charts.push(
           <div key={blockId}>
-            <h3>Rating</h3>
+            <h3>{title}</h3>
             <Bar data={chartData} />
           </div>
         );
