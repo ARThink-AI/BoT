@@ -33,6 +33,23 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       // totalContentInBlock: z.array(totalContentInBlock),
       // totalTextInput: z.array(totalTextInput),
       // totalRatingInput: z.array(totalRatingInput),
+      orderedGroups: z.array(
+        z.object({
+          groupId: z.string(),
+          title: z.string(),
+          coordinates: z.any(),
+          inputs: z.array(
+            z.object({
+              blockId: z.string(),
+              type: z.string(),
+              content: z.any(),
+              items: z.any(),
+              options: z.any(),
+              total: z.array(z.any()),
+            })
+          ),
+        })
+      ),
     })
   )
   .query(async ({ input: { typebotId }, ctx: { user } }) => {
@@ -447,25 +464,40 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         return inputEntry
       }),
     }))
-
-    const getGroupSequence = (edges, targetGroupId) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const getGroupSequence = (edges) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const sequence = []
       const visited = new Set()
       const groupEdgesMap = {}
 
       // Create a map of edges for quick lookup
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       edges.forEach((edge) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (!groupEdgesMap[edge.to.groupId]) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           groupEdgesMap[edge.to.groupId] = []
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         groupEdgesMap[edge.to.groupId].push(edge.from.groupId)
       })
-
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const traverse = (currentGroupId) => {
         if (visited.has(currentGroupId)) return
         visited.add(currentGroupId)
-
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const incomingEdges = groupEdgesMap[currentGroupId] || []
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         incomingEdges.forEach((groupId) => traverse(groupId))
 
         sequence.push(currentGroupId)
@@ -473,7 +505,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
 
       // Start traversal from each group that has incoming edges
       Object.keys(groupEdgesMap).forEach(traverse)
-
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return sequence // Reverse to get the correct order
     }
 
@@ -491,8 +524,14 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                 const inputEntry = {
                   blockId: block.id,
                   type: block.type,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
                   content: block.content || {},
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
                   items: block.items || {},
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
                   options: block.options || {},
                   total: [],
                 }
@@ -675,7 +714,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       })
       .filter((group) => group !== null)
 
-    console.log('groups', JSON.stringify(orderedGroups))
+    // console.log('groups', JSON.stringify(orderedGroups))
 
     // const inputs = graphs.map((input) => input.inputs)
     // const content = inputs.map((content) => content)
@@ -960,6 +999,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         itemId: answer.itemId ?? undefined,
         total: answer._count._all,
       })),
+      orderedGroups,
       // totalContentInBlock: totalAnswersPerContent.map((answer) => ({
       //   blockId: answer.blockId,
       //   content: answer.content,
