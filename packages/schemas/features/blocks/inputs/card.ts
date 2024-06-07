@@ -12,6 +12,7 @@ export const cardInputTypes = [
   'checkbox',
   'textarea',
   'radio',
+  'rating'
 ]
 
 export const cardOptionsSchema = cardOptionsBaseSchema
@@ -33,6 +34,18 @@ export const cardOptionsSchema = cardOptionsBaseSchema
           values: z.string().optional(),
           default: z.string().optional(),
           required: z.boolean().optional(),
+          buttonType: z.literal('Icons').or(z.literal('Numbers')).optional(),
+          length: z.number().optional(),
+          labels: z.object({
+            left: z.string().optional(),
+            right: z.string().optional(),
+            button: z.string().default("Send"),
+          }).optional(),
+          customIcon: z.object({
+            isEnabled: z.boolean().default(false),
+            svg: z.string().optional(),
+          }).optional(),
+          isOneClickSubmitEnabled: z.boolean().optional(),
         })
       ),
     })
