@@ -6,11 +6,8 @@ import { z } from 'zod'
 import { canReadTypebots } from '@/helpers/databaseRules'
 import {
   totalAnswersInBlock,
-  totalContentInBlock,
-  totalRatingInput,
-  totalTextInput,
 } from '@typebot.io/schemas/features/analytics'
-import { id } from 'date-fns/locale'
+
 
 export const getTotalAnswersInBlocks = authenticatedProcedure
   .meta({
@@ -52,6 +49,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       ),
     })
   )
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
   .query(async ({ input: { typebotId }, ctx: { user } }) => {
     const typebot = await prisma.typebot.findFirst({
       where: canReadTypebots(typebotId, user),
@@ -184,7 +183,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     //   }
     //  console.log("test", main() )
 
-    const groups = typebot.publishedTypebot.groups
+    // const groups = typebot.publishedTypebot.groups
     const edges = typebot.publishedTypebot.edges
 
     // const analytic = () => {
@@ -267,203 +266,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       },
     })
 
-    const graphs = publishedTypebot.groups.map((group) => ({
-      groupId: group.id,
-      title: group.title,
-      coordinates: group.graphCoordinates,
-      inputs: group.blocks.map((block) => {
-        const inputEntry = {
-          blockId: block.id,
-          type: block.type,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          content: block.content || {},
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          items: block.items || {},
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          options: block.options || {},
-          total: [],
-        }
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        function getInputRatingTotalCounts(totalAnswersPerInputRating) {
-          const blockIdTotals = {}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          totalAnswersPerInputRating.forEach((item) => {
-            const contents = item.content
-              .split(',')
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              .map((content) => content.trim())
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            if (!blockIdTotals[item.blockId]) {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              blockIdTotals[item.blockId] = {}
-            }
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            contents.forEach((content) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              if (!blockIdTotals[item.blockId][content]) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                blockIdTotals[item.blockId][content] = 0
-              }
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              blockIdTotals[item.blockId][content] += item._count._all
-            })
-          })
-
-          const totalRatingInput = Object.keys(blockIdTotals).flatMap(
-            (blockId) =>
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-
-              Object.keys(blockIdTotals[blockId]).map((content) => ({
-                blockId,
-                rating: content,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                total: blockIdTotals[blockId][content],
-              }))
-          )
-
-          return totalRatingInput
-        }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
-        if (block.type === 'rating input') {
-          const blockTotal = getInputRatingTotalCounts(
-            totalAnswersPerInputRating
-          )
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          // inputEntry.total.push(blockTotal)
-          // console.log('called', blockTotal)
-          const data = blockTotal
-            .map((block) => {
-              if (block.blockId == inputEntry.blockId) {
-                return {
-                  blockId: inputEntry.blockId,
-                  rating: block.rating,
-                  total: block.total,
-                }
-              }
-            })
-            .filter((item) => item !== undefined)
-
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-
-          inputEntry.total.push(data)
-          // console.log('test dataaaa', inputEntry.total)
-        }
-        const multipleSelect = totalAnswersPerContent
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        function getTotalCounts(multipleSelect) {
-          const contentTotals = {}
-
-          if (multipleSelect) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            multipleSelect.forEach((item) => {
-              const blockId = item.blockId
-              const contents = item.content
-                .split(',')
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                .map((content) => content.trim())
-
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              contents.forEach((content) => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                if (!contentTotals[content]) {
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  contentTotals[content] = {}
-                }
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                if (!contentTotals[content][blockId]) {
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  contentTotals[content][blockId] = 0
-                }
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                contentTotals[content][blockId] += item._count._all
-              })
-            })
-          }
-
-          // Convert object to array of objects with content, blockId, and total
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const totalCountsArray = []
-
-          Object.keys(contentTotals).forEach((content) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            Object.keys(contentTotals[content]).forEach((blockId) => {
-              totalCountsArray.push({
-                content: content,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                blockId: blockId,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                total: contentTotals[content][blockId],
-              })
-            })
-          })
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          return totalCountsArray
-        }
-
-        if (block.type === 'choice input') {
-          const dataMultipleSelectWise = getTotalCounts(multipleSelect)
-
-          const inputChoice = dataMultipleSelectWise
-            .map((block) => {
-              if (block.blockId == inputEntry.blockId) {
-                return {
-                  blockId: inputEntry.blockId,
-                  content: block.content,
-                  total: block.total,
-                }
-              }
-            })
-            .filter((item) => item !== undefined)
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          inputEntry.total.push(inputChoice)
-        }
-
-        // Find the matching answer count
-        const matchedCount = totalAnswersPerBlock.find(
-          (count) => count.blockId === block.id
-        )
-
-        // if (matchedCount) {
-        //   inputEntry.total = matchedCount._count._all
-        // }
-
-        return inputEntry
-      }),
-    }))
+    
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const getGroupSequence = (edges) => {
@@ -701,9 +504,9 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                 }
 
                 // Find the matching answer count
-                const matchedCount = totalAnswersPerBlock.find(
-                  (count) => count.blockId === block.id
-                )
+                // const matchedCount = totalAnswersPerBlock.find(
+                //   (count) => count.blockId === block.id
+                // )
 
                 // Functions for processing input types (rating input, choice input) omitted for brevity
 
