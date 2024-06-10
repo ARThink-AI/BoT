@@ -31,7 +31,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
     .find((group) => group.blocks.at(0)?.type === 'start')
     ?.blocks.at(0)?.id
 
-  console.log("trpcccccccccccccccccc", data)
+  console.log("dataaaaaaaaaa", data)
   // console.log("groupssss", publishedTypebot?.groups)
 
   const blocks = publishedTypebot?.groups
@@ -58,7 +58,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
 
   // const summary = summarizeCounts(blocks, counts);
   // console.log("type based input dataaaaaaa", summary);
-  console.log("data blockkkkkk", blocks)
+  console.log("data blockkkkkk", data?.orderedGroups)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore 
@@ -166,7 +166,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
         excludedPlans={['STARTER']}
       />
       <StatsCards stats={stats} pos="absolute" />
-      <AnalyticChart data={summary} multipleSelect={data?.totalContentInBlock} rating={data?.totalRatingInput} />
+      <AnalyticChart data={data?.orderedGroups} />
     </Flex >
   )
 }
