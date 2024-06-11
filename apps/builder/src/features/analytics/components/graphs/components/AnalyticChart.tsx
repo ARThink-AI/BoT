@@ -114,6 +114,36 @@ export const AnalyticChart = ({ data }) => {
       // console.log('Promoters:', promoters);
       // console.log('Detractors:', detractors);
 
+      // rating scale for 5
+
+      const ratingLength = ratingInput.options.length
+      console.log("rating inputttttttts", ratingLength)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const detractorsRatingScaleFive = total.filter(entry => entry.rating >= 0 && entry.rating <= 2).reduce((acc, curr) => acc + curr.total, 0);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const promotersRatingScaleFive = total.filter(entry => entry.rating >= 4 && entry.rating <= 5).reduce((acc, curr) => acc + curr.total, 0);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const totalResponsesRatingScaleFive = total.reduce((acc, curr) => acc + curr.total, 0);
+
+      const ratings = Array.from({ length: ratingLength + 1 }, (_, i) => i)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const totalMap = new Map(ratingInput.total[0].map(item => [parseInt(item.rating), item.total]))
+      const totals = ratings.map(rating => totalMap.get(rating) || 0)
+
+      console.log("ratings for all", ratings)
+
+      let npsScaleFive;
+      if (!isNaN(totalResponses) && totalResponses !== 0) {
+        npsScaleFive = ((promotersRatingScaleFive - detractorsRatingScaleFive) / totalResponsesRatingScaleFive) * 100;
+      } else {
+        npsScaleFive = 0; // Handle case where there are no responses or NaN
+      }
+
+      console.log("rating scale five", npsScaleFive)
 
 
       let nps;
@@ -128,12 +158,15 @@ export const AnalyticChart = ({ data }) => {
       const chartData = {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        labels: total.map(entry => entry.rating),
+        // labels: total.map(entry => entry.rating),
+        labels: ratings,
         datasets: [{
-          label: `NPS: ${nps.toFixed(2)}%`,
+          label: `NPS: ${ratingLength === 5 ? npsScaleFive.toFixed(2) : nps.toFixed(2)}%`,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          data: total.map(entry => entry.total),
+          // data: total.map(entry => entry.total),
+          data: totals,
+          // data: ratings,
           backgroundColor: 'rgba(255, 159, 64, 0.8)'
         }]
       };
