@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       console.log("translation", translation );
       const request = {
         input: { text:   translation },
-        voice: { languageCode:  langCode , ssmlGender: 'MALE'  },
+        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
         audioConfig: { audioEncoding: 'MP3' , speakingRate: 1.2  }
     };
       console.log("request input", JSON.stringify(request));
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
 
       const request = {
         input: { text },
-        voice: { languageCode:  langCode , ssmlGender: 'MALE'  },
+        voice: { languageCode:  langCode , ssmlGender: 'FEMALE'  },
         audioConfig: { audioEncoding: 'MP3' , speakingRate: 1.2 }
     };
       console.log("request input", JSON.stringify(request));
