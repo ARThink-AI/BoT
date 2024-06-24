@@ -11,6 +11,7 @@ const generalSettings = z.object({
   isVoiceEnabled : z.boolean().optional(),
   isTwilioEnabled : z.boolean().optional(),
   twilioPhoneNumber : z.string().optional(),
+  isAutoRefreshEnabled : z.boolean().optional(),
   
   isCustomInputEnabled : z.boolean().optional(),
  
@@ -59,7 +60,8 @@ export const defaultSettings = ({
     isInputPrefillEnabled: true,
     isHideQueryParamsEnabled: true,
     isVoiceEnabled : false,
-    isCustomInputEnabled : false  
+    isCustomInputEnabled : false  ,
+    isAutoRefreshEnabled : true  ,
    
   },
   typingEmulation: { enabled: true, speed: 300, maxDelay: 1.5 },

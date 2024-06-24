@@ -650,6 +650,7 @@ export const ConversationContainer = (props: Props) => {
         groupId: data.input.groupId,
       })
     }
+
     if (data.clientSideActions) {
       const actionsBeforeFirstBubble = data.clientSideActions.filter((action) =>
         isNotDefined(action.lastBubbleBlockId)
@@ -748,7 +749,19 @@ export const ConversationContainer = (props: Props) => {
         },
       ]
     );
+    if (!data.input && (props.initialChatReply.typebot.settings.general.isAutoRefreshEnabled ?? true)) {
+      setTimeout(() => {
+        console.log("its the end and auto refresh enabled");
+        sessionStorage.removeItem("intialize");
+        sessionStorage.removeItem("initialize_css");
+        sessionStorage.removeItem("bot_init");
+        sessionStorage.removeItem("chatchunks");
+        props.initializeBot();
+        return
+      }, 2000);
 
+
+    }
   }
 
   const autoScrollToBottom = (offsetTop?: number) => {

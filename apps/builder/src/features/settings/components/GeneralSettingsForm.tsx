@@ -68,6 +68,13 @@ export const GeneralSettingsForm = ({
       isCustomInputEnabled,
     })
 
+  const handleAutoRefreshInputChange = (isAutoRefreshEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isAutoRefreshEnabled,
+    })
+
+
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
   //   onGeneralSettingsChange({
   //     ...generalSettings,
@@ -115,6 +122,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isTwilioEnabled ?? false}
         onCheckChange={handleTwilioChange}
         moreInfoContent="Toggle to Enable Twilio"
+      />
+      <SwitchWithLabel
+        label="Auto Refresh Enabled"
+        initialValue={generalSettings.isAutoRefreshEnabled ?? true}
+        onCheckChange={handleAutoRefreshInputChange}
+        moreInfoContent="Toggle to Enable Auto Refresh"
       />
       {/* {generalSettings.isTwilioEnabled && (
         <TextInput
