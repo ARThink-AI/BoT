@@ -79,6 +79,7 @@ export const AnalyticChart = ({ data }) => {
   // @ts-ignore
 
   // chart for choice input and rating
+
   const charts = Array.isArray(data) && data.map(group => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -86,6 +87,8 @@ export const AnalyticChart = ({ data }) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const ratingInput = group.inputs.find(input => input.type === "rating input");
+
+      console.log("rating inputt", ratingInput)
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const total = ratingInput.total[0].map(entry => ({
@@ -115,9 +118,12 @@ export const AnalyticChart = ({ data }) => {
       // console.log('Detractors:', detractors);
 
       // rating scale for 5
+      console.log("rating optionss", ratingInput.options.length)
 
       const ratingLength = ratingInput.options.length
-      console.log("rating inputttttttts", ratingLength)
+
+
+      // console.log("rating inputttttttts", ratingLength)
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const detractorsRatingScaleFive = total.filter(entry => entry.rating >= 0 && entry.rating <= 2).reduce((acc, curr) => acc + curr.total, 0);
@@ -134,7 +140,7 @@ export const AnalyticChart = ({ data }) => {
       const totalMap = new Map(ratingInput.total[0].map(item => [parseInt(item.rating), item.total]))
       const totals = ratings.map(rating => totalMap.get(rating) || 0)
 
-      console.log("ratings for all", ratings)
+      console.log("ratings for all", totalMap)
 
       let npsScaleFive;
       if (!isNaN(totalResponses) && totalResponses !== 0) {
@@ -230,7 +236,198 @@ export const AnalyticChart = ({ data }) => {
 
         </div>
       );
-    } else {
+    }
+    else if (
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      group.inputs.some(input => input.type === "card input")) {
+
+      // const cardInput = group.inputs.find(input => input.type === "card input");
+      // console.log("card inputtt", cardInput)
+      // const title = cardInput.children.map((item) => item.label)
+      // const ratingInput = cardInput.options.inputs.find(input => input.type === "rating");
+
+      // const total = cardInput.children[0].total.map(entry => ({
+      //   rating: parseInt(entry.rating),
+      //   total: parseInt(entry.total)
+      // }));
+
+
+      // console.log("total inputt", total)
+      // // const total = cardInput.children.total.map(entry => ({
+      // //   rating: parseInt(entry.rating),
+      // //   total: parseInt(entry.total)
+      // // }));
+
+      // // const total = totalinp.total.map(entry => ({
+      // //   rating: parseInt(entry.rating),
+      // //   total: parseInt(entry.total)
+      // // }))
+      // console.log("totallll", cardInput.children)
+      // const detractors = total.filter(entry => entry.rating >= 0 && entry.rating <= 6).reduce((acc, curr) => acc + curr.total, 0);
+      // const promoters = total.filter(entry => entry.rating >= 9 && entry.rating <= 10).reduce((acc, curr) => acc + curr.total, 0);
+      // const totalResponses = total.reduce((acc, curr) => acc + curr.total, 0);
+
+      // const ratingLength = ratingInput.length;
+
+      // const detractorsRatingScaleFive = total.filter(entry => entry.rating >= 0 && entry.rating <= 2).reduce((acc, curr) => acc + curr.total, 0);
+      // const promotersRatingScaleFive = total.filter(entry => entry.rating >= 4 && entry.rating <= 5).reduce((acc, curr) => acc + curr.total, 0);
+      // const totalResponsesRatingScaleFive = total.reduce((acc, curr) => acc + curr.total, 0);
+
+      // const ratings = Array.from({ length: ratingLength + 1 }, (_, i) => i);
+      // const totalMap = new Map(cardInput.children[0].total.map(item => [parseInt(item.rating), item.total]));
+      // const totals = ratings.map(rating => totalMap.get(rating) || 0);
+
+      // let npsScaleFive;
+      // if (!isNaN(totalResponsesRatingScaleFive) && totalResponsesRatingScaleFive !== 0) {
+      //   npsScaleFive = ((promotersRatingScaleFive - detractorsRatingScaleFive) / totalResponsesRatingScaleFive) * 100;
+      // } else {
+      //   npsScaleFive = 0; // Handle case where there are no responses or NaN
+      // }
+
+      // let nps;
+      // if (!isNaN(totalResponses) && totalResponses !== 0) {
+      //   nps = ((promoters - detractors) / totalResponses) * 100;
+      // } else {
+      //   nps = 0; // Handle case where there are no responses or NaN
+      // }
+
+      // const chartData = {
+      //   labels: ratings,
+      //   datasets: [{
+      //     label: `NPS: ${ratingLength === 5 ? npsScaleFive.toFixed(2) : nps.toFixed(2)}%`,
+      //     data: totals,
+      //     backgroundColor: 'rgba(255, 159, 64, 0.8)'
+      //   }]
+      // };
+
+      // return (
+      //   <div key={group.groupId}>
+      //     {totalResponses > 0 && (
+      //       <>
+      //         <h3>{title ? title : group.title}</h3>
+      //         <Bar data={chartData} />
+      //       </>
+      //     )}
+      //   </div>
+      // );
+      const cardInput = group.inputs.find(input => input.type === "card input");
+      const ratingInput = cardInput.options.inputs.find(input => input.type === "rating");
+      // const ratingLength = ratingInput.length;
+      let ratingLength;
+      const cardRatingLengths = cardInput.options.inputs.map(input => {
+        if (input.type === "rating") {
+          return input.length
+        }
+      }).filter((item) => item != undefined);
+
+      // const ratingLength = cardRatingLengths
+
+
+      console.log("input lengthhh", cardRatingLengths)
+      // Initialize variables for NPS calculations
+      let totalResponses = 0;
+      let promoters = 0;
+      let detractors = 0;
+
+      console.log("totalresponses for input card", totalResponses)
+
+      // for rating scale 5
+      let totalResponsesScaleFive = 0;
+      let promotersScaleFive = 0;
+      let detractorsScaleFive = 0;
+
+      // Calculate NPS for the card input ratings
+      const ratingsData = cardInput.children.map(child => {
+        const ratingLabel = child.label;
+        const totalEntries = child.total;
+
+        console.log("total entriess", totalEntries)
+        ratingLength = child.length
+        // Calculate total responses for this specific rating
+        // const totalRatingResponses = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
+        // totalResponses += totalRatingResponses;
+        const totalRatingResponses = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
+        totalResponses += totalRatingResponses;
+
+        // Calculate promoters and detractors
+        const ratingPromoters = totalEntries.filter(entry => entry.rating >= 9 && entry.rating <= 10).reduce((acc, entry) => acc + entry.total, 0);
+        const ratingDetractors = totalEntries.filter(entry => entry.rating >= 0 && entry.rating <= 6).reduce((acc, entry) => acc + entry.total, 0);
+        promoters += ratingPromoters;
+        detractors += ratingDetractors;
+        console.log("rating promoterrrr", ratingPromoters)
+        console.log("rating detracterss", ratingDetractors)
+
+        console.log("Total promoters so far:", promoters);
+        console.log("Total detractors so far:", detractors);
+
+
+
+        // Calculate total responses for this specific rating
+        const totalResponsesScale = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
+        totalResponsesScaleFive += totalResponsesScale;
+
+        // Calculate promoters and detractors
+        const ratingPromotersScaleFive = totalEntries.filter(entry => entry.rating >= 4 && entry.rating <= 5).reduce((acc, entry) => acc + entry.total, 0);
+        const ratingDetractorsScaleFive = totalEntries.filter(entry => entry.rating >= 0 && entry.rating <= 2).reduce((acc, entry) => acc + entry.total, 0);
+        promotersScaleFive += ratingPromotersScaleFive;
+        detractorsScaleFive += ratingDetractorsScaleFive;
+        console.log("rating scale five promoterrrr", ratingPromotersScaleFive)
+        console.log("rating scale five detracterss", ratingDetractorsScaleFive)
+
+
+        const ratings = Array.from({ length: ratingLength + 1 }, (_, i) => i);
+        const totalMap = new Map(totalEntries.map(item => [parseInt(item.rating), item.total]));
+        const totals = ratings.map(rating => totalMap.get(rating) || 0);
+
+        return {
+          label: ratingLabel,
+          // ratings: totalEntries.map(entry => parseInt(entry.rating)),
+          ratings: ratings,
+          totals: totals
+        };
+      });
+
+      // Calculate overall NPS for the group
+      let nps;
+      if (!isNaN(totalResponses) && totalResponses !== 0) {
+        nps = ((promoters - detractors) / totalResponses) * 100;
+      } else {
+        nps = 0; // Handle case where there are no responses or NaN
+      }
+
+      // nps for rating scale 5
+      let npsScaleFives;
+      if (!isNaN(totalResponsesScaleFive) && totalResponsesScaleFive !== 0) {
+        npsScaleFives = ((promotersScaleFive - detractorsScaleFive) / totalResponsesScaleFive) * 100;
+      } else {
+        nps = 0; // Handle case where there are no responses or NaN
+      }
+
+      // Prepare chart data for each set of ratings
+      const chartsData = ratingsData.map(ratingData => {
+        const chartData = {
+          labels: ratingData.ratings,
+          datasets: [{
+            label: `NPS: ${ratingLength === 5 ? npsScaleFives.toFixed(2) : nps.toFixed(2)}%`,
+            data: ratingData.totals,
+            backgroundColor: 'rgba(255, 159, 64, 0.8)'
+          }]
+        };
+
+        return (
+          <div key={`${group.groupId}-${ratingData.label}`}>
+            <h3>{ratingData.label}</h3>
+            <Bar data={chartData} />
+          </div>
+        );
+      });
+
+      return chartsData;
+
+    }
+
+    else {
       return null; // Handle other types of inputs if necessary
     }
   });
@@ -287,6 +484,8 @@ export const AnalyticChart = ({ data }) => {
   //     return null; // Handle other types of inputs if necessary
   //   }
   // });
+
+
   return (
 
     <div style={{ display: 'flex', marginTop: '10%', justifyContent: 'center', alignItems: 'center', gap: '25px', flexWrap: 'wrap', height: '70%', overflowY: 'auto' }}>

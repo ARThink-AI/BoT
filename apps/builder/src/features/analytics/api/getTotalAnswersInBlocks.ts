@@ -4,10 +4,7 @@ import { TRPCError } from '@trpc/server'
 import { PublicTypebot } from '@typebot.io/schemas'
 import { z } from 'zod'
 import { canReadTypebots } from '@/helpers/databaseRules'
-import {
-  totalAnswersInBlock,
-} from '@typebot.io/schemas/features/analytics'
-
+import { totalAnswersInBlock } from '@typebot.io/schemas/features/analytics'
 
 export const getTotalAnswersInBlocks = authenticatedProcedure
   .meta({
@@ -43,14 +40,15 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
               items: z.any(),
               options: z.any(),
               total: z.array(z.any()),
+              children: z.array(z.any()),
             })
           ),
         })
       ),
     })
   )
-   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   .query(async ({ input: { typebotId }, ctx: { user } }) => {
     const typebot = await prisma.typebot.findFirst({
       where: canReadTypebots(typebotId, user),
@@ -266,7 +264,39 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       },
     })
 
-    
+    // answer count for card input
+    // const totalAnswersPerCardInput = await prisma.result.findMany({
+    //   where: {
+    //     typebotId: typebot.publishedTypebot.typebotId,
+    //   },
+    // })
+
+    const results = await prisma.result.findMany({
+      where: {
+        typebotId: typebot.publishedTypebot.typebotId,
+      },
+    })
+
+    // const countMap = new Map()
+
+    // results.forEach((result) => {
+    //   const jsonData = result.variables
+    //   if (Array.isArray(jsonData)) {
+    //     jsonData.forEach((item) => {
+    //       console.log('item ', JSON.stringify(item))
+    //       if (item.id == 'vtjfn7z68uk0q21kfd9yvxrq1') {
+    //         const value = item.value
+    //         if (countMap.has(value)) {
+    //           countMap.set(value, countMap.get(value) + 1)
+    //         } else {
+    //           countMap.set(value, 1)
+    //         }
+    //       }
+    //     })
+    //   }
+    // })
+    // console.log('result for card input', countMap)
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const getGroupSequence = (edges) => {
@@ -337,6 +367,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                   // @ts-ignore
                   options: block.options || {},
                   total: [],
+
+                  children: [],
                 }
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
@@ -418,6 +450,83 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                   inputEntry.total.push(data)
                   // console.log('test dataaaa', inputEntry.total)
                 }
+
+                if (inputEntry.options.inputs) {
+                  for (let i = 0; i < inputEntry.options.inputs.length; i++) {
+                    let inp = inputEntry.options.inputs[i]
+                    if (inp.type == 'rating' && inp.answerVariableId) {
+                      let label = inp.label
+                      let answerId = inp.answerVariableId
+                      const countMap = new Map()
+                      results.forEach((result) => {
+                        const jsonData = result.variables
+                        if (Array.isArray(jsonData)) {
+                          jsonData.forEach((item) => {
+                            // console.log('item ', JSON.stringify(item))
+                            if (item.id == answerId) {
+                              const value = item.value
+                              if (countMap.has(value)) {
+                                countMap.set(value, countMap.get(value) + 1)
+                              } else {
+                                countMap.set(value, 1)
+                              }
+                            }
+                          })
+                        }
+                      })
+
+                      let t = []
+                      for (let [key, value] of countMap) {
+                        console.log(key + ' is ' + value)
+                        t.push({ rating: key, total: value })
+                      }
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      inputEntry.children.push({
+                        label: label,
+                        total: t,
+                        length: inp.length,
+                      })
+                      console.log('')
+                    }
+                  }
+                }
+                // for (let i = 0; i < inputEntry.options.inputs.length; i++) {
+                //   let inp = inputEntry.options.inputs[i]
+                //   if (inp.type == 'rating' && inp.answerVariableId) {
+                //     let label = inp.label
+                //     let answerId = inp.answerVariableId
+                //     const countMap = new Map()
+                //     results.forEach((result) => {
+                //       const jsonData = result.variables
+                //       if (Array.isArray(jsonData)) {
+                //         jsonData.forEach((item) => {
+                //           // console.log('item ', JSON.stringify(item))
+                //           if (item.id == answerId) {
+                //             const value = item.value
+                //             if (countMap.has(value)) {
+                //               countMap.set(value, countMap.get(value) + 1)
+                //             } else {
+                //               countMap.set(value, 1)
+                //             }
+                //           }
+                //         })
+                //       }
+                //     })
+
+                //     let t = []
+                //     for (let [key, value] of countMap) {
+                //       console.log(key + ' is ' + value)
+                //       t.push({ content: key, total: value })
+                //     }
+                //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //     // @ts-ignore
+                //     inputEntry.children.push({ label: label, total: t })
+                //   }
+                // }
+
+                // console.log('resultttttttttttttttttt', answerId)
+
                 const multipleSelect = totalAnswersPerContent
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
@@ -518,7 +627,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       .filter((group) => group !== null)
 
     // console.log('groups', JSON.stringify(orderedGroups))
-
+    // console.log('card rating', cardInputrating)
+    // console.log('card input ratings', totalAnswersPerCardInput)
     // const inputs = graphs.map((input) => input.inputs)
     // const content = inputs.map((content) => content)
 
