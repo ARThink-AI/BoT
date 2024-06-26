@@ -437,6 +437,7 @@ export const AnalyticChart = ({ data }) => {
 
         return {
           label: ratingLabel,
+          totalResponse: totalRatingResponses,
           // ratings: totalEntries.map(entry => parseInt(entry.rating)),
           ratingLength: ratingLength,
           nps: nps,
@@ -470,21 +471,25 @@ export const AnalyticChart = ({ data }) => {
 
       // Prepare chart data for each set of ratings
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-ignorepz
       const chartsData = ratingsData.map(ratingData => {
         const chartData = {
           labels: ratingData.ratings,
           datasets: [{
-            label: `NPS: ${ratingData.ratingLength === 5 ? ratingData.npsScaleFives.toFixed(2) : ratingData.nps.toFixed(2)}%`,
+            label: `NPS: ${ratingData?.ratingLength === 5 ? ratingData?.npsScaleFives?.toFixed(2) : ratingData?.nps?.toFixed(2)}%`,
             data: ratingData.totals,
             backgroundColor: 'rgba(255, 159, 64, 0.8)'
           }]
         };
 
         return (
+
           <div key={`${group.groupId}-${ratingData.label}`}>
-            <h3>{ratingData.label}</h3>
-            <Bar data={chartData} />
+            {ratingData.totalResponse > 0 ? <>
+              <h3>{ratingData.label}</h3>
+              <Bar data={chartData} />
+            </> : ''}
+
           </div>
         );
       });
