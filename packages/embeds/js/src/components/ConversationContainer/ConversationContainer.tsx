@@ -83,14 +83,23 @@ export const ConversationContainer = (props: Props) => {
   //   },
   // ])
 
-  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
+  // const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
+  //   {
+  //     input: props.initialChatReply.input,
+  //     messages: props.initialChatReply.messages,
+  //     clientSideActions: props.initialChatReply.clientSideActions,
+  //   },
+  //   // @ts-ignore
+  // ] : JSON.parse(sessionStorage.getItem("chatchunks")))
+
+  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>([
     {
       input: props.initialChatReply.input,
       messages: props.initialChatReply.messages,
       clientSideActions: props.initialChatReply.clientSideActions,
     },
     // @ts-ignore
-  ] : JSON.parse(sessionStorage.getItem("chatchunks")))
+  ])
 
 
   const [dynamicTheme, setDynamicTheme] = createSignal<
