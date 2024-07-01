@@ -14,6 +14,7 @@ import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
+import { TextInput } from '@/components/inputs'
 // import { TextInput } from '@/components/inputs'
 // import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 type Props = {
@@ -81,7 +82,11 @@ export const GeneralSettingsForm = ({
   //     twilioPhoneNumber,
   //   })
 
-
+  const handleSessionTimoutTime = (sessionTimout: any) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      sessionTimout
+    })
 
 
 
@@ -96,6 +101,7 @@ export const GeneralSettingsForm = ({
         storage,
       },
     })
+
   // let twilioUrl = `https://www.twilio.com/authorize/CN01eb83649eb3514ba70c7dd777ec69de?state=${typebot.id}`;
   return (
     <Stack spacing={6}>
@@ -129,6 +135,25 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleAutoRefreshInputChange}
         moreInfoContent="Toggle to Enable Auto Refresh"
       />
+
+      <>
+        {/* <Text> Session Timeout  </Text> */}
+        <TextInput
+          label="Session Timeout"
+          onChange={handleSessionTimoutTime}
+          withVariableButton={false}
+          defaultValue={generalSettings.sessionTimout ?? '20'}
+
+        />
+        {/* <input
+        
+          // defaultValue={generalSettings.sessionTimout ? generalSettings.sessionTimout : ""}
+          onChange={e => handleSessionTimoutTime(e)}
+          defaultValue={20}
+          value={20}
+
+        /> */}
+      </>
       {/* {generalSettings.isTwilioEnabled && (
         <TextInput
           label="Twilio Phone Number"

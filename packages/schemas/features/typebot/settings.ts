@@ -8,14 +8,14 @@ const generalSettings = z.object({
   isTypingEmulationEnabled: z.boolean().optional(),
   isInputPrefillEnabled: z.boolean().optional(),
   isHideQueryParamsEnabled: z.boolean().optional(),
-  isVoiceEnabled : z.boolean().optional(),
-  isTwilioEnabled : z.boolean().optional(),
-  twilioPhoneNumber : z.string().optional(),
-  isAutoRefreshEnabled : z.boolean().optional(),
-  
-  isCustomInputEnabled : z.boolean().optional(),
- 
- 
+  isVoiceEnabled: z.boolean().optional(),
+  isTwilioEnabled: z.boolean().optional(),
+  twilioPhoneNumber: z.string().optional(),
+  isAutoRefreshEnabled: z.boolean().optional(),
+  sessionTimout: z.string().optional(),
+
+  isCustomInputEnabled: z.boolean().optional(),
+
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({
@@ -59,10 +59,9 @@ export const defaultSettings = ({
     },
     isInputPrefillEnabled: true,
     isHideQueryParamsEnabled: true,
-    isVoiceEnabled : false,
-    isCustomInputEnabled : false  ,
-    isAutoRefreshEnabled : true  ,
-   
+    isVoiceEnabled: false,
+    isCustomInputEnabled: false,
+    isAutoRefreshEnabled: true,
   },
   typingEmulation: { enabled: true, speed: 300, maxDelay: 1.5 },
   metadata: {
