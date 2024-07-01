@@ -14,6 +14,7 @@ const generalSettings = z.object({
   isAutoRefreshEnabled : z.boolean().optional(),
   
   isCustomInputEnabled : z.boolean().optional(),
+  publicId : z.string().optional(),
  
  
   isNewResultOnRefreshEnabled: z.boolean().optional(),
@@ -62,6 +63,7 @@ export const defaultSettings = ({
     isVoiceEnabled : false,
     isCustomInputEnabled : false  ,
     isAutoRefreshEnabled : true  ,
+    publicId : ""
    
   },
   typingEmulation: { enabled: true, speed: 300, maxDelay: 1.5 },

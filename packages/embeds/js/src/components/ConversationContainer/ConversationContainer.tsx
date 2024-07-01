@@ -298,13 +298,18 @@ export const ConversationContainer = (props: Props) => {
   onMount(() => {
     ; (async () => {
       if (props.initialChatReply.typebot.settings.general.isCustomInputEnabled) {
-        const response = await fetch("https://typebot.io/api/v1/typebots/openaibot/startChat", {
+        const response = await fetch("/api/v2/sendMessage", {
           method: "POST",
           // @ts-ignore
           headers: {
             "Content-type": "application/json"
 
           },
+          body: JSON.stringify({
+            startParams: {
+              typebot: props.initialChatReply.typebot.settings.general.publicId
+            }
+          })
           // body : JSON.stringify( {
           //   _id : sessionStorage.getItem("ticketId"),
           //   comment : comments,
@@ -977,54 +982,60 @@ export const ConversationContainer = (props: Props) => {
     setChatChunks(chunks);
 
     if (sessionId()) {
-      const response = await fetch(`https://typebot.io/api/v1/sessions/${sessionId()}/continueChat`, {
+      const response = await fetch(`/api/v2/sendMessage`, {
         method: "POST",
         // @ts-ignore
         headers: {
           "Content-type": "application/json"
 
+
         },
         body: JSON.stringify({
-          message: userInput()
+          message: userInput(),
+          sessionId: sessionId()
         })
 
       });
       const messageResp = await response.json();
       console.log("message Resp", messageResp);
-      if (messageResp?.messages.length > 0 && messageResp?.messages[0]?.content?.richText.length > 0 && messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text) {
-        const botResp = messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text;
-        let chunks = [...chatChunks()];
-        chunks.push(
-          {
-            messages: [
-              {
-                id: "unhxagqgd46929s701gnz5z8",
-                // @ts-ignore
-                type: "text",
-                content: {
-                  richText: [
-                    {
-                      "type": "variable",
-                      "children": [
-                        {
-                          "type": "p",
-                          "children": [
-                            {
-                              "text": botResp
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ],
-            clientSideActions: undefined
-          }
-        );
-        setChatChunks(chunks);
-      }
+      // if (messageResp?.messages.length > 0 && messageResp?.messages[0]?.content?.richText.length > 0 && messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text) {
+      // const botResp = messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text;
+      let chunks = [...chatChunks()];
+      chunks.push({
+        messages: messageResp?.messages,
+        clientSideActions: undefined
+      })
+      // chunks.push(
+      //   {
+      //     messages: [
+      //       {
+      //         id: "unhxagqgd46929s701gnz5z8",
+      //         // @ts-ignore
+      //         type: "text",
+      //         content: {
+      //           richText: [
+      //             {
+      //               "type": "variable",
+      //               "children": [
+      //                 {
+      //                   "type": "p",
+      //                   "children": [
+      //                     {
+      //                       "text": botResp
+      //                     }
+      //                   ]
+      //                 }
+      //               ]
+      //             }
+      //           ]
+      //         }
+      //       }
+      //     ],
+      //     clientSideActions: undefined
+      //   }
+      // );
+      setChatChunks(chunks);
+      // }
       setUserInput("");
       sessionStorage.removeItem("answer");
     } else {
