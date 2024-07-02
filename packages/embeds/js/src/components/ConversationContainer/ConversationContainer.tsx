@@ -129,11 +129,11 @@ export const ConversationContainer = (props: Props) => {
   const [liveChatData, setLiveChatData] = createSignal(sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : []);
   const [phoneNumber, setPhoneNumber] = createSignal("")
 
-  const [isVisible, setIsVisible] = createSignal(false);
+
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
-  console.log("before expire session", isVisible())
+
 
   //     console.log("live agent enabled");
 
@@ -631,23 +631,12 @@ export const ConversationContainer = (props: Props) => {
     setIsSending(false)
     if (error) {
       if (error.message == "Session expired. You need to start a new session.") {
-        setIsVisible(true)
-        setTimeout(() => {
-          setIsVisible(false)
-          console.log("set timeout called session timout")
-          sessionStorage.removeItem("intialize");
-          sessionStorage.removeItem("initialize_css");
-          sessionStorage.removeItem("bot_init");
-          sessionStorage.removeItem("chatchunks");
-          props.initializeBot();
-        }, 3000)
-
         console.log("session expireddd");
-        // sessionStorage.removeItem("intialize");
-        // sessionStorage.removeItem("initialize_css");
-        // sessionStorage.removeItem("bot_init");
-        // sessionStorage.removeItem("chatchunks");
-        // props.initializeBot();
+        sessionStorage.removeItem("intialize");
+        sessionStorage.removeItem("initialize_css");
+        sessionStorage.removeItem("bot_init");
+        sessionStorage.removeItem("chatchunks");
+        props.initializeBot();
         return
       }
       setHasError(true)
@@ -659,7 +648,6 @@ export const ConversationContainer = (props: Props) => {
         },
       ])
     }
-    console.log("after expire session", isVisible())
     if (!data) return
     if (data.lastMessageNewFormat) {
       setFormattedMessages([
@@ -1234,47 +1222,12 @@ export const ConversationContainer = (props: Props) => {
       return;
     }
   };
-  console.log("timeouttttt", props)
-
-
-
-  // snackbar for notifcation
-
-
-  // const showSnackbar = () => {
-  //   setIsVisible(true);
-  //   setTimeout(() => {
-  //     setIsVisible(false);
-  //   }, 3000);
-  // };
-
-  const closeSnackbar = () => {
-    setIsVisible(false);
-  };
-
-
-
-  // <div class={`fixed bottom-4 left-1/2 transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-  //   <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-  //     <span>{"Session timeout restart to continue"}</span>
-  //     <button class="ml-auto  text-white" onClick={closeSnackbar}>
-  //       ✖
-  //     </button>
-  //   </div>
-  // </div>
-
-
-
-
   return (
     <div
       ref={chatContainer}
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-
-
-
       {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
         
         <div style={{ display : "flex" , "flex-direction" : "row" , "align-items" : "center" , gap : "40" }} >
@@ -1398,17 +1351,6 @@ toggleLiveAgent();
         {/* <div class="fixed inset-0 bg-black opacity-50"></div> */}
       </div>
 
-
-      {/* snackbar for session timout */}
-      <div class={`fixed bottom-[50px] right-[0px] transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-        <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-          <span>{"Session timeout restart to continue"}</span>
-          <button class="ml-3   text-white" onClick={closeSnackbar}>
-            {/* ✖ */}
-            X
-          </button>
-        </div>
-      </div>
 
       <BottomSpacer />
     </div>
