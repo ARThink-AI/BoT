@@ -453,17 +453,21 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
 
                 if (inputEntry.options.inputs) {
                   for (let i = 0; i < inputEntry.options.inputs.length; i++) {
-                    let inp = inputEntry.options.inputs[i]
+                    const inp = inputEntry.options.inputs[i]
                     if (inp.type == 'rating' && inp.answerVariableId) {
-                      let label = inp.label
-                      let answerId = inp.answerVariableId
+                      const label = inp.label
+                      const answerId = inp.answerVariableId
                       const countMap = new Map()
                       results.forEach((result) => {
                         const jsonData = result.variables
                         if (Array.isArray(jsonData)) {
                           jsonData.forEach((item) => {
                             // console.log('item ', JSON.stringify(item))
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
                             if (item.id == answerId) {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
                               const value = item.value
                               if (countMap.has(value)) {
                                 countMap.set(value, countMap.get(value) + 1)
@@ -475,8 +479,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                         }
                       })
 
-                      let t = []
-                      for (let [key, value] of countMap) {
+                      const t = []
+                      for (const [key, value] of countMap) {
                         console.log(key + ' is ' + value)
                         t.push({ rating: key, total: value })
                       }

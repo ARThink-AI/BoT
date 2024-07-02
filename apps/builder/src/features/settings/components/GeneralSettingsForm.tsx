@@ -75,6 +75,14 @@ export const GeneralSettingsForm = ({
       isAutoRefreshEnabled,
     })
 
+  const handlePublicIdInputChange = (publicId: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      publicId,
+    })
+
+
+
 
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
   //   onGeneralSettingsChange({
@@ -82,7 +90,7 @@ export const GeneralSettingsForm = ({
   //     twilioPhoneNumber,
   //   })
 
-  const handleSessionTimoutTime = (sessionTimout: any) =>
+  const handleSessionTimoutTime = (sessionTimout: string) =>
     onGeneralSettingsChange({
       ...generalSettings,
       sessionTimout
@@ -182,6 +190,16 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleCustomInputChange}
         moreInfoContent="Toggle for Custom Input"
       />
+      {generalSettings.isCustomInputEnabled && (
+        <TextInput
+          label="Public Id"
+          onChange={handlePublicIdInputChange}
+          defaultValue={generalSettings.publicId ?? ''}
+          placeholder="Public Id "
+          withVariableButton={false}
+        />
+      )}
+
 
 
 

@@ -121,7 +121,9 @@ export const startSession = async ({
     typingEmulation: typebot.settings.typingEmulation,
     ...initialSessionState,
     // expiryTimeout: 1200000,
-    expiryTimeout: parseInt(timeout) * 60 * 1000,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+    expiryTimeout:  timeout ? parseInt(timeout) * 60 * 1000 :1200000 ,
     // expiryTimeout : 10000,
   }
   console.log('sessionnnnnnn', initialState.expiryTimeout)
