@@ -99,7 +99,7 @@ export const AnalyticChart = ({ data }) => {
       // @ts-ignore
       const title = group.inputs.find(input => input.type === "text")?.content?.richText[0]?.children[0]?.text;
 
-
+      console.log("total checkkkkkkk", total)
 
 
       // Calculate NPS
@@ -311,114 +311,185 @@ export const AnalyticChart = ({ data }) => {
       //     )}
       //   </div>
       // );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const cardInput = group.inputs.find(input => input.type === "card input");
-      const ratingInput = cardInput.options.inputs.find(input => input.type === "rating");
+      // const ratingInput = cardInput.options.inputs.find(input => input.type === "rating");
       // const ratingLength = ratingInput.length;
-      let ratingLength;
+      // let ratingLength;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const cardRatingLengths = cardInput.options.inputs.map(input => {
         if (input.type === "rating") {
           return input.length
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
       }).filter((item) => item != undefined);
 
       // const ratingLength = cardRatingLengths
 
 
+
+
+
+
       console.log("input lengthhh", cardRatingLengths)
       // Initialize variables for NPS calculations
-      let totalResponses = 0;
-      let promoters = 0;
-      let detractors = 0;
+      // let totalResponses = 0;
+      // let promoters = 0;
+      // let detractors = 0;
 
-      console.log("totalresponses for input card", totalResponses)
+      // console.log("totalresponses for input card", totalResponses)
+
 
       // for rating scale 5
-      let totalResponsesScaleFive = 0;
-      let promotersScaleFive = 0;
-      let detractorsScaleFive = 0;
+      // let totalResponsesScaleFive = 0;
+      // let promotersScaleFive = 0;
+      // let detractorsScaleFive = 0;
+
 
       // Calculate NPS for the card input ratings
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const ratingsData = cardInput.children.map(child => {
         const ratingLabel = child.label;
         const totalEntries = child.total;
 
         console.log("total entriess", totalEntries)
-        ratingLength = child.length
+        const ratingLength = child.length
         // Calculate total responses for this specific rating
         // const totalRatingResponses = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
         // totalResponses += totalRatingResponses;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const totalRatingResponses = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
-        totalResponses += totalRatingResponses;
+        // a = totalRatingResponses
+        // allRatingResponses.current.totalResponses = totalRatingResponses
+        // totalResponses += totalRatingResponses;
+        console.log("rating total responses", totalRatingResponses)
 
         // Calculate promoters and detractors
-        const ratingPromoters = totalEntries.filter(entry => entry.rating >= 9 && entry.rating <= 10).reduce((acc, entry) => acc + entry.total, 0);
-        const ratingDetractors = totalEntries.filter(entry => entry.rating >= 0 && entry.rating <= 6).reduce((acc, entry) => acc + entry.total, 0);
-        promoters += ratingPromoters;
-        detractors += ratingDetractors;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const ratingPromoters = totalEntries.filter(entry => parseInt(entry.rating) >= 9 && parseInt(entry.rating) <= 10).reduce((acc, entry) => acc + entry.total, 0);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const ratingDetractors = totalEntries.filter(entry => parseInt(entry.rating) >= 0 && parseInt(entry.rating) <= 6).reduce((acc, entry) => acc + entry.total, 0);
+        // promoters += ratingPromoters;
+        // detractors += ratingDetractors;
+        // allRatingResponses.current.promoters = ratingPromoters;
+        // allRatingResponses.current.detractors = ratingDetractors;
         console.log("rating promoterrrr", ratingPromoters)
         console.log("rating detracterss", ratingDetractors)
 
-        console.log("Total promoters so far:", promoters);
-        console.log("Total detractors so far:", detractors);
+        // console.log("Total promoters so far:", promoters);
+        // console.log("Total detractors so far:", detractors);
+        const totalResponses = totalRatingResponses
+        const promoters = ratingPromoters
+        const detractors = ratingDetractors
 
-
+        let nps;
+        if (!isNaN(totalResponses) && totalResponses !== 0) {
+          nps = ((promoters - detractors) / totalResponses) * 100;
+        } else {
+          nps = 0; // Handle case where there are no responses or NaN
+        }
+        console.log("rating for scale 10", nps)
 
         // Calculate total responses for this specific rating
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const totalResponsesScale = totalEntries.reduce((acc, entry) => acc + entry.total, 0);
-        totalResponsesScaleFive += totalResponsesScale;
+        // totalResponsesScaleFive += totalResponsesScale;
 
         // Calculate promoters and detractors
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const ratingPromotersScaleFive = totalEntries.filter(entry => entry.rating >= 4 && entry.rating <= 5).reduce((acc, entry) => acc + entry.total, 0);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const ratingDetractorsScaleFive = totalEntries.filter(entry => entry.rating >= 0 && entry.rating <= 2).reduce((acc, entry) => acc + entry.total, 0);
-        promotersScaleFive += ratingPromotersScaleFive;
-        detractorsScaleFive += ratingDetractorsScaleFive;
+        // promotersScaleFive += ratingPromotersScaleFive;
+        // detractorsScaleFive += ratingDetractorsScaleFive;
         console.log("rating scale five promoterrrr", ratingPromotersScaleFive)
         console.log("rating scale five detracterss", ratingDetractorsScaleFive)
+        const totalResponsesScaleFive = totalResponsesScale;
+        const promotersScaleFive = ratingPromotersScaleFive;
+        const detractorsScaleFive = ratingDetractorsScaleFive;
+
+
+
+        let npsScaleFives;
+        if (!isNaN(totalResponsesScaleFive) && totalResponsesScaleFive !== 0) {
+          npsScaleFives = ((promotersScaleFive - detractorsScaleFive) / totalResponsesScaleFive) * 100;
+        } else {
+          nps = 0; // Handle case where there are no responses or NaN
+        }
+        console.log("rating for scale 5", npsScaleFives)
 
 
         const ratings = Array.from({ length: ratingLength + 1 }, (_, i) => i);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const totalMap = new Map(totalEntries.map(item => [parseInt(item.rating), item.total]));
         const totals = ratings.map(rating => totalMap.get(rating) || 0);
 
         return {
           label: ratingLabel,
+          totalResponse: totalRatingResponses,
           // ratings: totalEntries.map(entry => parseInt(entry.rating)),
+          ratingLength: ratingLength,
+          nps: nps,
+          npsScaleFives: npsScaleFives,
           ratings: ratings,
           totals: totals
         };
       });
 
       // Calculate overall NPS for the group
-      let nps;
-      if (!isNaN(totalResponses) && totalResponses !== 0) {
-        nps = ((promoters - detractors) / totalResponses) * 100;
-      } else {
-        nps = 0; // Handle case where there are no responses or NaN
-      }
 
+
+      // const totalResponses = allRatingResponses.current.totalResponses
+      // const promoters = allRatingResponses.current.promoters
+      // const detractors = allRatingResponses.current.detractors
+
+      // let nps;
+      // if (!isNaN(totalResponses) && totalResponses !== 0) {
+      //   nps = ((promoters - detractors) / totalResponses) * 100;
+      // } else {
+      //   nps = 0; // Handle case where there are no responses or NaN
+      // }
+      // console.log("rating for scale 10", nps)
       // nps for rating scale 5
-      let npsScaleFives;
-      if (!isNaN(totalResponsesScaleFive) && totalResponsesScaleFive !== 0) {
-        npsScaleFives = ((promotersScaleFive - detractorsScaleFive) / totalResponsesScaleFive) * 100;
-      } else {
-        nps = 0; // Handle case where there are no responses or NaN
-      }
+      // let npsScaleFives;
+      // if (!isNaN(totalResponsesScaleFive) && totalResponsesScaleFive !== 0) {
+      //   npsScaleFives = ((promotersScaleFive - detractorsScaleFive) / totalResponsesScaleFive) * 100;
+      // } else {
+      //   nps = 0; // Handle case where there are no responses or NaN
+      // }
 
       // Prepare chart data for each set of ratings
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignorepz
       const chartsData = ratingsData.map(ratingData => {
         const chartData = {
           labels: ratingData.ratings,
           datasets: [{
-            label: `NPS: ${ratingLength === 5 ? npsScaleFives.toFixed(2) : nps.toFixed(2)}%`,
+            label: `NPS: ${ratingData?.ratingLength === 5 ? ratingData?.npsScaleFives?.toFixed(2) : ratingData?.nps?.toFixed(2)}%`,
             data: ratingData.totals,
             backgroundColor: 'rgba(255, 159, 64, 0.8)'
           }]
         };
 
         return (
+
           <div key={`${group.groupId}-${ratingData.label}`}>
-            <h3>{ratingData.label}</h3>
-            <Bar data={chartData} />
+            {ratingData.totalResponse > 0 ? <>
+              <h3>{ratingData.label}</h3>
+              <Bar data={chartData} />
+            </> : ''}
+
           </div>
         );
       });

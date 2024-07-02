@@ -74,7 +74,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
       return
     } else {
-      sessionStorage.setItem("bot_init", "true");
+      // sessionStorage.setItem("bot_init", "true");
     }
     console.log("initialize bot");
     setIsInitialized(true);
