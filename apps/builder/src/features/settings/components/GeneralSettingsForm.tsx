@@ -91,7 +91,7 @@ export const GeneralSettingsForm = ({
   //     twilioPhoneNumber,
   //   })
 
-  const handleSessionTimoutTime = (sessionTimout: any) =>
+  const handleSessionTimoutTime = (sessionTimout: string) =>
     onGeneralSettingsChange({
       ...generalSettings,
       sessionTimout
