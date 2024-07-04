@@ -270,13 +270,32 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     //     typebotId: typebot.publishedTypebot.typebotId,
     //   },
     // })
+    const totalAnswersPerInputText = await prisma.answer.groupBy({
+      by: ['blockId', 'content'], // Group by blockId and content
+      where: {
+        result: {
+          typebotId: typebot.publishedTypebot.typebotId,
+        },
+        blockId: {
+          in: publishedTypebot.groups.flatMap((group) =>
+            group.blocks
+              .filter((block) => block.type === 'text input')
+              .map((block) => block.id)
+          ),
+        },
+      },
+      _count: {
+        _all: true,
+        // Count the number of answers
+      },
+    })
 
     const results = await prisma.result.findMany({
       where: {
         typebotId: typebot.publishedTypebot.typebotId,
       },
     })
-
+    // console.log('text inputt', totalAnswersPerInputText)
     // const countMap = new Map()
 
     // results.forEach((result) => {
@@ -463,11 +482,11 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                         if (Array.isArray(jsonData)) {
                           jsonData.forEach((item) => {
                             // console.log('item ', JSON.stringify(item))
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
                             if (item.id == answerId) {
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
                               const value = item.value
                               if (countMap.has(value)) {
                                 countMap.set(value, countMap.get(value) + 1)
@@ -481,7 +500,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
 
                       const t = []
                       for (const [key, value] of countMap) {
-                        console.log(key + ' is ' + value)
+                        // console.log(key + ' is ' + value)
                         t.push({ rating: key, total: value })
                       }
                       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -491,7 +510,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                         total: t,
                         length: inp.length,
                       })
-                      console.log('')
+                      // console.log('')
                     }
                   }
                 }
@@ -616,6 +635,94 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                   inputEntry.total.push(inputChoice)
                 }
 
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                function getInputTextTotalCounts(totalAnswersPerInputText) {
+                  const blockIdTotals = {}
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  totalAnswersPerInputText.forEach((item) => {
+                    const contents = item.content
+                      .split(',')
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      .map((content) => content.trim())
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    if (!blockIdTotals[item.blockId]) {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      blockIdTotals[item.blockId] = {}
+                    }
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    contents.forEach((content) => {
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      if (!blockIdTotals[item.blockId][content]) {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        blockIdTotals[item.blockId][content] = 0
+                      }
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      blockIdTotals[item.blockId][content] += item._count._all
+                    })
+                  })
+
+                  const totalTextInput = Object.keys(blockIdTotals).flatMap(
+                    (blockId) =>
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+
+                      Object.keys(blockIdTotals[blockId]).map((content) => ({
+                        blockId,
+                        text: content,
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        total: blockIdTotals[blockId][content],
+                      }))
+                  )
+
+                  return totalTextInput
+                }
+
+                if (block.type === 'text input') {
+                  const blockTotal = getInputTextTotalCounts(
+                    totalAnswersPerInputText
+                  )
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  // inputEntry.total.push(blockTotal)
+                  // console.log('called', blockTotal)
+
+                  const data = blockTotal
+                    .map((block) => {
+                      if (block.blockId == inputEntry.blockId) {
+                        return {
+                          blockId: inputEntry.blockId,
+                          text: block.text,
+                          total: block.total,
+                        }
+                      }
+                    })
+                    .filter((item) => item !== undefined)
+
+                  if (inputEntry.options.isWordCloud) {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    inputEntry.total.push(data)
+                  }
+
+                  // console.log(inputEntry.options.isWordCloud)
+
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+
+                  // inputEntry.total.push(data)
+                  // console.log('test dataaaa', inputEntry.total)
+                }
+
                 // Find the matching answer count
                 // const matchedCount = totalAnswersPerBlock.find(
                 //   (count) => count.blockId === block.id
@@ -727,6 +834,59 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     //   // 'card input',
     // ]
 
+    // function getInputTextTotalCounts(totalAnswersPerInputText) {
+    //   const blockIdTotals = {}
+    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //   // @ts-ignore
+    //   totalAnswersPerInputText.forEach((item) => {
+    //     const contents = item.content
+    //       .split(',')
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       .map((content) => content.trim())
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     if (!blockIdTotals[item.blockId]) {
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       blockIdTotals[item.blockId] = {}
+    //     }
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     contents.forEach((content) => {
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       if (!blockIdTotals[item.blockId][content]) {
+    //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //         // @ts-ignore
+    //         blockIdTotals[item.blockId][content] = 0
+    //       }
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       blockIdTotals[item.blockId][content] += item._count._all
+    //     })
+    //   })
+
+    //   const totalTextInput = Object.keys(blockIdTotals).flatMap((blockId) =>
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+
+    //     Object.keys(blockIdTotals[blockId]).map((content) => ({
+    //       blockId,
+    //       text: content,
+    //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //       // @ts-ignore
+    //       total: blockIdTotals[blockId][content],
+    //     }))
+    //   )
+
+    //   return totalTextInput
+    // }
+
+    // console.log(
+    //   'word clouddd',
+    //   getInputTextTotalCounts(totalAnswersPerInputText)
+    // )
     // const totalAnswersPerInputTypes = await prisma.answer.groupBy({
     //   by: ['blockId', 'content'], // Group by blockId and content
     //   where: {
@@ -748,7 +908,7 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     // })
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    // function getTotalCounts(totalAnswersPerInputTypes) {
+    // function getTotalInputTextCounts(totalAnswersPerInputTypes) {
     //   const contentTotals = {}
     //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //   // @ts-ignore
@@ -785,9 +945,6 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
     // }
 
     // Get the total counts for each unique content type
-    // const totalCounts = getTotalCounts(totalAnswersPerInputTypes)
-
-    // console.log('base on type', totalCounts)
 
     // rating count calculation
     // const totalAnswersPerInputRating = await prisma.answer.groupBy({

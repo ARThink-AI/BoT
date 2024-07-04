@@ -2,7 +2,7 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ArcElement } from 'chart.js';
-
+import WordCloud from 'react-d3-cloud';
 
 
 ChartJS.register(
@@ -80,7 +80,10 @@ export const AnalyticChart = ({ data }) => {
 
   // chart for choice input and rating
 
-  const charts = Array.isArray(data) && data.map(group => {
+  const charts = Array.isArray(data) && data.map((group, index) => {
+
+    const textInput = group.inputs.find(input => input.type === "text input");
+    const isWordCloudEnable = textInput?.options?.isWordCloud
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (group.inputs.some(input => input.type === "rating input")) {
@@ -495,6 +498,82 @@ export const AnalyticChart = ({ data }) => {
       });
 
       return chartsData;
+
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    else if (group.inputs.some(input => input.type === "text input") && isWordCloudEnable) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const textInput = group.inputs.find(input => input.type === "text input");
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const title = group.inputs.find(input => input.type === "text")?.content?.richText[0]?.children[0]?.text;
+      const isWordCloudEnable = textInput.options.isWordCloud
+      // console.log("text word cloud", textInput.options.isWordCloud)
+      // const textInput = group.inputs.find(input => input.type === "text input");
+
+      // const wordCloudData = textInput?.total[0]?.map(entry => ({
+      //   text: entry.text,
+      //   value: entry.total
+      // }));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // const wordCloudData = (textInput.total && textInput.total[0])
+      //   ? textInput.total[0].map(entry => ({
+      //     text: entry.text,
+      //     value: entry.total
+      //   }))
+      //   : [];
+
+      // const dummyData = [
+      //   { text: 'Hey', value: 1 },
+      //   { text: 'lol', value: 2 },
+      //   { text: 'first impression', value: 1 },
+      //   { text: 'very cool', value: 1 },
+      //   { text: 'duck', value: 1 },
+      // ];
+
+
+
+      const scalingFactor = 5;
+      // const scaledData = wordCloudData.map(item => ({
+      //   text: item.text,
+      //   value: item.value * scalingFactor
+      // }));
+      const wordCloudData = (textInput.total && textInput.total[0])
+        ? textInput.total[0].map(entry => ({
+          text: entry.text,
+          value: entry.total * scalingFactor
+        }))
+        : [];
+      const max = 50;
+      const min = 40;
+      const fontsize = word => (Math.log2(word.value) * Math.floor(Math.random() * (max - min + 1)) + min);
+      // const fontSizeMapper = word => Math.log2(word.value) * 35;
+
+      return (
+        <div key={group.groupId}>
+          <h3>{title ? title : group.title}</h3>
+          <div style={{ height: "250px", width: "250px" }}>
+            <WordCloud
+              // data={wordCloudData}
+              rotate={word => word.value % 360}
+              data={wordCloudData}
+
+              // width={500}
+              // height={1000}
+              font="Times"
+              fontStyle="italic"
+              fontWeight="bold"
+              // fontSize={(word) => Math.log2(word.value) * 1}
+              fontSize={fontsize}
+              spiral="rectangular"
+            />
+          </div>
+
+        </div>
+      );
 
     }
 
