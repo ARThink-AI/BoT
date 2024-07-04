@@ -25,6 +25,7 @@ import {
   ratingInputBlockSchema,
   fileInputStepSchema,
   barCodeSchema,
+  authLoginSchema ,
   cardSchema
 } from './inputs'
 import {
@@ -105,6 +106,7 @@ export const inputBlockSchemas = [
   fileInputStepSchema,
   pictureChoiceBlockSchema,
   barCodeSchema,
+  authLoginSchema ,
   cardSchema
 ] as const
 

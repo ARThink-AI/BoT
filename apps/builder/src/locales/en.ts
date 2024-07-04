@@ -229,6 +229,7 @@ export default {
   'editor.sidebarBlock.button.label': 'Buttons',
   'editor.sidebarBlock.picChoice.label': 'Pic choice',
   'editor.sidebarBlock.barCodeReader.label':  'Scanner',
+  'editor.sidebarBlock.authlogin.label': 'Auth Login',
   'editor.sidebarBlock.card.label': 'Card',
   'editor.sidebarBlock.payment.label': 'Payment',
   'editor.sidebarBlock.rating.label': 'Rating',

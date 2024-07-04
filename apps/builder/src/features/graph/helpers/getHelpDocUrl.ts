@@ -55,7 +55,8 @@ export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string  => {
       return 'https://docs.typebot.io/editor/blocks/inputs/picture-choice'
     case InputBlockType.BARCODE_READER:
       return 'https://arthink.ai'
-        
+    case InputBlockType.AUTH_LOGIN:
+      return  'https://arthink.ai'   
     case IntegrationBlockType.OPEN_AI:
       return 'https://docs.typebot.io/editor/blocks/integrations/openai'
     case IntegrationBlockType.TRUDESK:

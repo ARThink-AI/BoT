@@ -13,3 +13,4 @@ export * from './url'
 export * from './pictureChoice'
 export * from "./barCode";
 export * from "./card";
+export * from "./authlogin"

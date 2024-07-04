@@ -46,6 +46,11 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
       //@ts-ignore
       return <Text fontSize="sm">{scopedT('barCodeReader.label')}</Text>
+    case InputBlockType.AUTH_LOGIN:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+      //@ts-ignore
+      return <Text fontSize="sm">{scopedT('authlogin.label')}</Text>
+
     case InputBlockType.CARD:
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
       //@ts-ignore

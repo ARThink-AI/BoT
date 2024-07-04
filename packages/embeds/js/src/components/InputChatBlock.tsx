@@ -37,6 +37,7 @@ import { Buttons } from '@/features/blocks/inputs/buttons/components/Buttons'
 import { SinglePictureChoice } from '@/features/blocks/inputs/pictureChoice/SinglePictureChoice'
 import { MultiplePictureChoice } from '@/features/blocks/inputs/pictureChoice/MultiplePictureChoice'
 import { formattedMessages } from '@/utils/formattedMessagesSignal'
+import { AuthLoginInput } from '@/features/blocks/inputs/authLogin/components/AuthLogin'
 
 type Props = {
   ref: HTMLDivElement | undefined
@@ -177,6 +178,15 @@ const Input = (props: {
           onSubmit={onSubmit}
         />
       </Match>
+      <Match when={props.block.type === InputBlockType.AUTH_LOGIN}>
+        <AuthLoginInput
+          block={props.block as TextInputBlock}
+          defaultValue={getPrefilledValue()}
+          onSubmit={onSubmit}
+        />
+      </Match>
+
+
       <Match when={props.block.type === InputBlockType.CARD}>
         <CardInput
           onSubmit={onSubmit}

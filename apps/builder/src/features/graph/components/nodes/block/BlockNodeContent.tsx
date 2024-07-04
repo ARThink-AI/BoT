@@ -48,6 +48,7 @@ import { PixelNodeBody } from '@/features/blocks/integrations/pixel/components/P
 import { useScopedI18n } from '@/locales'
 import { ZemanticAiNodeBody } from '@/features/blocks/integrations/zemanticAi/ZemanticAiNodeBody'
 import { TrudeskNodeBody } from '@/features/blocks/integrations/trudesk/TrudeskNodeBody'
+import { AuthLoginInputContent } from '@/features/blocks/inputs/authlogin/components/AuthLoginContent'
 
 type Props = {
   block: Block | StartBlock
@@ -113,6 +114,10 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     case InputBlockType.BARCODE_READER: {
       return <BarCodeInputContent block={block} />
     }
+    case InputBlockType.AUTH_LOGIN: {
+      return <AuthLoginInputContent block={block} />
+    }
+
     case InputBlockType.CARD: {
       return <CardInputContent block={block} />
     }

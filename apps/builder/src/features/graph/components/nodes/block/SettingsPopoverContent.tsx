@@ -52,6 +52,7 @@ import { SettingsHoverBar } from './SettingsHoverBar'
 import { PixelSettings } from '@/features/blocks/integrations/pixel/components/PixelSettings'
 import { ZemanticAiSettings } from '@/features/blocks/integrations/zemanticAi/ZemanticAiSettings'
 import { TrudeskSettings } from '@/features/blocks/integrations/trudesk/TrudeskSettings'
+import { AuthLoginInputSettings } from '@/features/blocks/inputs/authlogin/components/AuthLoginSettings'
 
 type Props = {
   block: BlockWithOptions
@@ -186,6 +187,14 @@ export const BlockSettings = ({
     case InputBlockType.BARCODE_READER: {
       return (
         <BarCodeInputSettings
+          options={block.options}
+          onOptionsChange={updateOptions}
+        />
+      )
+    }
+    case InputBlockType.AUTH_LOGIN: {
+      return (
+        <AuthLoginInputSettings
           options={block.options}
           onOptionsChange={updateOptions}
         />
