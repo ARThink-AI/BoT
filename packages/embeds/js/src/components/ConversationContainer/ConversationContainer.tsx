@@ -130,10 +130,12 @@ export const ConversationContainer = (props: Props) => {
   const [phoneNumber, setPhoneNumber] = createSignal("")
 
   const [isVisible, setIsVisible] = createSignal(false);
+
+
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
-  console.log("before expire session", isVisible())
+
 
   //     console.log("live agent enabled");
 
@@ -631,6 +633,12 @@ export const ConversationContainer = (props: Props) => {
     setIsSending(false)
     if (error) {
       if (error.message == "Session expired. You need to start a new session.") {
+        console.log("session expireddd");
+        // sessionStorage.removeItem("intialize");
+        // sessionStorage.removeItem("initialize_css");
+        // sessionStorage.removeItem("bot_init");
+        // sessionStorage.removeItem("chatchunks");
+        // props.initializeBot();
         setIsVisible(true)
         setTimeout(() => {
           setIsVisible(false)
@@ -641,13 +649,6 @@ export const ConversationContainer = (props: Props) => {
           sessionStorage.removeItem("chatchunks");
           props.initializeBot();
         }, 3000)
-
-        console.log("session expireddd");
-        // sessionStorage.removeItem("intialize");
-        // sessionStorage.removeItem("initialize_css");
-        // sessionStorage.removeItem("bot_init");
-        // sessionStorage.removeItem("chatchunks");
-        // props.initializeBot();
         return
       }
       setHasError(true)
@@ -659,7 +660,6 @@ export const ConversationContainer = (props: Props) => {
         },
       ])
     }
-    console.log("after expire session", isVisible())
     if (!data) return
     if (data.lastMessageNewFormat) {
       setFormattedMessages([
@@ -1234,37 +1234,19 @@ export const ConversationContainer = (props: Props) => {
       return;
     }
   };
-  console.log("timeouttttt", props)
 
+  const handleSubmitOnEnter = (e) => {
+    // console.log("enter clickedd", e)
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      userInputClicked()
+    }
 
-
-  // snackbar for notifcation
-
-
-  // const showSnackbar = () => {
-  //   setIsVisible(true);
-  //   setTimeout(() => {
-  //     setIsVisible(false);
-  //   }, 3000);
-  // };
+  }
 
   const closeSnackbar = () => {
     setIsVisible(false);
   };
-
-
-
-  // <div class={`fixed bottom-4 left-1/2 transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-  //   <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-  //     <span>{"Session timeout restart to continue"}</span>
-  //     <button class="ml-auto  text-white" onClick={closeSnackbar}>
-  //       ✖
-  //     </button>
-  //   </div>
-  // </div>
-
-
-
 
   return (
     <div
@@ -1272,9 +1254,6 @@ export const ConversationContainer = (props: Props) => {
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-
-
-
       {/* <div style={{ "margin-top" : "10px" , "cursor" : "pointer" }} >
         
         <div style={{ display : "flex" , "flex-direction" : "row" , "align-items" : "center" , gap : "40" }} >
@@ -1287,6 +1266,19 @@ toggleLiveAgent();
           } } > <img style={{ height : "25px" }} src={"https://quadz.blob.core.windows.net/demo1/live-chat.png"} /> </button>
         </div>
         </div> */}
+
+      {/* snackbar for session timout */}
+      <div class={`fixed bottom-[90px] right-[-125px]   transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
+        <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
+          <span>{"Session timeout restart to continue"}</span>
+          <button class="ml-3   text-white" onClick={closeSnackbar}>
+            {/* ✖ */}
+            X
+          </button>
+        </div>
+      </div>
+
+
       <For each={chatChunks()}>
         {(chatChunk, index) => {
           console.log("chat chunk", chatChunk, index);
@@ -1335,8 +1327,8 @@ toggleLiveAgent();
         <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
           <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
 
-            <input placeholder='type your message' class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
-            <div class='flex justify-center items-center'>
+            <input placeholder='Ask' onKeyDown={handleSubmitOnEnter} class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
+            <div class='flex justify-center items-center gap-[5px]'>
               {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
               {isRecording() && (
 
@@ -1344,8 +1336,8 @@ toggleLiveAgent();
                 // {/* <div style={{ "font-size": "8px" }} > Listening... </div> */}
 
               )}
-              <button disabled={userInput() ? false : true} onClick={userInputClicked} class={`${!userInput() ? 'cursor-not-allowed opacity-50' : ''} rounded-full bg-[#0077CC]`}>
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <button disabled={userInput() ? false : true} onClick={userInputClicked} class={`${!userInput() ? 'cursor-not-allowed opacity-50' : ''} `}>
+                {/* <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_63_137)">
                     <rect width="36" height="36" rx="18" fill="#0077CC" />
                     <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
@@ -1355,6 +1347,11 @@ toggleLiveAgent();
                       <rect width="36" height="36" rx="18" fill="white" />
                     </clipPath>
                   </defs>
+                </svg> */}
+                <svg xmlns="
+http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512" width="25px" height="25px" fill="" color="white" class="send-icon flex ">
+                  <path d="M476.59 227.05l-.16-.07L49.35 49.84A23.56 23.56 0 0027.14 52 24.65 24.65 0 0016 72.59v113.29a24 24 0 0019.52 23.57l232.93 43.07a4 4 0 010 7.86L35.53 303.45A24 24 0 0016 327v113.31A23.57 23.57 0 0026.59 460a23.94 23.94 0 0013.22 4 24.55 24.55 0 009.52-1.93L476.4 285.94l.19-.09a32 32 0 000-58.8z"></path>
                 </svg>
               </button>
             </div>
@@ -1396,19 +1393,13 @@ toggleLiveAgent();
           </div>
         </div>
         {/* <div class="fixed inset-0 bg-black opacity-50"></div> */}
+
+
       </div>
 
 
       {/* snackbar for session timout */}
-      <div class={`fixed bottom-[50px] right-[0px] transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-        <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-          <span>{"Session timeout restart to continue"}</span>
-          <button class="ml-3   text-white" onClick={closeSnackbar}>
-            {/* ✖ */}
-            X
-          </button>
-        </div>
-      </div>
+
 
       <BottomSpacer />
     </div>
