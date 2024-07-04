@@ -15,7 +15,7 @@ const generalSettings = z.object({
   sessionTimout: z.string().optional(),
   publicId: z.string().optional(),
   isCustomInputEnabled: z.boolean().optional(),
-  publicId: z.string().optional(),
+ 
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({

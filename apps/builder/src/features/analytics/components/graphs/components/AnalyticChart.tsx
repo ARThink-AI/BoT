@@ -81,7 +81,9 @@ export const AnalyticChart = ({ data }) => {
   // chart for choice input and rating
 
   const charts = Array.isArray(data) && data.map((group, index) => {
-
+    console.log("index", index);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const textInput = group.inputs.find(input => input.type === "text input");
     const isWordCloudEnable = textInput?.options?.isWordCloud
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -509,7 +511,7 @@ export const AnalyticChart = ({ data }) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const title = group.inputs.find(input => input.type === "text")?.content?.richText[0]?.children[0]?.text;
-      const isWordCloudEnable = textInput.options.isWordCloud
+      // const isWordCloudEnable = textInput.options.isWordCloud
       // console.log("text word cloud", textInput.options.isWordCloud)
       // const textInput = group.inputs.find(input => input.type === "text input");
 
@@ -542,6 +544,8 @@ export const AnalyticChart = ({ data }) => {
       //   value: item.value * scalingFactor
       // }));
       const wordCloudData = (textInput.total && textInput.total[0])
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         ? textInput.total[0].map(entry => ({
           text: entry.text,
           value: entry.total * scalingFactor
@@ -549,6 +553,8 @@ export const AnalyticChart = ({ data }) => {
         : [];
       const max = 50;
       const min = 40;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const fontsize = word => (Math.log2(word.value) * Math.floor(Math.random() * (max - min + 1)) + min);
       // const fontSizeMapper = word => Math.log2(word.value) * 35;
 
@@ -558,6 +564,8 @@ export const AnalyticChart = ({ data }) => {
           <div style={{ height: "250px", width: "250px" }}>
             <WordCloud
               // data={wordCloudData}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
               rotate={word => word.value % 360}
               data={wordCloudData}
 
