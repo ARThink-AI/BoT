@@ -708,11 +708,20 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                     })
                     .filter((item) => item !== undefined)
 
-                  if (inputEntry.options.isWordCloud) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    inputEntry.total.push(data)
-                  }
+                  // const isWordCloudEnable =
+                  //   inputEntry.options.isWordCloud ?? true
+
+                  // console.log(isWordCloudEnable)
+
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  inputEntry.total.push(data)
+
+                  // if (isWordCloudEnable) {
+                  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  //   // @ts-ignore
+                  //   inputEntry.total.push(data)
+                  // }
 
                   // console.log(inputEntry.options.isWordCloud)
 

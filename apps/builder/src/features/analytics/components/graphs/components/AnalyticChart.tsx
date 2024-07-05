@@ -85,7 +85,7 @@ export const AnalyticChart = ({ data }) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const textInput = group.inputs.find(input => input.type === "text input");
-    const isWordCloudEnable = textInput?.options?.isWordCloud
+    const isWordCloudEnable = textInput?.options?.isWordCloud ?? true
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (group.inputs.some(input => input.type === "rating input")) {
