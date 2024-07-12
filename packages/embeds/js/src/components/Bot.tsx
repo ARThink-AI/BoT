@@ -591,7 +591,7 @@ const BotContent = (props: BotContentProps) => {
 
       {/* <div style={{ "margin-left": "70%", position: "relative" }} > */}
 
-      <LiteBadge botContainer={botContainer} />
+      {!props.initialChatReply.typebot.settings.general.hideBranding && <LiteBadge botContainer={botContainer} />}
 
 
       {/* </div> */}

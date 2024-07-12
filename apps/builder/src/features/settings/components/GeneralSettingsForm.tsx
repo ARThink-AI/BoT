@@ -96,6 +96,11 @@ export const GeneralSettingsForm = ({
       ...generalSettings,
       sessionTimout
     })
+  const handleHideBranding = (hideBranding: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      hideBranding
+    })
 
 
 
@@ -119,6 +124,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isInputPrefillEnabled ?? true}
         onCheckChange={handleInputPrefillChange}
         moreInfoContent="Inputs are automatically pre-filled whenever their associated variable has a value"
+      />
+      <SwitchWithLabel
+        label="Hide Branding"
+        initialValue={generalSettings.hideBranding ?? false}
+        onCheckChange={handleHideBranding}
+        moreInfoContent="Hide Footer"
       />
       <SwitchWithLabel
         label="Hide query params on bot start"

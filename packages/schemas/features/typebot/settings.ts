@@ -13,6 +13,7 @@ const generalSettings = z.object({
   twilioPhoneNumber: z.string().optional(),
   isAutoRefreshEnabled: z.boolean().optional(),
   sessionTimout: z.string().optional(),
+  hideBranding : z.boolean().optional(),
   publicId: z.string().optional(),
   isCustomInputEnabled: z.boolean().optional(),
  
