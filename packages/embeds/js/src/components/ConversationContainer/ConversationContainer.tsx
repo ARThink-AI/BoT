@@ -1324,8 +1324,8 @@ toggleLiveAgent();
 
       <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
-        <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
-          <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
+        <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);" class="w-[90%] border-2 rounded-full overflow-hidden">
+          <div class="container w-full lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
 
             <input placeholder='Ask' onKeyDown={handleSubmitOnEnter} class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
             <div class='flex justify-center items-center gap-[5px]'>

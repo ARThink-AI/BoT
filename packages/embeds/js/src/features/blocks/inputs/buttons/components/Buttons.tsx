@@ -225,8 +225,9 @@ export const Buttons = (props: Props) => {
         >
           <For each={filteredItems()}>
             {(item, index) => (
-              <span class={'relative' + (isMobile() ? ' w-full' : '')}>
+              <span class={'relative'}>
                 <Button
+                  style={{ "font-size": "xx-small", "padding": "0px" }}
                   on:click={() => handleClick(index())}
                   data-itemid={item.id}
                   class="w-full"
