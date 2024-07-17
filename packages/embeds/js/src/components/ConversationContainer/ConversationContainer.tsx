@@ -302,7 +302,7 @@ export const ConversationContainer = (props: Props) => {
   onMount(() => {
     ; (async () => {
       if (props.initialChatReply.typebot.settings.general.isCustomInputEnabled) {
-        const response = await fetch("/api/v2/sendMessage", {
+        const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
           method: "POST",
           // @ts-ignore
           headers: {
@@ -996,7 +996,7 @@ export const ConversationContainer = (props: Props) => {
     setChatChunks(chunks);
 
     if (sessionId()) {
-      const response = await fetch(`/api/v2/sendMessage`, {
+      const response = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
         method: "POST",
         // @ts-ignore
         headers: {
