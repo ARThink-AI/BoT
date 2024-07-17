@@ -3,10 +3,13 @@ import {
   Spinner,
   useColorModeValue,
   useDisclosure,
+  Input,
+  Box,
+  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { Stats } from '@typebot.io/schemas'
-import React from 'react'
+import React, { useState } from 'react'
 import { StatsCards } from './StatsCards'
 import { ChangePlanModal } from '@/features/billing/components/ChangePlanModal'
 
@@ -20,16 +23,21 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   const t = useI18n()
   const { isOpen, onOpen, onClose } = useDisclosure();
   console.log("on open", onOpen);
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
   const { typebot, publishedTypebot } = useTypebot()
   const { data } = trpc.analytics.getTotalAnswersInBlocks.useQuery(
     {
       typebotId: typebot?.id as string,
+      startDate: startDate,
+      endDate: endDate,
     },
     { enabled: isDefined(publishedTypebot) }
   )
   const startBlockId = publishedTypebot?.groups
     .find((group) => group.blocks.at(0)?.type === 'start')
     ?.blocks.at(0)?.id
+
 
   console.log("dataaaaaaaaaa", data)
   // console.log("groupssss", publishedTypebot?.groups)
@@ -59,6 +67,15 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
   // const summary = summarizeCounts(blocks, counts);
   // console.log("type based input dataaaaaaa", summary);
   console.log("data blockkkkkk", data?.orderedGroups)
+  const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(event.target.value);
+  };
+  console.log("start date", startDate)
+  console.log("end date", endDate)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore 
@@ -167,6 +184,14 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
       />
       <StatsCards stats={stats} pos="absolute" />
       <AnalyticChart data={data?.orderedGroups} />
+      <Box>
+        <FormLabel>Start Date</FormLabel>
+        <Input onChange={handleStartDateChange} type='date' />
+      </Box>
+      <Box>
+        <FormLabel>End Date</FormLabel>
+        <Input onChange={handleEndDateChange} type='date' />
+      </Box>
     </Flex >
   )
 }
