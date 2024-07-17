@@ -1194,6 +1194,117 @@ export const ConversationContainer = (props: Props) => {
   //   // userInputClicked()
   // }
 
+  // const startRecordingUserVoice = () => {
+  //   try {
+  //     console.log("start recording called");
+
+  //     // Check if the browser supports the Web Speech API
+  //     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  //     if (!SpeechRecognition) {
+  //       throw new Error('Web Speech API is not supported in this browser.');
+  //     }
+
+  //     let recognition = new SpeechRecognition();
+  //     setRecognition(recognition)
+  //     recognition.continuous = true;
+  //     recognition.interimResults = false;
+  //     recognition.lang = 'en-US';
+
+  //     recognition.onstart = () => {
+  //       console.log("Speech recognition started");
+  //       setIsRecording(true);
+  //     };
+
+  //     recognition.onresult = (event) => {
+  //       const transcript = Array.from(event.results)
+  //         .map(result => result[0])
+  //         .map(result => result.transcript)
+  //         .join('');
+
+  //       console.log("Transcript:", transcript);
+
+  //       // const val = userInput() + " " + transcript;
+  //       const val = transcript;
+  //       if (val.length > 1) {
+  //         setUserInput(val);
+  //       }
+  //       // userInput();
+
+  //       // setTimeout(() => {
+  //       //   if (userInput()) {
+  //       //     console.log("user voice", val.length, val);
+  //       //     userInputClicked();
+  //       //   }
+  //       // }, 4000);
+  //     };
+
+
+  //     recognition.onerror = (event) => {
+  //       console.error("Speech recognition error:", event.error);
+  //     };
+
+  //     recognition.onend = () => {
+  //       console.log("Speech recognition ended");
+  //       // setIsRecording(false);
+  //       setTimeout(() => {
+  //         console.log("end calling");
+  //         // if (userInput()) {
+  //         // stopRecordingUserVoice();
+  //         if (recognition() && userInput()) {
+  //           console.log("entered timeout")
+  //           recognition()?.stop();
+  //           userInputClicked();
+  //           setIsRecording(false);
+  //         }
+  //         // }
+  //       }, 1500);
+  //     };
+
+  //     recognition.onspeechend = () => {
+  //       console.log("Speech has stopped being detected");
+  //       stopRecordingUserVoice();
+
+
+  //       // recognition()?.stop();
+  //       // userInputClicked();
+  //       // setIsRecording(false);
+
+  //     };
+
+  //     recognition.start();
+  //     // setTimeout(() => {
+  //     //   console.log("set timeout called for voice", userInput());
+  //     //   // console.log("recogination", recognition());
+  //     //   console.log("stop recording user voice", stopRecordingUserVoice);
+  //     //   if (userInput()) {
+  //     //     stopRecordingUserVoice();
+  //     //   }
+  //     // }, 4000);
+
+
+  //   } catch (err) {
+  //     console.error('Error accessing speech recognition:', err);
+  //   }
+  // };
+
+  // const stopRecordingUserVoice = () => {
+  //   try {
+  //     // if (recognition() && userInput()) {
+  //     //   recognition()?.stop();
+  //     //   userInputClicked();
+  //     //   setIsRecording(false);
+  //     // }
+  //     if (recognition()) {
+  //       recognition()?.stop();
+  //       userInputClicked();
+  //       setIsRecording(false);
+  //     }
+
+  //   } catch (err) {
+  //     console.log("error in stop recording", err);
+  //   }
+
+  // };
   const startRecordingUserVoice = () => {
     try {
       console.log("start recording called");
@@ -1204,18 +1315,17 @@ export const ConversationContainer = (props: Props) => {
         throw new Error('Web Speech API is not supported in this browser.');
       }
 
-      let recognition = new SpeechRecognition();
-      setRecognition(recognition)
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = false; // Change to false to allow speechend detection
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
 
-      recognition.onstart = () => {
+      recognitionInstance.onstart = () => {
         console.log("Speech recognition started");
         setIsRecording(true);
       };
 
-      recognition.onresult = (event) => {
+      recognitionInstance.onresult = (event) => {
         const transcript = Array.from(event.results)
           .map(result => result[0])
           .map(result => result.transcript)
@@ -1223,64 +1333,41 @@ export const ConversationContainer = (props: Props) => {
 
         console.log("Transcript:", transcript);
 
-        // const val = userInput() + " " + transcript;
-        const val = transcript;
+        const val = userInput() + " " + transcript;
         if (val.length > 1) {
           setUserInput(val);
         }
-        // userInput();
 
-        // setTimeout(() => {
-        //   if (userInput()) {
-        //     console.log("user voice", val.length, val);
-        //     userInputClicked();
-        //   }
-        // }, 4000);
-      };
-
-
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-      };
-
-      recognition.onend = () => {
-        console.log("Speech recognition ended");
-        // setIsRecording(false);
         setTimeout(() => {
-          console.log("end calling");
-          // if (userInput()) {
-          // stopRecordingUserVoice();
-          if (recognition() && userInput()) {
-            console.log("entered timeout")
-            recognition()?.stop();
+          if (val.length > 1) {
+            console.log("user voice", val.length);
             userInputClicked();
-            setIsRecording(false);
           }
-          // }
-        }, 1500);
+        }, 4000);
       };
 
-      recognition.onspeechend = () => {
+      recognitionInstance.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        if (event.error === 'no-speech' || event.error === 'audio-capture') {
+          stopRecordingUserVoice();
+        }
+      };
+
+      recognitionInstance.onspeechend = () => {
         console.log("Speech has stopped being detected");
         stopRecordingUserVoice();
-
-
-        // recognition()?.stop();
-        // userInputClicked();
-        // setIsRecording(false);
-
       };
 
-      recognition.start();
-      // setTimeout(() => {
-      //   console.log("set timeout called for voice", userInput());
-      //   // console.log("recogination", recognition());
-      //   console.log("stop recording user voice", stopRecordingUserVoice);
-      //   if (userInput()) {
-      //     stopRecordingUserVoice();
-      //   }
-      // }, 4000);
+      recognitionInstance.onend = () => {
+        console.log("Speech recognition ended");
+        setIsRecording(false);
+        if (recognition() && !isRecording()) {
+          startRecordingUserVoice();
+        }
+      };
 
+      setRecognition(recognitionInstance);
+      recognitionInstance.start();
 
     } catch (err) {
       console.error('Error accessing speech recognition:', err);
@@ -1288,22 +1375,10 @@ export const ConversationContainer = (props: Props) => {
   };
 
   const stopRecordingUserVoice = () => {
-    try {
-      // if (recognition() && userInput()) {
-      //   recognition()?.stop();
-      //   userInputClicked();
-      //   setIsRecording(false);
-      // }
-      if (recognition()) {
-        recognition()?.stop();
-        userInputClicked();
-        setIsRecording(false);
-      }
-
-    } catch (err) {
-      console.log("error in stop recording", err);
+    if (recognition()) {
+      recognition().stop();
+      setIsRecording(false);
     }
-
   };
 
   const openModal = () => setIsOpen(true);
