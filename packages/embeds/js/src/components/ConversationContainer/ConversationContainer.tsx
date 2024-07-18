@@ -967,6 +967,7 @@ export const ConversationContainer = (props: Props) => {
   }
   const userInputClicked = async () => {
     console.log("user input clicked");
+    setUserInput("");
 
     let chunks = [...chatChunks()];
     chunks.push(
@@ -1051,7 +1052,7 @@ export const ConversationContainer = (props: Props) => {
       // );
       setChatChunks(chunks);
       // }
-      setUserInput("");
+
 
       sessionStorage.removeItem("answer");
     } else {
