@@ -47,21 +47,21 @@ export const Bubble = (props: BubbleProps) => {
 
   const [isBotOpened, setIsBotOpened] = createSignal(false)
   const [isBotStarted, setIsBotStarted] = createSignal(false)
-  const [ socketInstance , setSocketInstance  ] = createSignal(null);
+  const [socketInstance, setSocketInstance] = createSignal(null);
 
   onMount(() => {
-   console.log("checking socket connection");
-   const socketInstance = io( "http://localhost:3050" ,{
-    reconnection: true, // Enable reconnection
-    reconnectionAttempts: Infinity, // Retry indefinitely
-    reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
-    reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
-  } );
-  socketInstance.on("connect", () => {
-    console.log("socket instance connected for bubble", socketInstance.id );
-    // @ts-ignore
-    setSocketInstance(socketInstance);
-  } );
+    console.log("checking socket connection");
+    const socketInstance = io("http://localhost:3050", {
+      reconnection: true, // Enable reconnection
+      reconnectionAttempts: Infinity, // Retry indefinitely
+      reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
+      reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
+    });
+    socketInstance.on("connect", () => {
+      console.log("socket instance connected for bubble", socketInstance.id);
+      // @ts-ignore
+      setSocketInstance(socketInstance);
+    });
 
 
 
@@ -179,7 +179,7 @@ export const Bubble = (props: BubbleProps) => {
           'z-index': 42424242,
         }}
         class={
-          'fixed rounded-lg w-full sm:w-[400px] max-h-[704px]' +
+          'fixed rounded-lg w-full sm:w-[600px] max-h-[704px]' +
           (isBotOpened() ? ' opacity-1' : ' opacity-0 pointer-events-none') +
           (props.theme?.button?.size === 'large'
             ? ' bottom-24'

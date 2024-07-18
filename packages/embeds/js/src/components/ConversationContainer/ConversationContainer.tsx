@@ -967,8 +967,9 @@ export const ConversationContainer = (props: Props) => {
   }
   const userInputClicked = async () => {
     console.log("user input clicked");
+    // setUserInput("");
+    let userinputt = userInput();
     setUserInput("");
-
     let chunks = [...chatChunks()];
     chunks.push(
       {
@@ -987,7 +988,7 @@ export const ConversationContainer = (props: Props) => {
             "isLong": false
           },
           "prefilledValue": "Hi",
-          "answer": userInput()
+          "answer": userinputt
         },
         messages: [
 
@@ -1007,7 +1008,7 @@ export const ConversationContainer = (props: Props) => {
 
         },
         body: JSON.stringify({
-          message: userInput(),
+          message: userinputt,
           sessionId: sessionId()
         })
 
@@ -1057,7 +1058,7 @@ export const ConversationContainer = (props: Props) => {
       sessionStorage.removeItem("answer");
     } else {
       sessionStorage.removeItem("answer");
-      setUserInput("");
+      // setUserInput("");
     }
     setRecognition(null);
   }
