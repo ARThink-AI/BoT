@@ -939,9 +939,9 @@ export const CardInput = (props: any) => {
                         < textarea
                           class="border p-2 rounded-md w-full"
                           placeholder={input.placeholder}
-                          value={input?.userInput ? input?.userInput : ""}
+                          value={input?.values ? input?.values : ""}
                           onChange={(e) =>
-                            updateInput("userInput", e.target.value, i())}
+                            updateInput("values", e.target.value, i())}
                           required={input.required}
                         />
                       </>
