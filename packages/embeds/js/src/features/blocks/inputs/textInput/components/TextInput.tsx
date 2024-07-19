@@ -5,7 +5,7 @@ import { InputSubmitContent } from '@/types'
 import { isMobile } from '@/utils/isMobileSignal'
 import type { TextInputBlock } from '@typebot.io/schemas'
 import { createSignal, onCleanup, onMount } from 'solid-js'
-import { env  } from "@typebot.io/env";
+import { env } from "@typebot.io/env";
 import TimerComponent from './Timer';
 type Props = {
   block: TextInputBlock
@@ -18,6 +18,7 @@ export const TextInput = (props: Props) => {
   const [stream, setStream] = createSignal(null);
   const [isRecording, setIsRecording] = createSignal(false);
   const [recordedAudio, setRecordedAudio] = createSignal(null);
+  const [recognition, setRecognition] = createSignal(null)
   let inputRef: HTMLInputElement | HTMLTextAreaElement | undefined
 
   const handleInput = (inputValue: string) => setInputValue(inputValue)
@@ -39,98 +40,166 @@ export const TextInput = (props: Props) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit()
   }
 
-  const startRecordingUserVoice = async () => {
+  // const startRecordingUserVoice = async () => {
+  //   try {
+  //     console.log("start recording called");
+  //     const audioStream = await navigator.mediaDevices.getUserMedia({
+  //       audio: {
+  //           deviceId: "default",
+  //           sampleRate: 48000, // Adjust to your requirement
+  //           sampleSize: 16,
+  //           channelCount: 1,
+  //       },
+  //       video: false,
+  //   });
+
+  //     setStream(audioStream);
+  //     const mediaRecorder = new MediaRecorder(audioStream);
+  //     const chunks = [];
+
+  //     mediaRecorder.ondataavailable = (event) => {
+  //       console.log("on data aviaalble", event);
+  //       chunks.push(event.data);
+
+  //     };
+  //     mediaRecorder.onstop = async () => {
+  //       console.log("on stop");
+  //       const blob = new Blob(chunks, { type: 'audio/wav' });
+  //       setRecordedAudio(URL.createObjectURL(blob));
+
+  //       // Convert the recorded audio to text using Google Cloud Speech-to-Text API
+  //       const audioData = await blob.arrayBuffer();
+  //       const base64Audio = Buffer.from(audioData).toString('base64');
+  //        console.log("audio data",audioData);
+  //       try {
+  //         const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           // body: JSON.stringify({ audio: base64Audio }),
+  //           body: JSON.stringify({ audio: base64Audio , type : "speechtotext" , text : "Hii" }),
+  //         });
+
+  //         if (!response.ok) {
+  //           throw new Error('Error converting audio to text');
+  //         }
+
+  //         const result = await response.json();
+  //         console.log("result transcription", result.message.transcription );
+  //         // if ( inputNode() ) {
+  //         //   let n = inputNode();
+  //         //   n.value = result.transcription
+  //         // }
+  //         const val = inputValue() + " " +result.message.transcription;
+  //         setInputValue(val);
+  //         // node.value = result.transcription;
+  //         // setRecordedText(result.transcription);
+  //       } catch (error) {
+  //         console.error('Error calling Speech-to-Text API:', error);
+  //       }
+  //     };
+  //     // mediaRecorder.onstop = () => {
+  //     //   console.log("on stop");
+  //     //   const blob = new Blob(chunks, { type: 'audio/wav' });
+  //     //   setRecordedAudio(URL.createObjectURL(blob));
+  //     // };
+  //     console.log("media recorder", mediaRecorder);
+  //     mediaRecorder.start()
+
+  //     setIsRecording(true);
+
+  //     //  Handle Edge Case: Stop recording after 10 seconds (adjust as needed)
+  //     setTimeout(() => {
+  //       if (isRecording()) {
+  //         stopRecordingUserVoice()
+  //         // mediaRecorder.stop();
+  //         // setIsRecording(false);
+  //       }
+  //     }, 50000);
+
+  //   } catch (err) {
+  //     // setError('Permission to access the microphone was denied.');
+  //     console.error('Error accessing microphone:', err);
+  //   }
+  // }
+  // const stopRecordingUserVoice = async () => {
+  //   console.log("stop recording callled");
+  //   if (stream()) {
+  //     stream().getTracks().forEach((track) => {
+  //       track.stop();
+  //     });
+  //   }
+  //   setIsRecording(false);
+  // }
+  const startRecordingUserVoice = () => {
     try {
       console.log("start recording called");
-      const audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-            deviceId: "default",
-            sampleRate: 48000, // Adjust to your requirement
-            sampleSize: 16,
-            channelCount: 1,
-        },
-        video: false,
-    });
 
-      setStream(audioStream);
-      const mediaRecorder = new MediaRecorder(audioStream);
-      const chunks = [];
+      // Check if the browser supports the Web Speech API
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        throw new Error('Web Speech API is not supported in this browser.');
+      }
 
-      mediaRecorder.ondataavailable = (event) => {
-        console.log("on data aviaalble", event);
-        chunks.push(event.data);
-      
+      let recognition = new SpeechRecognition();
+      setRecognition(recognition)
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        console.log("Speech recognition started");
+        setIsRecording(true);
       };
-      mediaRecorder.onstop = async () => {
-        console.log("on stop");
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        setRecordedAudio(URL.createObjectURL(blob));
-  
-        // Convert the recorded audio to text using Google Cloud Speech-to-Text API
-        const audioData = await blob.arrayBuffer();
-        const base64Audio = Buffer.from(audioData).toString('base64');
-         console.log("audio data",audioData);
-        try {
-          const response = await fetch(`${env.NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE}/api/integrations/texttospeech`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            // body: JSON.stringify({ audio: base64Audio }),
-            body: JSON.stringify({ audio: base64Audio , type : "speechtotext" , text : "Hii" }),
-          });
-  
-          if (!response.ok) {
-            throw new Error('Error converting audio to text');
-          }
 
-          const result = await response.json();
-          console.log("result transcription", result.message.transcription );
-          // if ( inputNode() ) {
-          //   let n = inputNode();
-          //   n.value = result.transcription
-          // }
-          const val = inputValue() + " " +result.message.transcription;
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0])
+          .map(result => result.transcript)
+          .join('');
+
+        console.log("Transcript:", transcript);
+
+        const val = transcript;
+        if (val.length > 1) {
           setInputValue(val);
-          // node.value = result.transcription;
-          // setRecordedText(result.transcription);
-        } catch (error) {
-          console.error('Error calling Speech-to-Text API:', error);
         }
+
+        // setTimeout(() => {
+        //   if (val.length > 1) {
+        //     console.log("user voice", val.length);
+        //     userInputClicked();
+        //   }
+        // }, 4000);
       };
-      // mediaRecorder.onstop = () => {
-      //   console.log("on stop");
-      //   const blob = new Blob(chunks, { type: 'audio/wav' });
-      //   setRecordedAudio(URL.createObjectURL(blob));
-      // };
-      console.log("media recorder", mediaRecorder);
-      mediaRecorder.start()
 
-      setIsRecording(true);
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+      };
 
-      //  Handle Edge Case: Stop recording after 10 seconds (adjust as needed)
-      setTimeout(() => {
-        if (isRecording()) {
-          stopRecordingUserVoice()
-          // mediaRecorder.stop();
-          // setIsRecording(false);
-        }
-      }, 50000);
+      recognition.onend = () => {
+        console.log("Speech recognition ended");
+        setIsRecording(false);
+      };
+
+      recognition.onspeechend = () => {
+        console.log("Speech has stopped being detected");
+        stopRecordingUserVoice();
+      };
+
+      recognition.start();
 
     } catch (err) {
-      // setError('Permission to access the microphone was denied.');
-      console.error('Error accessing microphone:', err);
+      console.error('Error accessing speech recognition:', err);
     }
-  }
-  const stopRecordingUserVoice = async () => {
-    console.log("stop recording callled");
-    if (stream()) {
-      stream().getTracks().forEach((track) => {
-        track.stop();
-      });
+  };
+
+  const stopRecordingUserVoice = () => {
+    if (recognition()) {
+      recognition()?.stop();
     }
-    setIsRecording(false);
-  }
+  };
 
   onMount(() => {
     if (!isMobile() && inputRef) inputRef.focus()
@@ -176,22 +245,22 @@ export const TextInput = (props: Props) => {
           }
         />
       )}
-      
-       {/* {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> } */}
-       { !isRecording() && <button disabled={ isRecording() } 
-        onClick={ () => startRecordingUserVoice() }
-        style={{ cursor : "pointer" }}  
-      // onMouseDown={startRecordingUserVoice} 
-       ><img style={{ height : "25px" , "margin-bottom" : "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
-       {/* { isRecording() && <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "30px" , "margin-bottom" : "12px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button> } */}
-       { isRecording() && (
-           <div style={{ display : "flex" , "flex-direction" : "column" , "align-items" : "center" , "justify-content" : "center" }} >
-            <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "25px"  }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
-          <div style={{ "font-size" : "8px" }} > Listening... </div> 
-         </div>
-       ) }
 
-       {/* </div> */}
+      {/* {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> } */}
+      {!isRecording() && <button disabled={isRecording()}
+        onClick={() => startRecordingUserVoice()}
+        style={{ cursor: "pointer" }}
+      // onMouseDown={startRecordingUserVoice} 
+      ><img style={{ height: "25px", "margin-bottom": "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
+      {/* { isRecording() && <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "30px" , "margin-bottom" : "12px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button> } */}
+      {isRecording() && (
+        <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
+          <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
+          <div style={{ "font-size": "8px" }} > Listening... </div>
+        </div>
+      )}
+
+      {/* </div> */}
       {/* { isRecording() && <button disabled={ !isRecording() } 
       
       // onClick={ () => stopRecordingUserVoice() }
