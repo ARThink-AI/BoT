@@ -965,96 +965,131 @@ export const ConversationContainer = (props: Props) => {
     setLive(!l);
   }
   const userInputClicked = async () => {
-    console.log("user input clicked");
+    try {
+      console.log("user input clicked");
 
-    let chunks = [...chatChunks()];
-    chunks.push(
-      {
-        input: {
-          "id": "ow5y1j9yvsp7jo46qaswc38k",
-          "groupId": "nb24en7liv3s8e959uxtz1h0",
-          "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
-          // @ts-ignore
-          "type": "text input",
-          "options": {
-            "labels": {
-              "placeholder": "Ask question",
-              "button": "Send"
-            },
-            "variableId": "vb6co7ry0n84c9tuml9oae2ld",
-            "isLong": false
-          },
-          "prefilledValue": "Hi",
-          "answer": userInput()
-        },
-        messages: [
-
-        ],
-        clientSideActions: undefined
-      }
-    );
-    setChatChunks(chunks);
-
-    if (sessionId()) {
-      const response = await fetch(`/api/v2/sendMessage`, {
-        method: "POST",
-        // @ts-ignore
-        headers: {
-          "Content-type": "application/json"
-
-
-        },
-        body: JSON.stringify({
-          message: userInput(),
-          sessionId: sessionId()
-        })
-
-      });
-      const messageResp = await response.json();
-      console.log("message Resp", messageResp);
-      // if (messageResp?.messages.length > 0 && messageResp?.messages[0]?.content?.richText.length > 0 && messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text) {
-      // const botResp = messageResp?.messages[0]?.content?.richText[0]?.children[0]?.children[0]?.text;
       let chunks = [...chatChunks()];
-      chunks.push({
-        messages: messageResp?.messages,
-        clientSideActions: undefined
-      })
-      // chunks.push(
-      //   {
-      //     messages: [
-      //       {
-      //         id: "unhxagqgd46929s701gnz5z8",
-      //         // @ts-ignore
-      //         type: "text",
-      //         content: {
-      //           richText: [
-      //             {
-      //               "type": "variable",
-      //               "children": [
-      //                 {
-      //                   "type": "p",
-      //                   "children": [
-      //                     {
-      //                       "text": botResp
-      //                     }
-      //                   ]
-      //                 }
-      //               ]
-      //             }
-      //           ]
-      //         }
-      //       }
-      //     ],
-      //     clientSideActions: undefined
-      //   }
-      // );
+      chunks.push(
+        {
+          input: {
+            "id": "ow5y1j9yvsp7jo46qaswc38k",
+            "groupId": "nb24en7liv3s8e959uxtz1h0",
+            "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+            // @ts-ignore
+            "type": "text input",
+            "options": {
+              "labels": {
+                "placeholder": "Ask question",
+                "button": "Send"
+              },
+              "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+              "isLong": false
+            },
+            "prefilledValue": "Hi",
+            "answer": userInput()
+          },
+          messages: [
+
+          ],
+          clientSideActions: undefined
+        }
+      );
       setChatChunks(chunks);
-      // }
-      setUserInput("");
-      sessionStorage.removeItem("answer");
-    } else {
-      sessionStorage.removeItem("answer");
-      setUserInput("");
+
+      if (sessionId()) {
+        const response = await fetch(`/api/v2/sendMessage`, {
+          method: "POST",
+          // @ts-ignore
+          headers: {
+            "Content-type": "application/json"
+
+
+          },
+          body: JSON.stringify({
+            message: userInput(),
+            sessionId: sessionId()
+          })
+
+        });
+        const messageResp = await response.json();
+        console.log("message Resp", messageResp);
+        if (messageResp?.message == "Session expired. You need to start a new session.") {
+          console.log("session expired restating...");
+          const response = await fetch("/api/v2/sendMessage", {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json"
+
+            },
+            body: JSON.stringify({
+              startParams: {
+                typebot: props.initialChatReply.typebot.settings.general.publicId
+              }
+            })
+            // body : JSON.stringify( {
+            //   _id : sessionStorage.getItem("ticketId"),
+            //   comment : comments,
+            //   note : false ,
+            //   ticketid : false 
+            // } )
+            // body: JSON.stringify({
+            //   // @ts-ignore
+            //   ticketid: sessionStorage.getItem("ticketId"),
+            //   note: comments.join(" ")
+
+            // })
+          });
+          const sessionResponse = await response.json();
+          // setSessionId(sessionResponse?.sessionId);
+          const responsee = await fetch(`/api/v2/sendMessage`, {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json"
+
+
+            },
+            body: JSON.stringify({
+              message: userInput(),
+              sessionId: sessionResponse?.sessionId
+            })
+
+          });
+          const messageResp = await responsee.json();
+          let chunks = [...chatChunks()];
+          chunks.push({
+            messages: messageResp?.messages,
+            clientSideActions: undefined
+          })
+
+          setChatChunks(chunks);
+
+          setUserInput("");
+          sessionStorage.removeItem("answer");
+          setSessionId(sessionResponse?.sessionId);
+
+
+        } else {
+          let chunks = [...chatChunks()];
+          chunks.push({
+            messages: messageResp?.messages,
+            clientSideActions: undefined
+          })
+
+          setChatChunks(chunks);
+
+          setUserInput("");
+          sessionStorage.removeItem("answer");
+        }
+
+
+      } else {
+        sessionStorage.removeItem("answer");
+        setUserInput("");
+      }
+    } catch (err) {
+      console.log("Error happened inside userInputClicked", err?.message);
     }
   }
 
