@@ -609,7 +609,7 @@ export const CardInput = (props: any) => {
     inputs().forEach(input => {
       console.log("input", input)
       // ans[input.answerVariableId] = input.userInput ? input?.default : input?.userInput;
-      if (input.type == "text" || input.type == "phone" || input.type == "email" || input.type == "rating") {
+      if (input.type == "text" || input.type == "phone" || input.type == "email" || input.type == "rating" || input.type == "textarea") {
         ans[input.answerVariableId] = input.values
       } else {
         ans[input.answerVariableId] = input.default
