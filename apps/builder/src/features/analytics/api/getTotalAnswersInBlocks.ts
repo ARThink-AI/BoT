@@ -52,6 +52,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   .query(
+     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
     async ({ input: { typebotId, startDate, endDate }, ctx: { user } }) => {
       const typebot = await prisma.typebot.findFirst({
         where: canReadTypebots(typebotId, user),

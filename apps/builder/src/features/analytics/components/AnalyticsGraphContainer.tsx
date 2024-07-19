@@ -4,13 +4,13 @@ import {
   useColorModeValue,
   useDisclosure,
   Input,
-  Box,
+
   FormLabel,
   Button,
-  SimpleGrid,
+
   FormControl,
-  Card,
-  CardHeader,
+  Card
+
 } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { Stats } from '@typebot.io/schemas'
