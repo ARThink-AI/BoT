@@ -968,7 +968,8 @@ export const ConversationContainer = (props: Props) => {
   const userInputClicked = async () => {
     try {
       console.log("user input clicked");
-
+      let userr = userInput();
+      setUserInput("");
       let chunks = [...chatChunks()];
       chunks.push(
         {
@@ -987,7 +988,7 @@ export const ConversationContainer = (props: Props) => {
               "isLong": false
             },
             "prefilledValue": "Hi",
-            "answer": userInput()
+            "answer": userr
           },
           messages: [
 
@@ -1007,7 +1008,7 @@ export const ConversationContainer = (props: Props) => {
 
           },
           body: JSON.stringify({
-            message: userInput(),
+            message: userr,
             sessionId: sessionId()
           })
 
@@ -1052,7 +1053,7 @@ export const ConversationContainer = (props: Props) => {
 
             },
             body: JSON.stringify({
-              message: userInput(),
+              message: userr,
               sessionId: sessionResponse?.sessionId
             })
 
@@ -1066,7 +1067,7 @@ export const ConversationContainer = (props: Props) => {
 
           setChatChunks(chunks);
 
-          setUserInput("");
+          // setUserInput("");
           sessionStorage.removeItem("answer");
           setSessionId(sessionResponse?.sessionId);
 
@@ -1080,14 +1081,14 @@ export const ConversationContainer = (props: Props) => {
 
           setChatChunks(chunks);
 
-          setUserInput("");
+          // setUserInput("");
           sessionStorage.removeItem("answer");
         }
 
 
       } else {
         sessionStorage.removeItem("answer");
-        setUserInput("");
+        // setUserInput("");
       }
     } catch (err) {
       console.log("Error happened inside userInputClicked", err?.message);

@@ -132,6 +132,74 @@ export const TextInput = (props: Props) => {
   //   }
   //   setIsRecording(false);
   // }
+  // const startRecordingUserVoice = () => {
+  //   try {
+  //     console.log("start recording called");
+
+  //     // Check if the browser supports the Web Speech API
+  //     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  //     if (!SpeechRecognition) {
+  //       throw new Error('Web Speech API is not supported in this browser.');
+  //     }
+
+  //     let recognition = new SpeechRecognition();
+  //     setRecognition(recognition)
+  //     recognition.continuous = true;
+  //     recognition.interimResults = false;
+  //     recognition.lang = 'en-US';
+
+  //     recognition.onstart = () => {
+  //       console.log("Speech recognition started");
+  //       setIsRecording(true);
+  //     };
+
+  //     recognition.onresult = (event) => {
+  //       const transcript = Array.from(event.results)
+  //         .map(result => result[0])
+  //         .map(result => result.transcript)
+  //         .join('');
+
+  //       console.log("Transcript:", transcript);
+
+  //       const val = transcript;
+  //       if (val.length > 1) {
+  //         setInputValue(val);
+  //       }
+
+  //       // setTimeout(() => {
+  //       //   if (val.length > 1) {
+  //       //     console.log("user voice", val.length);
+  //       //     userInputClicked();
+  //       //   }
+  //       // }, 4000);
+  //     };
+
+  //     recognition.onerror = (event) => {
+  //       console.error("Speech recognition error:", event.error);
+  //     };
+
+  //     recognition.onend = () => {
+  //       console.log("Speech recognition ended");
+  //       setIsRecording(false);
+  //     };
+
+  //     recognition.onspeechend = () => {
+  //       console.log("Speech has stopped being detected");
+  //       stopRecordingUserVoice();
+  //     };
+
+  //     recognition.start();
+
+  //   } catch (err) {
+  //     console.error('Error accessing speech recognition:', err);
+  //   }
+  // };
+
+  // const stopRecordingUserVoice = () => {
+  //   if (recognition()) {
+  //     recognition()?.stop();
+  //   }
+  // };
   const startRecordingUserVoice = () => {
     try {
       console.log("start recording called");
@@ -142,18 +210,17 @@ export const TextInput = (props: Props) => {
         throw new Error('Web Speech API is not supported in this browser.');
       }
 
-      let recognition = new SpeechRecognition();
-      setRecognition(recognition)
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = false; // Change to false to allow speechend detection
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
 
-      recognition.onstart = () => {
+      recognitionInstance.onstart = () => {
         console.log("Speech recognition started");
         setIsRecording(true);
       };
 
-      recognition.onresult = (event) => {
+      recognitionInstance.onresult = (event) => {
         const transcript = Array.from(event.results)
           .map(result => result[0])
           .map(result => result.transcript)
@@ -166,29 +233,37 @@ export const TextInput = (props: Props) => {
           setInputValue(val);
         }
 
-        // setTimeout(() => {
-        //   if (val.length > 1) {
-        //     console.log("user voice", val.length);
-        //     userInputClicked();
-        //   }
-        // }, 4000);
+        // const val = userInput() + " " + transcript;
+        // if (val.length > 1) {
+        //   setUserInput(val);
+        // }
+
+        // Trigger user input action immediately after speech recognition ends
+        // if (val.length > 1) {
+        //   console.log("user voice", val.length);
+        //   userInputClicked();
+        // }
       };
 
-      recognition.onerror = (event) => {
+      recognitionInstance.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
+        if (event.error === 'no-speech' || event.error === 'audio-capture') {
+          stopRecordingUserVoice();
+        }
       };
 
-      recognition.onend = () => {
-        console.log("Speech recognition ended");
-        setIsRecording(false);
-      };
-
-      recognition.onspeechend = () => {
+      recognitionInstance.onspeechend = () => {
         console.log("Speech has stopped being detected");
         stopRecordingUserVoice();
       };
 
-      recognition.start();
+      recognitionInstance.onend = () => {
+        console.log("Speech recognition ended");
+        setIsRecording(false);
+      };
+
+      setRecognition(recognitionInstance);
+      recognitionInstance.start();
 
     } catch (err) {
       console.error('Error accessing speech recognition:', err);
@@ -198,6 +273,8 @@ export const TextInput = (props: Props) => {
   const stopRecordingUserVoice = () => {
     if (recognition()) {
       recognition()?.stop();
+      setIsRecording(false);
+
     }
   };
 
