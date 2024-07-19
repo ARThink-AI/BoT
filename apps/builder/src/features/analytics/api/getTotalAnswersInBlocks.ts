@@ -19,8 +19,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
   .input(
     z.object({
       typebotId: z.string(),
-      startDate: z.date(),
-      endDate: z.date(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
     })
   )
   .output(
@@ -67,15 +67,25 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
 
       // const startDate = '2024-06-04' // dynamically set start date
       // const endDate = '2024-06-05'
+      const adjustedStartDate = startDate
+        ? new Date(startDate.setHours(0, 0, 0, 0))
+        : undefined
+      const adjustedEndDate = endDate
+        ? new Date(endDate.setHours(23, 59, 59, 999))
+        : undefined
 
       const totalAnswersPerBlock = await prisma.answer.groupBy({
         by: ['itemId', 'blockId'],
         where: {
           result: {
             typebotId: typebot.publishedTypebot.typebotId,
+            // createdAt: {
+            //   ...(startDate ? { gte: startDate } : {}),
+            //   ...(endDate ? { lte: endDate } : {}),
+            // },
             createdAt: {
-              gte: startDate,
-              lte: endDate,
+              ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+              ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
             },
           },
           blockId: {
@@ -235,6 +245,14 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         where: {
           result: {
             typebotId: typebot.publishedTypebot.typebotId,
+            // createdAt: {
+            //   ...(startDate ? { gte: startDate } : {}),
+            //   ...(endDate ? { lte: endDate } : {}),
+            // },
+            createdAt: {
+              ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+              ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
+            },
           },
           blockId: {
             in: publishedTypebot.groups.flatMap((group) =>
@@ -259,6 +277,14 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
           },
           result: {
             typebotId: typebot.publishedTypebot.typebotId,
+            // createdAt: {
+            //   ...(startDate ? { gte: startDate } : {}),
+            //   ...(endDate ? { lte: endDate } : {}),
+            // },
+            createdAt: {
+              ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+              ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
+            },
           },
           blockId: {
             in: publishedTypebot.groups.flatMap((group) =>
@@ -285,6 +311,14 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
         where: {
           result: {
             typebotId: typebot.publishedTypebot.typebotId,
+            // createdAt: {
+            //   ...(startDate ? { gte: startDate } : {}),
+            //   ...(endDate ? { lte: endDate } : {}),
+            // },
+            createdAt: {
+              ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+              ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
+            },
           },
           blockId: {
             in: publishedTypebot.groups.flatMap((group) =>
@@ -303,6 +337,14 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
       const results = await prisma.result.findMany({
         where: {
           typebotId: typebot.publishedTypebot.typebotId,
+          // createdAt: {
+          //   ...(startDate ? { gte: startDate } : {}),
+          //   ...(endDate ? { lte: endDate } : {}),
+          // },
+          createdAt: {
+            ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+            ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
+          },
         },
       })
       // console.log('text inputt', totalAnswersPerInputText)
@@ -402,6 +444,8 @@ export const getTotalAnswersInBlocks = authenticatedProcedure
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
                   function getInputRatingTotalCounts(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     totalAnswersPerInputRating
                   ) {
                     const blockIdTotals = {}
