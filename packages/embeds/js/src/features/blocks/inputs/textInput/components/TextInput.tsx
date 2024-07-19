@@ -230,7 +230,8 @@ export const TextInput = (props: Props) => {
 
         const val = inputValue() + " " + transcript;
         if (val.length > 1) {
-          setInputValue(val);
+          // setInputValue(val);
+          props.onSubmit({ value: val })
         }
 
         // const val = userInput() + " " + transcript;
