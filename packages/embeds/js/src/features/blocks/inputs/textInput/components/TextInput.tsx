@@ -228,7 +228,7 @@ export const TextInput = (props: Props) => {
 
         console.log("Transcript:", transcript);
 
-        const val = transcript;
+        const val = inputValue() + " " + transcript;
         if (val.length > 1) {
           setInputValue(val);
         }
@@ -331,9 +331,9 @@ export const TextInput = (props: Props) => {
       ><img style={{ height: "25px", "margin-bottom": "12px" }} src={"https://quadz.blob.core.windows.net/demo1/mic.svg"} /></button>}
       {/* { isRecording() && <button onClick={stopRecordingUserVoice} style={{ cursor : "pointer" }} ><img style={{ height : "30px" , "margin-bottom" : "12px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button> } */}
       {isRecording() && (
-        <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
+        <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center", "margin-bottom": "15px" }} >
           <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
-          <div style={{ "font-size": "8px" }} > Listening... </div>
+          {/*<div style={{ "font-size": "8px" }} > Listening... </div> */}
         </div>
       )}
 
