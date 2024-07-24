@@ -22,6 +22,8 @@ export const getResults = authenticatedProcedure
       typebotId: z.string(),
       limit: z.coerce.number().min(1).max(maxLimit).default(50),
       cursor: z.string().optional(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
     })
   )
   // .output(
@@ -38,6 +40,14 @@ export const getResults = authenticatedProcedure
         message: `limit must be between 1 and ${maxLimit}`,
       })
     const { cursor } = input
+
+    const adjustedStartDate = input.startDate
+      ? new Date(input.startDate.setHours(0, 0, 0, 0))
+      : undefined
+    const adjustedEndDate = input.endDate
+      ? new Date(input.endDate.setHours(23, 59, 59, 999))
+      : undefined
+
     const typebot = await prisma.typebot.findUnique({
       where: {
         id: input.typebotId,
@@ -63,6 +73,10 @@ export const getResults = authenticatedProcedure
         typebotId: typebot.id,
         hasStarted: true,
         isArchived: false,
+        createdAt: {
+          ...(adjustedStartDate ? { gte: adjustedStartDate } : {}),
+          ...(adjustedEndDate ? { lte: adjustedEndDate } : {}),
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -70,7 +84,7 @@ export const getResults = authenticatedProcedure
       include: { answers: true },
     })) as ResultWithAnswers[]
 
-   let nextCursor: typeof cursor | undefined
+    let nextCursor: typeof cursor | undefined
     if (results.length > limit) {
       const nextResult = results.pop()
       nextCursor = nextResult?.id
