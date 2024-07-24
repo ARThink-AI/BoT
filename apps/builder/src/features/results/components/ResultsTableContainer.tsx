@@ -215,6 +215,18 @@ export const ResultsTableContainer = () => {
   }
   const isDateAvailable = localStartDate && localEndDate
 
+  const handleResetDate = () => {
+
+    setLocalStartDate('')
+    setLocalEndDate('')
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    setStartDate('')
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    setEndDate('')
+    refetchResults()
+  }
 
 
   return (
@@ -254,6 +266,7 @@ export const ResultsTableContainer = () => {
               />
             </FormControl>
             <Button w={'100%'} fontSize={'xs'} mt={7} colorScheme='blue' onClick={handleApplyClick} isDisabled={Boolean(!isDateAvailable)}>Apply</Button>
+            <Button w={'100%'} fontSize={'xs'} mt={7} colorScheme='blue' onClick={handleResetDate}>Reset</Button>
           </Flex>
         </Flex>
       </Card>
