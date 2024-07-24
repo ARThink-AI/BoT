@@ -48,7 +48,7 @@ import { PixelNodeBody } from '@/features/blocks/integrations/pixel/components/P
 import { useScopedI18n } from '@/locales'
 import { ZemanticAiNodeBody } from '@/features/blocks/integrations/zemanticAi/ZemanticAiNodeBody'
 import { TrudeskNodeBody } from '@/features/blocks/integrations/trudesk/TrudeskNodeBody'
-
+import { WhatsappNodeBody } from '@/features/blocks/integrations/whatsapp/WhatsappNodeBody'
 type Props = {
   block: Block | StartBlock
   indices: BlockIndices
@@ -210,6 +210,13 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     case IntegrationBlockType.TRUDESK:
       return (
         <TrudeskNodeBody
+          task={block.options.task}
+          variableId={"variableId" in block.options ? block.options.variableId : ""}
+        />
+      )
+    case IntegrationBlockType.WHATSAPP:
+      return (
+        <WhatsappNodeBody
           task={block.options.task}
           variableId={"variableId" in block.options ? block.options.variableId : ""}
         />
