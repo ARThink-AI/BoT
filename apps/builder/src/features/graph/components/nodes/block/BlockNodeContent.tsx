@@ -218,7 +218,7 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
       return (
         <WhatsappNodeBody
           task={block.options.task}
-          variableId={"variableId" in block.options ? block.options.variableId : ""}
+        // variableId={"variableId" in block.options ? block.options.variableId : ""}
         />
       )
     case IntegrationBlockType.PIXEL: {
