@@ -144,7 +144,9 @@ const resultsContext = createContext<{
   endDate: Date | null
   setStartDate: (date: Date | null) => void
   setEndDate: (date: Date | null) => void
-}>({} as any)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+}>({})
 
 export const ResultsProvider = ({
   children,

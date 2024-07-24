@@ -158,7 +158,7 @@
 
 
 import React, { useEffect, useState } from 'react'
-import { Stack, Button, Input, HStack, Card, Flex, FormControl, FormLabel } from '@chakra-ui/react'
+import { Stack, Button, Input, Card, Flex, FormControl, FormLabel } from '@chakra-ui/react'
 import { useResults } from '../ResultsProvider'
 import { ResultsTable } from './table/ResultsTable'
 import { useRouter } from 'next/router'
