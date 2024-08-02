@@ -143,6 +143,7 @@ export const TypebotHeader = () => {
             >
               {scopedT('shareButton.label')}
             </Button>
+
           </>
         )}
 
@@ -150,15 +151,26 @@ export const TypebotHeader = () => {
 
 
         {isDefined(publishedTypebot) && (
-          <Button
-            as={Link}
-            href={`/typebots/${typebot?.id}/results`}
-            colorScheme={router.pathname.includes('results') ? 'blue' : 'gray'}
-            variant={router.pathname.includes('results') ? 'outline' : 'ghost'}
-            size="sm"
-          >
-            {scopedT('resultsButton.label')}
-          </Button>
+          <>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/results`}
+              colorScheme={router.pathname.includes('results') ? 'blue' : 'gray'}
+              variant={router.pathname.includes('results') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('resultsButton.label')}
+            </Button>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/reminders`}
+              colorScheme={router.pathname.endsWith('reminders') ? 'blue' : 'gray'}
+              variant={router.pathname.endsWith('reminders') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('remindersButton.label')}
+            </Button>
+          </>
         )}
       </HStack>
       <HStack

@@ -6,11 +6,13 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model Users {
-  id  Int    @id @default(autoincrement())
-  email String
-  password_hash String 
+  id            Int    @id @default(autoincrement())
+  email         String
+  password_hash String
 }
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -96,7 +98,7 @@ model Workspace {
   isQuarantined                 Boolean               @default(false)
   isSuspended                   Boolean               @default(false)
   themeTemplates                ThemeTemplate[]
-  twilioId                      String? 
+  twilioId                      String?
   twilioPhoneNumber             String?
 }
 
@@ -329,6 +331,14 @@ model ThemeTemplate {
   theme       Json
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
+}
+
+model Reminder {
+  id        String @id @default(uuid())
+  job_id    String
+  typebotId String
+  type      String
+  payload   Json
 }
 
 enum WorkspaceRole {
