@@ -175,6 +175,12 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
     setAppliedStartDate(startDate);
     setAppliedEndDate(endDate);
   };
+  const handleResetDate = () => {
+    setAppliedStartDate('');
+    setAppliedEndDate('');
+    setStartDate(null)
+    setEndDate(null)
+  }
 
   const summary = summarizeCounts(blocks, counts);
   console.log("summary data based on input type..", summary)
@@ -240,7 +246,7 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
       <StatsCards stats={stats} pos="absolute" />
       <AnalyticChart data={data?.orderedGroups} />
 
-      <Card p={5} position={'absolute'} top={5} left={10} variant={'elevated'}>
+      <Card w={'max-content'} p={5} position={'absolute'} top={0} left={5} variant={'elevated'}>
 
         <Flex >
           <Flex gap={2.5} >
@@ -255,7 +261,8 @@ export const AnalyticsGraphContainer = ({ stats }: { stats?: Stats }) => {
             </FormControl>
 
 
-            <Button fontSize={'xs'} mt={7} colorScheme='blue' isDisabled={Boolean(!isDateAvailable)} onClick={handleApplyClick}>Apply</Button>
+            <Button w={'100%'} fontSize={'xs'} mt={7} colorScheme='blue' isDisabled={Boolean(!isDateAvailable)} onClick={handleApplyClick}>Apply</Button>
+            <Button w={'100%'} fontSize={'xs'} mt={7} colorScheme='blue' onClick={handleResetDate}>Reset</Button>
           </Flex>
 
         </Flex>
