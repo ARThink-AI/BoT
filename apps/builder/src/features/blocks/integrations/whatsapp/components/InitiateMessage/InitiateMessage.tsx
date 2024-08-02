@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { ChangeEvent } from "react";
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { VStack, FormLabel, Button, Link, Text, Image, Select } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@/components/icons'
@@ -43,7 +43,7 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
     let components = [...options.components];
     components = components.map(comp => {
       if (comp.type != type) return comp;
-      let updatedComp = {
+      const updatedComp = {
         ...comp,
         variables: [...comp.variables]
       };
@@ -68,41 +68,62 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
     })
   }
   const handleTemplateChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    let components = [];
+    const components = [];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
+
     if (whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value).length > 0) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      let template = whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value)[0];
+      const template = whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value)[0];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       if (template && template?.components?.filter(t => t.type == "BODY").length > 0) {
-        let selectedComponent = template?.components?.filter(t => t.type == "BODY")[0];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const selectedComponent = template?.components?.filter(t => t.type == "BODY")[0];
         console.log("variablesss", selectedComponent?.example?.body_text[0]);
         // let array = deepCloneArray(selectedComponent?.example?.body_text);
         if (selectedComponent?.example?.body_text[0]) {
-          let newComp = { type: "BODY", text: selectedComponent.text, variables: [...selectedComponent?.example?.body_text[0]] ?? [] };
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const newComp = { type: "BODY", text: selectedComponent.text, variables: selectedComponent?.example?.body_text?.[0] ? [...selectedComponent.example.body_text[0]] : [] };
+
+
           // let newComp = { type: "BODY", text: selectedComponent.text, variables: new Array(selectedComponent?.example?.body_text[0].length).fill("") ?? [] };
           components.push(newComp);
         } else {
           console.log(" enteredd else ");
-          let newComp = { type: "BODY", text: selectedComponent.text, variables: [] };
+          const newComp = { type: "BODY", text: selectedComponent.text, variables: [] };
           components.push(newComp);
         }
       }
       // Header Code 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       if (template && template?.components?.filter(t => t.type == "HEADER").length > 0) {
-        let selectedComponent = template?.components?.filter(t => t.type == "HEADER")[0];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const selectedComponent = template?.components?.filter(t => t.type == "HEADER")[0];
         // Header Format text 
         if (selectedComponent?.format == 'TEXT') {
           if (selectedComponent?.example?.header_text) {
-            let newComp = { type: "HEADER", text: selectedComponent.text, variables: [...selectedComponent?.example?.header_text] ?? [] };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const newComp = { type: "HEADER", text: selectedComponent.text, variables: selectedComponent?.example?.header_text ? [...selectedComponent.example.header_text] : [] };
 
             components.push(newComp);
           } else {
-            let newComp = { type: "HEADER", text: selectedComponent.text, variables: [] };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const newComp = { type: "HEADER", text: selectedComponent.text, variables: [] };
             components.push(newComp);
           }
         }
         if (selectedComponent?.format == 'IMAGE' && selectedComponent?.example?.header_handle) {
-          let newComp = { type: "HEADER", text: selectedComponent.text, image: true, variables: [...selectedComponent?.example?.header_handle] ?? [] };
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const newComp = { type: "HEADER", text: selectedComponent.text, image: true, variables: selectedComponent?.example?.header_handle ? [...selectedComponent.example.header_handle] : [] };
 
           components.push(newComp);
         }
@@ -115,8 +136,10 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
     onOptionsChange({
       ...options,
       selectedTemplateId: e?.target?.value,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       selectedTemplateName: whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value).length > 0 ? whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value)[0].name : "",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       selectedTemplateLang: whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value).length > 0 ? whatsappMessageTemplates?.templates?.filter(temp => temp?.id == e?.target?.value)[0].language : "",
       components: [...components]
@@ -143,8 +166,10 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
   );
   // console.log("whatsappMessageTemplates", whatsappMessageTemplates);
   let selectedTemplate;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (options?.selectedTemplateId && whatsappMessageTemplates && whatsappMessageTemplates?.templates?.filter(temp => temp?.id == options?.selectedTemplateId).length > 0) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     selectedTemplate = whatsappMessageTemplates?.templates?.filter(temp => temp?.id == options?.selectedTemplateId)[0];
   }
@@ -198,16 +223,22 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
       { /* 
        Header text
       */ }
-
+      {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
       {options?.components?.filter(t => t.type == "HEADER").length > 0 && (
         <VStack spacing={1} >
           <FormLabel> Header </FormLabel>
           {/* <Text> {options?.components?.filter(t => t.type == "HEADER")[0]?.format == "IMAGE" ? "Upload" : ""} </Text> */}
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           <Text> {options?.components?.filter(t => t.type == "HEADER")[0]?.text ?? ""} </Text>
-
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {options?.components?.filter(t => t.type == "HEADER")[0]?.variables.length > 0 && (
             <Text> Variables  </Text>
           )}
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {options?.components?.filter(t => t.type == "HEADER")[0]?.variables?.map((variable, index) => {
             return (
               <TextInput
@@ -215,6 +246,7 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
                 defaultValue={variable}
                 // value={variable}
                 // onChange={handlePhoneNumberIdChange}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 onChange={(val) => {
                   // console.log("vvvv", val);
@@ -230,15 +262,22 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
         </VStack>
       )}
 
-
+      {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
 
       {options?.components?.filter(t => t.type == "BODY").length > 0 && (
         <VStack spacing={1} >
           <FormLabel>Body</FormLabel>
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           <Text> {options?.components?.filter(t => t.type == "BODY")[0]?.text ?? ""} </Text>
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {options?.components?.filter(t => t.type == "BODY")[0]?.variables.length > 0 && (
             <Text> Variables  </Text>
           )}
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           {options?.components?.filter(t => t.type == "BODY")[0]?.variables?.map((variable, index) => {
             return (
               <TextInput
@@ -246,6 +285,7 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
                 defaultValue={variable}
                 // value={variable}
                 // onChange={handlePhoneNumberIdChange}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 onChange={(val) => {
                   // console.log("vvvv", val);
@@ -260,11 +300,13 @@ export const InitiateMessage = ({ options, onOptionsChange }) => {
           })}
         </VStack>
       )}
-      { /*  @ts-ignore */}
+      {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
       {selectedTemplate && selectedTemplate.components.filter(t => t.type == "FOOTER").length > 0 && (
         <VStack spacing={1} >
           <FormLabel> Footer  </FormLabel>
-          { /*  @ts-ignore */}
+          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore */ }
           <Text> {selectedTemplate.components.filter(t => t.type == "FOOTER")[0]?.text} </Text>
         </VStack>
       )}

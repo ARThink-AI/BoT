@@ -36,6 +36,8 @@ export const WhatsAppSettings = ({
   const updateTask = (task: WhatsappTask) => {
     switch (task) {
       case 'Initiate Message': {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         onOptionsChange({
           credentialsId: options?.credentialsId,
           task

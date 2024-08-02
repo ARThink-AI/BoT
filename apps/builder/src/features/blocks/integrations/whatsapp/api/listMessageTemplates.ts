@@ -43,7 +43,7 @@ export const listMessageTemplates = authenticatedProcedure.meta({
   }).json();
 
   const {
-    data: { expires_at, scopes, app_id, application },
+    data: { app_id },
   } = (await got(
     `https://graph.facebook.com/v17.0/debug_token?input_token=${data?.systemAccessToken}`,
     {

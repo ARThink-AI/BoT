@@ -11,13 +11,17 @@ import { ExecuteIntegrationResponse } from '../../../types'
 import prisma from '@typebot.io/lib/prisma'
 import { decrypt } from "@typebot.io/lib/api/encryption/decrypt";
 import { resumeWhatsappExecution } from "./resumeWhatsappBlock";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 function fillText(template, variables) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return template.replace(/{{(\d+)}}/g, (match, number) => {
     return variables[number - 1];
   });
 }
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 function containsBraces(str) {
   return /{{.*?}}/.test(str);
 }
@@ -62,12 +66,16 @@ export const initiateMessage = async (data: { systemAccessToken: string }, block
   try {
     // console.log("opttttttttttt", JSON.stringify(block.options));
     const payload = [];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     let components = block.options.components;
     for (let i = 0; i < components.length; i++) {
       if (components[i].type == "BODY" && containsBraces(components[i].text)) {
         let obj = { type: "BODY", parameters: [] };
 
         for (let j = 0; j < components[i].variables.length; j++) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           obj.parameters.push({ type: "text", text: components[i].variables[j] })
         }
         payload.push(obj);
@@ -76,6 +84,8 @@ export const initiateMessage = async (data: { systemAccessToken: string }, block
         let obj = { type: "HEADER", parameters: [] };
 
         for (let j = 0; j < components[i].variables.length; j++) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           obj.parameters.push({ type: "text", text: components[i].variables[j] })
         }
         payload.push(obj);
@@ -91,10 +101,16 @@ export const initiateMessage = async (data: { systemAccessToken: string }, block
     if (payload.length > 0) {
       lastPayload = {
         messaging_product: "whatsapp",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         to: block.options?.to,
         type: "template",
         template: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           name: block.options?.selectedTemplateName,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           language: { code: block.options?.selectedTemplateLang },
           components: payload
 
@@ -105,10 +121,16 @@ export const initiateMessage = async (data: { systemAccessToken: string }, block
     } else {
       lastPayload = {
         messaging_product: "whatsapp",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         to: block.options?.to,
         type: "template",
         template: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           name: block.options?.selectedTemplateName,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           language: { code: block.options?.selectedTemplateLang }
 
         }
@@ -132,7 +154,9 @@ export const initiateMessage = async (data: { systemAccessToken: string }, block
     //     scopes: string[]
     //   }
     // }
-    const messageResponse = await got.post(`https://graph.facebook.com/v20.0/${block.options?.phoneNumberId}/messages`, {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const messageResponse = await got.post(`https://graph.facebook.com/v20.0/${block?.options?.phoneNumberId}/messages`, {
       json: lastPayload,
       headers: {
         "Content-Type": "application/json",

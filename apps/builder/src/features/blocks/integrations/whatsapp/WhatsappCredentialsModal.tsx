@@ -20,40 +20,27 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
+
   ModalCloseButton,
   ModalBody,
   Stack,
   ModalFooter,
-  Stepper,
-  useSteps,
-  Step,
-  StepIndicator,
-  Box,
-  StepIcon,
-  StepNumber,
-  StepSeparator,
-  StepStatus,
-  StepTitle,
+
   UnorderedList,
   ListItem,
   Text,
   Image,
   Button,
-  HStack,
-  IconButton,
-  Heading,
+
   OrderedList,
   Link,
   Code,
-  Input,
-  InputGroup,
-  InputRightElement,
+
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
 import { ExternalLinkIcon } from '@/components/icons'
-import { isEmpty, isNotEmpty } from '@typebot.io/lib/utils'
+import { isNotEmpty } from '@typebot.io/lib/utils'
 
 // import { useToast } from '@/hooks/useToast'
 type Props = {
@@ -101,6 +88,7 @@ export const WhatsappCredentialsModal = ({
     },
     { enabled: isNotEmpty(systemAccessToken) }
   )
+  console.log("token info data", tokenInfoData);
   const isTokenValid = async () => {
     console.log("is token valid check called");
     setIsVerifying(true)
