@@ -48,6 +48,23 @@ export const executeWhatsappBlock = async (
   )) as { systemAccessToken: string };
   console.log("data decrypted", data);
   if (block.options.task == "Initiate Message") {
+    let variableRegex = /{{(.*?)}}/g;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    let variables = block.options?.to?.match(variableRegex);
+    if (variables) {
+      for (let variable of variables) {
+        let variableName = variable.slice(2, -2);
+        let typebotVariable = typebot.variables.find((variable) => variable.name === variableName);
+        if (typebotVariable) {
+          let variableValue = typebotVariable.value;
+          console.log("variableValue", variableValue);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          block.options.to = block.options?.to?.replace(variable, variableValue);
+        }
+      }
+    }
     const { response: webhookResponse, logs: executeWebhookLogs } =
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -64,7 +81,7 @@ export const executeWhatsappBlock = async (
 export const initiateMessage = async (data: { systemAccessToken: string }, block: WhatsappBlock): Promise<{ response: WebhookResponse; logs?: ReplyLog[] }> => {
   const logs: ReplyLog[] = [];
   try {
-    // console.log("opttttttttttt", JSON.stringify(block.options));
+    console.log("opttttttttttt", JSON.stringify(block.options));
     const payload = [];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
