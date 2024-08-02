@@ -23,6 +23,36 @@ const initialOptionsSchema = z
 
 const initiateMessageOptionsSchema = z.object({
   task: z.literal(whatsappTasks[0]),
+  to: z.string().optional(),
+  variableId: z.string().optional(),
+  phoneNumberId: z.string().optional(),
+  selectedTemplateName: z.string().optional(),
+  selectedTemplateId: z.string().optional(),
+  selectedTemplateLang: z.string().optional(),
+  components: z.array(z.object({
+    type: z.string(),
+    text: z.string().optional(),
+    variables: z.array(z.string()).default([]),
+    // image: z.object({ link: z.string() }).optional(),
+    image: z.boolean().optional(),
+    location: z.object({ latitude: z.string(), longitude: z.string(), name: z.string().optional(), address: z.string().optional() }).optional()
+  })).default([]),
+
+  // templateInfo: z.object({
+  //   id: z.string(),
+  //   name: z.string(),
+  //   language: z.string(),
+  //   status: z.string(),
+  //   category: z.string(),
+  //   sub_category: z.string().optional(),
+  //   components: z.array(z.object({
+  //     type: z.string(),
+  //     text: z.string().optional(),
+  //     image: z.object({ link: z.string() }).optional(),
+  //     location: z.object({ latitude: z.string(), longitude: z.string(), name: z.string().optional(), address: z.string().optional() }).optional()
+  //   })).optional(),
+
+  // }).optional()
 
 }).merge(whatsappBaseOptionsSchema);
 

@@ -37,7 +37,8 @@ export const trpcRouter = router({
   openAI: openAIRouter,
   generateUploadUrl,
   zemanticAi: zemanticAiRouter,
-  trudesk: trudeskRouter
+  trudesk: trudeskRouter,
+  Whatsapp: WhatsappRouter
 })
 
 export type AppRouter = typeof trpcRouter
