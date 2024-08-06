@@ -41,6 +41,14 @@ const baseEnv = {
     .string()
     .min(1)
     .transform((string) => string.split(',')) ,
+    NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE : z
+    .string()
+    .min(1)
+    .transform((string) => string.split(',')) ,
+    NEXT_PUBLIC_FLOWISE_SOCKET_URL : z
+    .string()
+    .min(1)
+    .transform((string) => string.split(',')) ,
     NEXT_PUBLIC_BUILDER_URL :    z
     .string()
     .min(1)
@@ -55,6 +63,8 @@ const baseEnv = {
     NEXT_PUBLIC_FLOWISE_URL : getRuntimeVariable('NEXT_PUBLIC_FLOWISE_URL'),
     NEXT_PUBLIC_BUILDER_URL : getRuntimeVariable('NEXT_PUBLIC_BUILDER_URL'),
     NEXT_PUBLIC_INTERNAL_FLOWISE_ROUTE : getRuntimeVariable('NEXT_PUBLIC_INTERNAL_FLOWISE_ROUTE'),
+    NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE : getRuntimeVariable('NEXT_PUBLIC_INTERNAL_VIEWER_ROUTE'),
+    NEXT_PUBLIC_FLOWISE_SOCKET_URL : getRuntimeVariable('NEXT_PUBLIC_FLOWISE_SOCKET_URL'),
     NEXT_PUBLIC_VIEWER_INTERNAL_URL: getRuntimeVariable(
       'NEXT_PUBLIC_VIEWER_INTERNAL_URL'
     ),
@@ -141,7 +151,11 @@ const customOAuthEnv = {
 const googleEnv = {
   server: {
     GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOEY_AI_KEY : z.string().min(1).optional(),
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    GOOGLE_PROJECT_ID:   z.string().min(1).optional(),
+    TWILIO_AUTH_TOKEN : z.string().min(1).optional(),
+    GOOGLE_PROJECT_CREDENTIALS : z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_GOOGLE_API_KEY: z.string().min(1).optional(),
@@ -157,20 +171,10 @@ const stripeEnv = {
   server: {
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-    STRIPE_STARTER_PRODUCT_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_YEARLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_CHATS_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_CHATS_YEARLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_STORAGE_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_STARTER_STORAGE_YEARLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_PRODUCT_ID: z.string().min(1).optional(),
-    STRIPE_PRO_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_YEARLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_CHATS_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_CHATS_YEARLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_STORAGE_MONTHLY_PRICE_ID: z.string().min(1).optional(),
-    STRIPE_PRO_STORAGE_YEARLY_PRICE_ID: z.string().min(1).optional(),
+    STRIPE_STARTER_PRICE_ID: z.string().min(1).optional(),
+    STRIPE_STARTER_CHATS_PRICE_ID: z.string().min(1).optional(),
+    STRIPE_PRO_PRICE_ID: z.string().min(1).optional(),
+    STRIPE_PRO_CHATS_PRICE_ID: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string().min(1).optional(),
@@ -193,6 +197,15 @@ const s3Env = {
     S3_REGION: z.string().min(1).optional(),
     S3_PUBLIC_CUSTOM_DOMAIN: z.string().url().optional(),
   },
+}
+const azureBlobEnv = {
+  server : {
+    AZURE_BLOB_ACCOUNT_NAME : z.string().min(1).optional(),
+    AZURE_BLOB_ACCOUNT_KEY : z.string().min(1).optional(),
+    AZURE_BLOB_CONNECTION_STRING : z.string().min(1).optional() ,
+    AZURE_BLOB_CONTAINER_NAME: z.string().min(1).optional(),
+    AZURE_BLOB_PUBLIC_CUSTOM_DOMAIN :  z.string().min(1).optional(),
+  }
 }
 
 const giphyEnv = {
@@ -308,6 +321,7 @@ export const env = createEnv({
     ...smtpEnv.server,
     ...googleEnv.server,
     ...stripeEnv.server,
+    ...azureBlobEnv.server,
     ...s3Env.server,
     ...vercelEnv.server,
     ...sleekPlanEnv.server,

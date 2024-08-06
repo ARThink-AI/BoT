@@ -60,6 +60,7 @@ export const EmbedBubble = ({ block, onTransitionEnd }: Props) => {
             {isTyping ? <TypingBubble /> : <></>}
           </div>
           <iframe
+            allow="camera"
             id="embed-bubble-content"
             src={url}
             className={

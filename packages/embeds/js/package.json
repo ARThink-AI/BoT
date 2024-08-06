@@ -1,6 +1,6 @@
 {
   "name": "@typebot.io/js",
-  "version": "0.2.5",
+  "version": "0.2.9",
   "description": "Javascript library to display typebots on your website",
   "type": "module",
   "main": "dist/index.js",
@@ -12,6 +12,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@zxing/library" : "0.20.0",
+    "socket.io-client":  "4.7.2",
+    "razorpay" :"2.9.2",
     "@stripe/stripe-js": "1.54.1",
     "@udecode/plate-common": "^21.1.5",
     "dompurify": "^3.0.6",
@@ -21,6 +24,7 @@
     "solid-js": "1.7.8"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs":"24.0.0",
     "@babel/preset-typescript": "7.22.5",
     "@rollup/plugin-babel": "6.0.3",
     "@rollup/plugin-node-resolve": "15.1.0",

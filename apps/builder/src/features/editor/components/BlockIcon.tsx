@@ -7,6 +7,7 @@ import {
   BlockType,
 } from '@typebot.io/schemas'
 import React from 'react'
+import { WhatsAppLogo } from '@/components/logos/WhatsAppLogo'
 import { FlagIcon, SendEmailIcon, WebhookIcon } from '@/components/icons'
 import { WaitIcon } from '@/features/blocks/logic/wait/components/WaitIcon'
 import { ScriptIcon } from '@/features/blocks/logic/script/components/ScriptIcon'
@@ -41,7 +42,7 @@ import { AbTestIcon } from '@/features/blocks/logic/abTest/components/AbTestIcon
 import { PictureChoiceIcon } from '@/features/blocks/inputs/pictureChoice/components/PictureChoiceIcon'
 import { PixelLogo } from '@/features/blocks/integrations/pixel/components/PixelLogo'
 import { ZemanticAiLogo } from '@/features/blocks/integrations/zemanticAi/ZemanticAiLogo'
-import { FlowwiseLogo  } from "@/features/blocks/integrations/flowwise/components/FlowwiseLogo";
+import { FlowwiseLogo } from "@/features/blocks/integrations/flowwise/components/FlowwiseLogo";
 type BlockIconProps = { type: BlockType } & IconProps
 
 export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
@@ -77,6 +78,10 @@ export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
       return <ButtonsInputIcon color={orange} {...props} />
     case InputBlockType.PICTURE_CHOICE:
       return <PictureChoiceIcon color={orange} {...props} />
+    case InputBlockType.BARCODE_READER:
+      return <img style={{ height: "1em", width: "1em" }} src="https://quadz.blob.core.windows.net/demo1/camera_1105083.png" />
+    case InputBlockType.CARD:
+      return <PaymentInputIcon color={orange} {...props} />
     case InputBlockType.PAYMENT:
       return <PaymentInputIcon color={orange} {...props} />
     case InputBlockType.RATING:
@@ -117,12 +122,16 @@ export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
       return <ChatwootLogo {...props} />
     case IntegrationBlockType.OPEN_AI:
       return <OpenAILogo fill={openAIColor} {...props} />
+    case IntegrationBlockType.TRUDESK:
+      return <WebhookIcon {...props} />
+    case IntegrationBlockType.WHATSAPP:
+      return <WhatsAppLogo {...props} />
     case IntegrationBlockType.PIXEL:
       return <PixelLogo {...props} />
     case IntegrationBlockType.ZEMANTIC_AI:
       return <ZemanticAiLogo {...props} />
     case IntegrationBlockType.FLOWWISE:
-      return <FlowwiseLogo {...props}/>  
+      return <FlowwiseLogo {...props} />
     case 'start':
       return <FlagIcon {...props} />
   }

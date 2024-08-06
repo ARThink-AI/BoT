@@ -42,6 +42,15 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
       return <Text fontSize="sm">{scopedT('button.label')}</Text>
     case InputBlockType.PICTURE_CHOICE:
       return <Text fontSize="sm">{scopedT('picChoice.label')}</Text>
+    case InputBlockType.BARCODE_READER:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+      //@ts-ignore
+      return <Text fontSize="sm">{scopedT('barCodeReader.label')}</Text>
+    case InputBlockType.CARD:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+      //@ts-ignore
+      return <Text fontSize="sm">{scopedT('card.label')}</Text>
+
     case InputBlockType.PAYMENT:
       return <Text fontSize="sm">{scopedT('payment.label')}</Text>
     case InputBlockType.RATING:
@@ -82,11 +91,15 @@ export const BlockLabel = ({ type }: Props): JSX.Element => {
       return <Text fontSize="sm">{scopedT('chatwoot.label')}</Text>
     case IntegrationBlockType.OPEN_AI:
       return <Text fontSize="sm">{scopedT('openai.label')}</Text>
+    case IntegrationBlockType.TRUDESK:
+      return <Text fontSize="sm">{scopedT('trudesk.label')}</Text>
+    case IntegrationBlockType.WHATSAPP:
+      return <Text fontSize={"sm"} > {scopedT("whatsapp.label")} </Text>
     case IntegrationBlockType.PIXEL:
       return <Text fontSize="sm">{scopedT('pixel.label')}</Text>
     case IntegrationBlockType.ZEMANTIC_AI:
       return <Text fontSize="sm">{scopedT('zemanticAi.label')}</Text>
     case IntegrationBlockType.FLOWWISE:
-        return <Text fontSize="sm">{scopedT('flowwise.label')}</Text>   
+      return <Text fontSize="sm">{scopedT('flowwise.label')}</Text>
   }
 }

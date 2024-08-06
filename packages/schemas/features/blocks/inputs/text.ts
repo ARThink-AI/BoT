@@ -15,11 +15,13 @@ export const textInputOptionsSchema = textInputOptionsBaseSchema
   .merge(
     z.object({
       isLong: z.boolean(),
+      isWordCloud:  z.boolean().optional()
     })
   )
 
 export const defaultTextInputOptions: TextInputOptions = {
   isLong: false,
+  
   labels: { button: defaultButtonLabel, placeholder: 'Type your answer...' },
 }
 

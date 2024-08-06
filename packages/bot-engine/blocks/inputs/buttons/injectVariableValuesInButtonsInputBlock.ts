@@ -20,7 +20,9 @@ export const injectVariableValuesInButtonsInputBlock =
           variable.id === block.options.dynamicVariableId &&
           isDefined(variable.value)
       ) as VariableWithValue | undefined
-      if (!variable) return block
+      if (!variable) return block;
+      
+
       const value = getVariableValue(state)(variable)
       return {
         ...block,
@@ -43,8 +45,10 @@ const getVariableValue =
       const [transformedVariable] = transformStringVariablesToList(variables)([
         variable.id,
       ])
+      
       updateVariablesInSession(state)([transformedVariable])
       return transformedVariable.value as string[]
     }
+   
     return variable.value
   }

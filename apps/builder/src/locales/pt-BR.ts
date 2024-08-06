@@ -254,6 +254,8 @@ export default {
   'editor.sidebarBlock.pabbly.label': 'Pabbly',
   'editor.sidebarBlock.chatwoot.label': 'Chatwoot',
   'editor.sidebarBlock.openai.label': 'OpenAI',
+  'editor.sidebarBlock.trudesk.label': 'Quadz',
+  'editor.sidebarBlock.whatsapp.label' : 'Whatsapp',
   'editor.sidebarBlock.pixel.label': 'Pixel',
   'editor.sidebarBlock.zemanticAi.label': 'Zemantic AI',
   'editor.sidebarBlock.flowwise.label': 'Flow Wise',
@@ -322,6 +324,7 @@ export default {
     'Compatível com Youtube, Vimeo e outros',
   'editor.blocks.bubbles.video.settings.worksWith.placeholder':
     'Colar o link do vídeo...',
+  'editor.blocks.bubbles.video.settings.numberInput.unit': 'px',
   'editor.blocks.bubbles.textEditor.plate.label': 'Editor de texto',
   'editor.blocks.bubbles.textEditor.searchVariable.placeholder':
     'Pesquisar uma variável',

@@ -23,6 +23,8 @@ import { EmailInputNodeContent } from '@/features/blocks/inputs/emailInput/compo
 import { FileInputContent } from '@/features/blocks/inputs/fileUpload/components/FileInputContent'
 import { NumberNodeContent } from '@/features/blocks/inputs/number/components/NumberNodeContent'
 import { PaymentInputContent } from '@/features/blocks/inputs/payment/components/PaymentInputContent'
+import { BarCodeInputContent } from '@/features/blocks/inputs/barCodeReader/components/BarCodeReaderContent';
+import { CardInputContent } from '@/features/blocks/inputs/card/components/CardContent';
 import { PhoneNodeContent } from '@/features/blocks/inputs/phone/components/PhoneNodeContent'
 import { RatingInputContent } from '@/features/blocks/inputs/rating/components/RatingInputContent'
 import { TextInputNodeContent } from '@/features/blocks/inputs/textInput/components/TextInputNodeContent'
@@ -45,7 +47,8 @@ import { PictureChoiceNode } from '@/features/blocks/inputs/pictureChoice/compon
 import { PixelNodeBody } from '@/features/blocks/integrations/pixel/components/PixelNodeBody'
 import { useScopedI18n } from '@/locales'
 import { ZemanticAiNodeBody } from '@/features/blocks/integrations/zemanticAi/ZemanticAiNodeBody'
-
+import { TrudeskNodeBody } from '@/features/blocks/integrations/trudesk/TrudeskNodeBody'
+import { WhatsappNodeBody } from '@/features/blocks/integrations/whatsapp/WhatsappNodeBody'
 type Props = {
   block: Block | StartBlock
   indices: BlockIndices
@@ -106,6 +109,12 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
     }
     case InputBlockType.PICTURE_CHOICE: {
       return <PictureChoiceNode block={block} indices={indices} />
+    }
+    case InputBlockType.BARCODE_READER: {
+      return <BarCodeInputContent block={block} />
+    }
+    case InputBlockType.CARD: {
+      return <CardInputContent block={block} />
     }
     case InputBlockType.PHONE: {
       return (
@@ -198,6 +207,20 @@ export const BlockNodeContent = ({ block, indices }: Props): JSX.Element => {
         />
       )
     }
+    case IntegrationBlockType.TRUDESK:
+      return (
+        <TrudeskNodeBody
+          task={block.options.task}
+          variableId={"variableId" in block.options ? block.options.variableId : ""}
+        />
+      )
+    case IntegrationBlockType.WHATSAPP:
+      return (
+        <WhatsappNodeBody
+          task={block.options.task}
+        // variableId={"variableId" in block.options ? block.options.variableId : ""}
+        />
+      )
     case IntegrationBlockType.PIXEL: {
       return <PixelNodeBody options={block.options} />
     }

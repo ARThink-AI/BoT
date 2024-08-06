@@ -81,6 +81,7 @@ export const executeWebhookBlock = async (
     }
   const { response: webhookResponse, logs: executeWebhookLogs } =
     await executeWebhook(parsedWebhook)
+  console.log("execute webhook response", JSON.stringify(webhookResponse)  )  
   return resumeWebhookExecution({
     state,
     block,
@@ -132,7 +133,8 @@ const parseWebhookAttributes =
       convertKeyValueTableToObject(webhook.queryParams, typebot.variables)
     )
     const bodyContent = await getBodyContent({
-      body:  block.type == "Flow Wise" ?  JSON.stringify({ question : state.typebotsQueue[0].answers[0].value  }): webhook.body,
+      // body:  block.type == "Flow Wise" ?  JSON.stringify({ question : state.typebotsQueue[0].answers[0].value  }): webhook.body,
+      body: webhook.body,
       answers,
       variables: typebot.variables,
     });
@@ -219,7 +221,8 @@ export const executeWebhook = async (
         description: `Webhook successfuly executed.`,
         details: {
           statusCode: response.statusCode,
-          request,
+          body:  request.body,
+          // request,
           response: safeJsonParse(response.body).data,
         },
       })
@@ -244,7 +247,8 @@ export const executeWebhook = async (
         description: `Webhook returned an error.`,
         details: {
           statusCode: error.response.statusCode,
-          request,
+          body:  request.body,
+          // request,
           response,
         },
       })
@@ -259,7 +263,8 @@ export const executeWebhook = async (
       status: 'error',
       description: `Webhook failed to execute.`,
       details: {
-        request,
+        body:  request.body,
+        // request,
         response,
       },
     })

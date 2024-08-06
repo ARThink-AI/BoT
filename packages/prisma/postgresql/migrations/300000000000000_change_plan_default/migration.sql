@@ -1,0 +1,3 @@
+ALTER TABLE "Workspace"
+ALTER COLUMN "plan"
+SET DEFAULT 'PRO';

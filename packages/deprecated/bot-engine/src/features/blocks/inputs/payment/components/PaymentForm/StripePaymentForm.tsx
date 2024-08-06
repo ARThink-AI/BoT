@@ -22,6 +22,7 @@ export const StripePaymentForm = ({ options, onSuccess }: Props) => {
     typebot: { variables },
     onNewLog,
   } = useTypebot()
+  console.log("payment stripe loaded");
   const [stripe, setStripe] = useState<Stripe | null>(null)
   const [clientSecret, setClientSecret] = useState('')
   const [amountLabel, setAmountLabel] = useState('')

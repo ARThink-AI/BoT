@@ -9,16 +9,20 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  FormLabel,
 } from '@chakra-ui/react'
 import { DropdownList } from '@/components/DropdownList'
+import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import {
   PaymentAddress,
   PaymentInputOptions,
   PaymentProvider,
+  Variable
 } from '@typebot.io/schemas'
 import React, { ChangeEvent } from 'react'
 import { currencies } from '../currencies'
 import { StripeConfigModal } from './StripeConfigModal'
+import { RazorPayConfigModal  } from "./RazorPayXConfigModal"
 import { CredentialsDropdown } from '@/features/credentials/components/CredentialsDropdown'
 import { TextInput } from '@/components/inputs'
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
@@ -32,7 +36,8 @@ type Props = {
 export const PaymentSettings = ({ options, onOptionsChange }: Props) => {
   const { workspace } = useWorkspace()
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const handleVariableChange = (variable?: Variable) =>
+  onOptionsChange({ ...options, variableId: variable?.id })
   const updateProvider = (provider: PaymentProvider) => {
     onOptionsChange({
       ...options,
@@ -100,7 +105,7 @@ export const PaymentSettings = ({ options, onOptionsChange }: Props) => {
       ...options,
       additionalInformation: { ...options.additionalInformation, address },
     })
-
+  console.log("options provider", options.provider );
   return (
     <Stack spacing={4}>
       <Stack>
@@ -115,12 +120,14 @@ export const PaymentSettings = ({ options, onOptionsChange }: Props) => {
         <Text>Account:</Text>
         {workspace && (
           <CredentialsDropdown
-            type="stripe"
+            // type="stripe"
+            type={ options.provider == "Razorpay" ? "razorpay" : "stripe" }
             workspaceId={workspace.id}
             currentCredentialsId={options.credentialsId}
             onCredentialsSelect={updateCredentials}
             onCreateNewClick={onOpen}
-            credentialsName="Stripe account"
+            // credentialsName="Stripe account"
+            credentialsName={ options.provider == "Razorpay" ? "Razorpay account" : "Stripe account" }
           />
         )}
       </Stack>
@@ -158,6 +165,15 @@ export const PaymentSettings = ({ options, onOptionsChange }: Props) => {
         defaultValue={options.labels.success ?? 'Success'}
         placeholder="Success"
       />
+      <Stack>
+        <FormLabel mb="0" htmlFor="variable">
+          Save payload in a variable:
+        </FormLabel>
+        <VariableSearchInput
+          initialVariableId={options.variableId}
+          onSelectVariable={handleVariableChange}
+        />
+      </Stack>
       <Accordion allowToggle>
         <AccordionItem>
           <AccordionButton justifyContent="space-between">
@@ -193,15 +209,26 @@ export const PaymentSettings = ({ options, onOptionsChange }: Props) => {
               address={options.additionalInformation?.address}
               onAddressChange={updateAddress}
             />
+            
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-
-      <StripeConfigModal
+       {  options.provider == "Razorpay" ? (
+         <RazorPayConfigModal
+         
+         isOpen={isOpen}
+         onClose={onClose}
+         onNewCredentials={updateCredentials}
+         />
+       ) : (
+<StripeConfigModal
+       
         isOpen={isOpen}
         onClose={onClose}
         onNewCredentials={updateCredentials}
       />
+       )  }
+      
     </Stack>
   )
 }

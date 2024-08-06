@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { env } from '@typebot.io/env'
 import { TRPCError } from '@trpc/server'
 import { generatePresignedPostPolicy } from '@typebot.io/lib/s3/generatePresignedPostPolicy'
+import { generatePresignedPostPolicyBlob } from '@typebot.io/lib/azure-blob/generatePresignedPostPolicy'
 import prisma from '@typebot.io/lib/prisma'
 import { isWriteWorkspaceForbidden } from '@/features/workspace/helpers/isWriteWorkspaceForbidden'
 import { isWriteTypebotForbidden } from '@/features/typebot/helpers/isWriteTypebotForbidden'
@@ -58,12 +59,16 @@ export const generateUploadUrl = authenticatedProcedure
       fileUrl: z.string(),
     })
   )
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   .mutation(async ({ input: { filePathProps, fileType }, ctx: { user } }) => {
-    if (!env.S3_ENDPOINT || !env.S3_ACCESS_KEY || !env.S3_SECRET_KEY)
+    if (
+      (!env.S3_ENDPOINT && !env.S3_ACCESS_KEY && !env.S3_SECRET_KEY) ||
+      (!env.AZURE_BLOB_CONNECTION_STRING && !env.AZURE_BLOB_CONTAINER_NAME)
+    )
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message:
-          'S3 not properly configured. Missing one of those variables: S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY',
+        message: 'File upload not configured properly',
       })
 
     if ('resultId' in filePathProps && !user)
@@ -76,18 +81,35 @@ export const generateUploadUrl = authenticatedProcedure
       authenticatedUserId: user?.id,
       uploadProps: filePathProps,
     })
+    if (env.S3_ENDPOINT && env.S3_ACCESS_KEY && env.S3_SECRET_KEY) {
+      const presignedPostPolicy = await generatePresignedPostPolicy({
+        fileType,
+        filePath,
+      })
 
-    const presignedPostPolicy = await generatePresignedPostPolicy({
-      fileType,
-      filePath,
-    })
+      return {
+        presignedUrl: presignedPostPolicy.postURL,
+        formData: presignedPostPolicy.formData,
+        fileUrl: env.S3_PUBLIC_CUSTOM_DOMAIN
+          ? `${env.S3_PUBLIC_CUSTOM_DOMAIN}/${filePath}`
+          : `${presignedPostPolicy.postURL}/${presignedPostPolicy.formData.key}`,
+      }
+    } else if (
+      env.AZURE_BLOB_CONNECTION_STRING &&
+      env.AZURE_BLOB_CONTAINER_NAME
+    ) {
+      const presignedPostPolicy = await generatePresignedPostPolicyBlob({
+        fileType,
+        filePath,
+      })
 
-    return {
-      presignedUrl: presignedPostPolicy.postURL,
-      formData: presignedPostPolicy.formData,
-      fileUrl: env.S3_PUBLIC_CUSTOM_DOMAIN
-        ? `${env.S3_PUBLIC_CUSTOM_DOMAIN}/${filePath}`
-        : `${presignedPostPolicy.postURL}/${presignedPostPolicy.formData.key}`,
+      return {
+        presignedUrl: presignedPostPolicy.presignedUrl,
+        formData: presignedPostPolicy.formData,
+        fileUrl: env.AZURE_BLOB_PUBLIC_CUSTOM_DOMAIN
+          ? `${env.AZURE_BLOB_PUBLIC_CUSTOM_DOMAIN}/${filePath}`
+          : `${presignedPostPolicy.presignedUrl}/${presignedPostPolicy.formData.key}`,
+      }
     }
   })
 

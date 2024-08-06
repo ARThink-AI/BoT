@@ -1,3 +1,4 @@
+// import { Input } from '@chakra-ui/react'
 import { createId } from '@paralleldrive/cuid2'
 import {
   isBubbleBlockType,
@@ -45,9 +46,10 @@ import {
   BlockWithItems,
   defaultTypebotLinkOptions,
   zemanticAiDefaultOptions,
+  defaultCardInputOptions
 } from '@typebot.io/schemas'
 import { defaultPictureChoiceOptions } from '@typebot.io/schemas/features/blocks/inputs/pictureChoice'
-
+import { defaultBarCodeInputOptions } from "@typebot.io/schemas/features/blocks/inputs/barCode";
 const parseDefaultItems = (
   type: BlockWithItems['type'],
   blockId: string
@@ -107,6 +109,10 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
       return defaultChoiceInputOptions
     case InputBlockType.PICTURE_CHOICE:
       return defaultPictureChoiceOptions
+    case InputBlockType.BARCODE_READER:
+      return defaultBarCodeInputOptions
+    case InputBlockType.CARD:
+      return defaultCardInputOptions
     case InputBlockType.PAYMENT:
       return defaultPaymentInputOptions
     case InputBlockType.RATING:
@@ -135,13 +141,17 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
     case IntegrationBlockType.PABBLY_CONNECT:
     case IntegrationBlockType.MAKE_COM:
     case IntegrationBlockType.WEBHOOK:
-    case IntegrationBlockType.FLOWWISE:  
+    case IntegrationBlockType.FLOWWISE:
       return defaultWebhookOptions(createId())
     case IntegrationBlockType.EMAIL:
       return defaultSendEmailOptions
     case IntegrationBlockType.CHATWOOT:
       return defaultChatwootOptions
     case IntegrationBlockType.OPEN_AI:
+      return {}
+    case IntegrationBlockType.TRUDESK:
+      return {}
+    case IntegrationBlockType.WHATSAPP:
       return {}
     case IntegrationBlockType.PIXEL:
       return {}

@@ -38,16 +38,19 @@ export const LiteBadge = (props: Props) => {
   })
 
   return (
+    <div style={{ width:  "100%" , height:  "30px" , background : "#929292" , display : "flex" , "justify-content" : "center" , "align-items" : "center", position : "absolute" , bottom : 0 , left:  0 }} >
     <a
       ref={liteBadge}
       href={'https://arthink.ai/'}
       target="_blank"
       rel="noopener noreferrer"
-      class="lite-badge"
-      id="lite-badge"
+      style={{ "text-decoration" : "none"  }}
+      // class="lite-badge"
+      // id="lite-badge"
     >
       {/* <TypebotLogo /> */}
-      <span style={{ "font-size" : "8px" }} > Powered by Quadz</span>
+      <span style={{ "font-size" : "11px" , color : "white" }} > ⚡ Powered by Quadz</span>
     </a>
+   </div>
   )
 }

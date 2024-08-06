@@ -11,6 +11,13 @@
     "test:report": "pnpm playwright show-report"
   },
   "dependencies": {
+    "twilio": "^5.0.4",
+    "socket.io-client":"4.7.2",
+    "@google-cloud/translate" : "8.0.2",
+    "@google-cloud/speech": "^6.1.0",
+    "@google-cloud/text-to-speech" : "^5.0.1",
+    "qrcode":  "1.5.3",
+    "uuid":  "9.0.1",
     "@planetscale/database": "^1.8.0",
     "@sentry/nextjs": "7.73.0",
     "@trpc/server": "10.40.0",
@@ -41,6 +48,7 @@
     "@typebot.io/lib": "workspace:*",
     "@typebot.io/schemas": "workspace:*",
     "@typebot.io/tsconfig": "workspace:*",
+    
     "@types/cors": "2.8.13",
     "@types/node": "20.4.2",
     "@types/nodemailer": "6.4.8",

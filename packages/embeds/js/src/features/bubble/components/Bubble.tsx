@@ -14,7 +14,7 @@ import { isDefined } from '@typebot.io/lib'
 import { BubbleParams } from '../types'
 import { Bot, BotProps } from '../../../components/Bot'
 import { getPaymentInProgressInStorage } from '@/features/blocks/inputs/payment/helpers/paymentInProgressStorage'
-
+import { io } from "socket.io-client";
 export type BubbleProps = BotProps &
   BubbleParams & {
     onOpen?: () => void
@@ -23,6 +23,7 @@ export type BubbleProps = BotProps &
   }
 
 export const Bubble = (props: BubbleProps) => {
+  console.log("this bubble file is called before rendering");
   const [bubbleProps, botProps] = splitProps(props, [
     'onOpen',
     'onClose',
@@ -46,8 +47,25 @@ export const Bubble = (props: BubbleProps) => {
 
   const [isBotOpened, setIsBotOpened] = createSignal(false)
   const [isBotStarted, setIsBotStarted] = createSignal(false)
+  const [ socketInstance , setSocketInstance  ] = createSignal(null);
 
   onMount(() => {
+   console.log("checking socket connection");
+   const socketInstance = io( "http://localhost:3050" ,{
+    reconnection: true, // Enable reconnection
+    reconnectionAttempts: Infinity, // Retry indefinitely
+    reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
+    reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
+  } );
+  socketInstance.on("connect", () => {
+    console.log("socket instance connected for bubble", socketInstance.id );
+    // @ts-ignore
+    setSocketInstance(socketInstance);
+  } );
+
+
+
+
     window.addEventListener('message', processIncomingEvent)
     const autoShowDelay = bubbleProps.autoShowDelay
     const previewMessageAutoShowDelay =
@@ -67,7 +85,9 @@ export const Bubble = (props: BubbleProps) => {
   })
 
   onCleanup(() => {
-    window.removeEventListener('message', processIncomingEvent)
+    window.removeEventListener('message', processIncomingEvent);
+    // @ts-ignore
+    socketInstance.disconnect();
   })
 
   createEffect(() => {
@@ -170,6 +190,7 @@ export const Bubble = (props: BubbleProps) => {
         <Show when={isBotStarted()}>
           <Bot
             {...botProps}
+            socket1={socketInstance()}
             prefilledVariables={prefilledVariables()}
             class="rounded-lg"
           />

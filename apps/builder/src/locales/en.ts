@@ -228,6 +228,8 @@ export default {
   'editor.sidebarBlock.phone.label': 'Phone',
   'editor.sidebarBlock.button.label': 'Buttons',
   'editor.sidebarBlock.picChoice.label': 'Pic choice',
+  'editor.sidebarBlock.barCodeReader.label':  'Scanner',
+  'editor.sidebarBlock.card.label': 'Card',
   'editor.sidebarBlock.payment.label': 'Payment',
   'editor.sidebarBlock.rating.label': 'Rating',
   'editor.sidebarBlock.file.label': 'File',
@@ -247,6 +249,8 @@ export default {
   'editor.sidebarBlock.pabbly.label': 'Pabbly',
   'editor.sidebarBlock.chatwoot.label': 'Chatwoot',
   'editor.sidebarBlock.openai.label': 'OpenAI',
+  'editor.sidebarBlock.trudesk.label': 'Quadz',
+  'editor.sidebarBlock.whatsapp.label' : 'Whatsapp',
   'editor.sidebarBlock.pixel.label': 'Pixel',
   'editor.sidebarBlock.zemanticAi.label': 'Zemantic AI',
   'editor.sidebarBlock.flowwise.label': 'Flow Wise',
@@ -312,6 +316,7 @@ export default {
     'Works with Youtube, Vimeo and others',
   'editor.blocks.bubbles.video.settings.worksWith.placeholder':
     'Paste the video link...',
+  'editor.blocks.bubbles.video.settings.numberInput.unit': 'px',
   'editor.blocks.bubbles.textEditor.plate.label': 'Text editor',
   'editor.blocks.bubbles.textEditor.searchVariable.placeholder':
     'Search for a variable',

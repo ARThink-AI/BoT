@@ -41,7 +41,8 @@ export const resumeWhatsAppFlow = async ({
   const session = await getSession(sessionId)
 
   const isPreview = workspaceId === undefined || credentialsId === undefined
-
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
   const { typebot } = session?.state.typebotsQueue[0] ?? {}
   const messageContent = await getIncomingMessageContent({
     message: receivedMessage,
@@ -59,13 +60,19 @@ export const resumeWhatsAppFlow = async ({
 
   const isSessionExpired =
     session &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
     isDefined(session.state.expiryTimeout) &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
     session?.updatedAt.getTime() + session.state.expiryTimeout < Date.now()
 
   const resumeResponse =
     session && !isSessionExpired
       ? await continueBotFlow(messageContent, {
           version: 2,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
           state: { ...session.state, whatsApp: { contact } },
         })
       : workspaceId
@@ -75,10 +82,10 @@ export const resumeWhatsAppFlow = async ({
           credentials: { ...credentials, id: credentialsId as string },
           contact,
         })
-      : undefined
+      : { error: 'workspaceId not found' }
 
-  if (!resumeResponse) {
-    console.error('Could not find or create session', sessionId)
+  if ('error' in resumeResponse) {
+    console.log('Chat not starting:', resumeResponse.error)
     return {
       message: 'Message received',
     }

@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from '@typebot.io/prisma'
 import { InputBlockType, Typebot } from '@typebot.io/schemas'
 import { deleteFilesFromBucket } from '../../s3/deleteFilesFromBucket'
+import {  deleteFilesFromBlob } from "../../azure-blob/deleteFilesFromBucket";
 
 type ArchiveResultsProps = {
   typebot: Pick<Typebot, 'groups'>
@@ -59,9 +60,14 @@ export const archiveResults =
           },
         })
         if (filesToDelete.length > 0)
-          await deleteFilesFromBucket({
+          // await deleteFilesFromBucket({
+          //   urls: filesToDelete.flatMap((a) => a.content.split(', ')),
+          // })
+          await deleteFilesFromBlob({ 
+
             urls: filesToDelete.flatMap((a) => a.content.split(', ')),
-          })
+          }
+           )
       }
 
       await prisma.$transaction([

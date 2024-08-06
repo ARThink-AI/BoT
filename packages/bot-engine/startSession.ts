@@ -46,7 +46,7 @@ export const startSession = async ({
   userId,
   initialSessionState,
 }: Props): Promise<ChatReply & { newSessionState: SessionState }> => {
-  console.log("start session called");
+  console.log('start session called')
   if (!startParams)
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -75,7 +75,7 @@ export const startSession = async ({
     result && result.variables.length > 0
       ? injectVariablesFromExistingResult(prefilledVariables, result.variables)
       : prefilledVariables
-
+  const timeout = typebot.settings.general.sessionTimout
   const initialState: SessionState = {
     version: '2',
     typebotsQueue: [
@@ -120,8 +120,13 @@ export const startSession = async ({
     isStreamEnabled: startParams.isStreamEnabled,
     typingEmulation: typebot.settings.typingEmulation,
     ...initialSessionState,
+    // expiryTimeout: 1200000,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+    expiryTimeout:  timeout ? parseInt(timeout) * 60 * 1000 :1200000 ,
+    // expiryTimeout : 10000,
   }
-
+  console.log('sessionnnnnnn', initialState.expiryTimeout)
   if (startParams.isOnlyRegistering) {
     return {
       newSessionState: initialState,

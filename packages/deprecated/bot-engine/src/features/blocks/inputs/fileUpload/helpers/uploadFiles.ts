@@ -16,6 +16,7 @@ export const uploadFiles = async ({
   files,
   onUploadProgress,
 }: UploadFileProps): Promise<UrlList> => {
+  console.log('upload files callledddd')
   const urls = []
   let i = 0
   for (const { file, path } of files) {

@@ -23,9 +23,11 @@ export const UploadButton = ({
 
   const { mutate } = trpc.generateUploadUrl.useMutation({
     onSettled: () => {
+      console.log('entered onsettled hereee')
       setIsUploading(false)
     },
     onSuccess: async (data) => {
+      console.log('entereddddddd hereeeeee')
       if (!file) return
       const formData = new FormData()
       Object.entries(data.formData).forEach(([key, value]) => {
@@ -34,6 +36,11 @@ export const UploadButton = ({
       formData.append('file', file)
       const upload = await fetch(data.presignedUrl, {
         method: 'POST',
+        // method: 'PUT',
+        // headers: {
+        //   'x-ms-blob-type': 'BlockBlob',
+        //   'Content-Type': fileType,
+        // },
         body: formData,
       })
 
@@ -47,12 +54,14 @@ export const UploadButton = ({
   })
 
   const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('handle input change called')
     if (!e.target?.files) return
     setIsUploading(true)
     const file = e.target.files[0] as File | undefined
     if (!file)
       return showToast({ description: 'Could not read file.', status: 'error' })
     setFile(await compressFile(file))
+    console.log('handle input change callledd')
     mutate({
       filePathProps,
       fileType: file.type,

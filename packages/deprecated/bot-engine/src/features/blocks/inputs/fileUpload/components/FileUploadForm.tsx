@@ -20,6 +20,7 @@ export const FileUploadForm = ({
   onSubmit,
   onSkip,
 }: Props) => {
+  console.log("file upload files callleddd");
   const { isPreview, currentTypebotId } = useTypebot()
   const { resultId } = useAnswers()
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])

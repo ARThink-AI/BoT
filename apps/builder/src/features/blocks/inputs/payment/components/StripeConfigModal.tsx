@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/useToast'
 import { TextInput } from '@/components/inputs'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
 import { TextLink } from '@/components/TextLink'
-import { StripeCredentials } from '@typebot.io/schemas'
+import { StripeCredentials  } from '@typebot.io/schemas'
 import { trpc } from '@/lib/trpc'
 import { isNotEmpty } from '@typebot.io/lib'
 import { useUser } from '@/features/account/hooks/useUser'
@@ -28,6 +28,7 @@ type Props = {
   isOpen: boolean
   onClose: () => void
   onNewCredentials: (id: string) => void
+  
 }
 
 export const StripeConfigModal = ({
@@ -40,7 +41,7 @@ export const StripeConfigModal = ({
   const [isCreating, setIsCreating] = useState(false)
   const { showToast } = useToast()
   const [stripeConfig, setStripeConfig] = useState<
-    StripeCredentials['data'] & { name: string }
+    StripeCredentials['data']  & { name: string }
   >({
     name: '',
     live: { publicKey: '', secretKey: '' },
@@ -122,7 +123,7 @@ export const StripeConfigModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Connect Stripe account</ModalHeader>
+        <ModalHeader>Connect  Stripe  account</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack as="form" spacing={4}>
@@ -130,7 +131,7 @@ export const StripeConfigModal = ({
               isRequired
               label="Account name:"
               onChange={handleNameChange}
-              placeholder="Typebot"
+              placeholder="Bot"
               withVariableButton={false}
               debounceTimeout={0}
             />

@@ -10,6 +10,7 @@ import {
 import { byId, isDefined } from '@typebot.io/lib'
 import { z } from 'zod'
 import { generatePresignedUrl } from '@typebot.io/lib/s3/deprecated/generatePresignedUrl'
+import {  generatePresignedUrlBlob } from '@typebot.io/lib/azure-blob/generatePresignedUrl';
 import { env } from '@typebot.io/env'
 import prisma from '@typebot.io/lib/prisma'
 
@@ -38,12 +39,20 @@ export const getUploadUrl = publicProcedure
     })
   )
   .query(async ({ input: { typebotId, blockId, filePath, fileType } }) => {
-    if (!env.S3_ENDPOINT || !env.S3_ACCESS_KEY || !env.S3_SECRET_KEY)
+    if ( (!env.S3_ENDPOINT || !env.S3_ACCESS_KEY || !env.S3_SECRET_KEY) || ( !env.AZURE_BLOB_ACCOUNT_NAME || !env.AZURE_BLOB_ACCOUNT_KEY || !env.AZURE_BLOB_CONNECTION_STRING || !env.AZURE_BLOB_CONTAINER_NAME )  ) {
+      // throw new TRPCError({
+      //   code: 'INTERNAL_SERVER_ERROR',
+      //   message:
+      //     'S3 not properly configured. Missing one of those variables: S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY',
+      // })
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message:
-          'S3 not properly configured. Missing one of those variables: S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY',
+          'File upload variables not configured properly',
       })
+    }
+
+     
 
     const publicTypebot = (await prisma.publicTypebot.findFirst({
       where: { typebotId },
@@ -61,12 +70,23 @@ export const getUploadUrl = publicProcedure
         message: 'File upload block not found',
       })
 
-    const presignedUrl = await generatePresignedUrl({
-      fileType,
-      filePath,
-    })
-
+    // const presignedUrl = await generatePresignedUrl({
+    //   fileType,
+    //   filePath,
+    // })
+    let presignedUrl:string;
+    if ( env.S3_ENDPOINT  && env.S3_ACCESS_KEY && env.S3_SECRET_KEY ) {
+        presignedUrl = await generatePresignedUrl({
+            fileType,
+            filePath,
+          })
+    } else if ( env.AZURE_BLOB_CONNECTION_STRING && env.AZURE_BLOB_CONTAINER_NAME )  {
+      presignedUrl = await generatePresignedUrlBlob({ fileType , filePath })
+    }
+   
     return {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       presignedUrl,
       hasReachedStorageLimit: false,
     }

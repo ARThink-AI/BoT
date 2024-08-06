@@ -24,6 +24,8 @@ import {
   paymentInputSchema,
   ratingInputBlockSchema,
   fileInputStepSchema,
+  barCodeSchema,
+  cardSchema
 } from './inputs'
 import {
   chatwootBlockSchema,
@@ -35,7 +37,9 @@ import {
   sendEmailBlockSchema,
   webhookBlockSchema,
   zapierBlockSchema,
-  flowwiseBlockSchema
+  flowwiseBlockSchema,
+  trudeskBlockSchema,
+  whatsappBlockSchema
 } from './integrations'
 import { openAIBlockSchema } from './integrations/openai'
 import {
@@ -101,6 +105,8 @@ export const inputBlockSchemas = [
   ratingInputBlockSchema,
   fileInputStepSchema,
   pictureChoiceBlockSchema,
+  barCodeSchema,
+  cardSchema
 ] as const
 
 export const blockSchema = z.discriminatedUnion('type', [
@@ -131,6 +137,8 @@ export const blockSchema = z.discriminatedUnion('type', [
   pixelBlockSchema,
   zemanticAiBlockSchema,
   flowwiseBlockSchema,
+  trudeskBlockSchema,
+  whatsappBlockSchema
 ])
 
 export type Block = z.infer<typeof blockSchema>
@@ -144,8 +152,8 @@ export type InputBlockOptions = InputBlock['options']
 export type LogicBlock = Extract<Block, { type: LogicBlockType }>
 export type LogicBlockOptions = LogicBlock extends
   | {
-      options?: infer Options
-    }
+    options?: infer Options
+  }
   | {}
   ? Options
   : never

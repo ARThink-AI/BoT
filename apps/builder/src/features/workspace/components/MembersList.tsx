@@ -8,7 +8,6 @@ import {
 // import { UnlockPlanAlertInfo } from '@/components/UnlockPlanAlertInfo'
 import { WorkspaceInvitation, WorkspaceRole } from '@typebot.io/prisma'
 import React from 'react'
-import { getSeatsLimit, isSeatsLimitReached } from '@typebot.io/lib/pricing'
 import { AddMemberForm } from './AddMemberForm'
 import { MemberItem } from './MemberItem'
 import { isDefined } from '@typebot.io/lib'
@@ -21,6 +20,7 @@ import { updateMemberQuery } from '../queries/updateMemberQuery'
 import { Member } from '../types'
 import { useWorkspace } from '../WorkspaceProvider'
 import { useScopedI18n } from '@/locales'
+import { getSeatsLimit } from '@typebot.io/lib/billing/getSeatsLimit'
 
 export const MembersList = () => {
   const scopedT = useScopedI18n('workspace.membersList')
@@ -93,12 +93,11 @@ export const MembersList = () => {
   const seatsLimit = workspace ? getSeatsLimit(workspace) : undefined
 
   const canInviteNewMember =
-    workspace &&
-    !isSeatsLimitReached({
-      plan: workspace?.plan,
-      customSeatsLimit: workspace?.customSeatsLimit,
-      existingMembersAndInvitationsCount: currentMembersCount,
-    })
+    seatsLimit === 'inf'
+      ? true
+      : seatsLimit
+      ? currentMembersCount < seatsLimit
+      : false
 
   return (
     <Stack w="full" spacing={3}>

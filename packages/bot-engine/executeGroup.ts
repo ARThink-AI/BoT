@@ -18,6 +18,7 @@ import { executeLogic } from './executeLogic'
 import { executeIntegration } from './executeIntegration'
 import { computePaymentInputRuntimeOptions } from './blocks/inputs/payment/computePaymentInputRuntimeOptions'
 import { injectVariableValuesInButtonsInputBlock } from './blocks/inputs/buttons/injectVariableValuesInButtonsInputBlock'
+import { injectVariableValuesInCardInputBlock } from './blocks/inputs/card/injectVariableValuesInCardInputBlock' 
 import { injectVariableValuesInPictureChoiceBlock } from './blocks/inputs/pictureChoice/injectVariableValuesInPictureChoiceBlock'
 import { getPrefilledInputValue } from './getPrefilledValue'
 import { parseDateInput } from './blocks/inputs/date/parseDateInput'
@@ -29,12 +30,20 @@ type ContextProps = {
   state: SessionState
   currentReply?: ChatReply
   currentLastBubbleId?: string
+  firstBubbleWasStreamed?: boolean
 }
 
 export const executeGroup = async (
   group: Group,
-  { version, state, currentReply, currentLastBubbleId }: ContextProps
+  {
+    version,
+    state,
+    currentReply,
+    currentLastBubbleId,
+    firstBubbleWasStreamed,
+  }: ContextProps
 ): Promise<ChatReply & { newSessionState: SessionState }> => {
+  console.log("entered execute group", currentLastBubbleId );
   const messages: ChatReply['messages'] = currentReply?.messages ?? []
   let clientSideActions: ChatReply['clientSideActions'] =
     currentReply?.clientSideActions
@@ -44,10 +53,13 @@ export const executeGroup = async (
 
   let newSessionState = state
 
+  let index = -1
   for (const block of group.blocks) {
+    index++
     nextEdgeId = block.outgoingEdgeId
 
     if (isBubbleBlock(block)) {
+      if (firstBubbleWasStreamed && index === 0) continue
       messages.push(
         parseBubbleBlock(block, {
           version,
@@ -57,8 +69,23 @@ export const executeGroup = async (
       lastBubbleBlockId = block.id
       continue
     }
-
-    if (isInputBlock(block))
+   console.log("before input block input condition");
+    if (isInputBlock(block)) {
+      console.log("yooooo");
+      console.log( parseInput(newSessionState)(block) );
+      console.log("heee", JSON.stringify({
+        messages,
+        input: await parseInput(newSessionState)(block),
+        newSessionState: {
+          ...newSessionState,
+          currentBlock: {
+            groupId: group.id,
+            blockId: block.id,
+          },
+        },
+        clientSideActions,
+        logs,
+      })  );
       return {
         messages,
         input: await parseInput(newSessionState)(block),
@@ -72,6 +99,21 @@ export const executeGroup = async (
         clientSideActions,
         logs,
       }
+    }
+      // return {
+      //   messages,
+      //   input: await parseInput(newSessionState)(block),
+      //   newSessionState: {
+      //     ...newSessionState,
+      //     currentBlock: {
+      //       groupId: group.id,
+      //       blockId: block.id,
+      //     },
+      //   },
+      //   clientSideActions,
+      //   logs,
+      // }
+      console.log("not reaching here");
     const executionResponse = isLogicBlock(block)
       ? await executeLogic(newSessionState)(block)
       : isIntegrationBlock(block)
@@ -130,7 +172,7 @@ export const executeGroup = async (
   if (!nextGroup.group) {
     return { messages, newSessionState, clientSideActions, logs }
   }
-
+   console.log("before execute group return");
   return executeGroup(nextGroup.group, {
     version,
     state: newSessionState,
@@ -159,6 +201,9 @@ export const parseInput =
     switch (block.type) {
       case InputBlockType.CHOICE: {
         return injectVariableValuesInButtonsInputBlock(state)(block)
+      }
+      case InputBlockType.CARD: {
+        return injectVariableValuesInCardInputBlock(state)(block)
       }
       case InputBlockType.PICTURE_CHOICE: {
         return injectVariableValuesInPictureChoiceBlock(

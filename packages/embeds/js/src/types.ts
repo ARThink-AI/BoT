@@ -11,6 +11,7 @@ export type BotContext = {
   isPreview: boolean
   apiHost?: string
   sessionId: string
+  selectedLanguage : string
 }
 
 export type InitialChatReply = ChatReply & {

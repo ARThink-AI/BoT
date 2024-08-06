@@ -5,7 +5,7 @@ import {
   LogicBlockType,
 } from '@typebot.io/schemas'
 
-export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string  => {
+export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string => {
   switch (blockType) {
     case LogicBlockType.TYPEBOT_LINK:
       return 'https://docs.typebot.io/editor/blocks/logic/typebot-link'
@@ -53,8 +53,15 @@ export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string  => {
       return 'https://docs.typebot.io/editor/blocks/integrations/webhook'
     case InputBlockType.PICTURE_CHOICE:
       return 'https://docs.typebot.io/editor/blocks/inputs/picture-choice'
+    case InputBlockType.BARCODE_READER:
+      return 'https://arthink.ai'
+
     case IntegrationBlockType.OPEN_AI:
       return 'https://docs.typebot.io/editor/blocks/integrations/openai'
+    case IntegrationBlockType.TRUDESK:
+      return 'https://arthink.ai'
+    case IntegrationBlockType.WHATSAPP:
+      return 'https://arthink.ai'
     case IntegrationBlockType.MAKE_COM:
       return 'https://docs.typebot.io/editor/blocks/integrations/make-com'
     case LogicBlockType.AB_TEST:
@@ -66,6 +73,6 @@ export const getHelpDocUrl = (blockType: BlockWithOptions['type']): string  => {
     case IntegrationBlockType.ZEMANTIC_AI:
       return 'https://docs.typebot.io/editor/blocks/integrations/zemantic-ai'
     default:
-      return ""  
+      return ""
   }
 }

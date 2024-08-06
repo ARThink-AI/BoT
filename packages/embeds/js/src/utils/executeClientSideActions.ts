@@ -14,11 +14,13 @@ import { injectStartProps } from './injectStartProps'
 type Props = {
   clientSideAction: NonNullable<ChatReply['clientSideActions']>[0]
   context: ClientSideActionContext
-  onMessageStream?: (message: string) => void
+  onMessageStream?: (props: { id: string; message: string }) => void
+  socket : any
 }
 
 export const executeClientSideAction = async ({
   clientSideAction,
+  socket,
   context,
   onMessageStream,
 }: Props): Promise<
@@ -26,6 +28,7 @@ export const executeClientSideAction = async ({
   | { replyToSend: string | undefined; logs?: ReplyLog[] }
   | void
 > => {
+  console.log("client side action",clientSideAction);
   if ('chatwoot' in clientSideAction) {
     return executeChatwoot(clientSideAction.chatwoot)
   }
@@ -68,7 +71,7 @@ export const executeClientSideAction = async ({
     return { replyToSend: message }
   }
   if ('webhookToExecute' in clientSideAction) {
-    const response = await executeWebhook(clientSideAction.webhookToExecute)
+    const response = await executeWebhook(clientSideAction.webhookToExecute, socket, onMessageStream )
     return { replyToSend: response }
   }
   if ('startPropsToInject' in clientSideAction) {

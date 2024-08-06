@@ -38,6 +38,7 @@ const currencySymbols: { [key: string]: string } = {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log("entereddd create payment intent infoo");
   await cors(req, res)
   if (req.method === 'POST') {
     const { inputOptions, isPreview, variables } = (

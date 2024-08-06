@@ -12,9 +12,9 @@ import { AlertIcon } from '@/components/icons'
 import { Workspace } from '@typebot.io/prisma'
 import React from 'react'
 import { parseNumberWithCommas } from '@typebot.io/lib'
-import { getChatsLimit } from '@typebot.io/lib/pricing'
 import { defaultQueryOptions, trpc } from '@/lib/trpc'
 import { useScopedI18n } from '@/locales'
+import { getChatsLimit } from '@typebot.io/lib/billing/getChatsLimit'
 
 type Props = {
   workspace: Workspace
@@ -32,9 +32,10 @@ export const UsageProgressBars = ({ workspace }: Props) => {
 
   const workspaceChatsLimit = getChatsLimit(workspace)
 
-  const chatsPercentage = Math.round(
-    (totalChatsUsed / workspaceChatsLimit) * 100
-  )
+  const chatsPercentage =
+    workspaceChatsLimit === 'inf'
+      ? 0
+      : Math.round((totalChatsUsed / workspaceChatsLimit) * 100)
 
   return (
     <Stack spacing={6}>
@@ -65,7 +66,7 @@ export const UsageProgressBars = ({ workspace }: Props) => {
               </Tooltip>
             )}
             <Text fontSize="sm" fontStyle="italic" color="gray.500">
-              {scopedT('chats.resetInfo')}
+              (Resets on {data?.resetsAt.toLocaleDateString()})
             </Text>
           </HStack>
 
@@ -79,7 +80,7 @@ export const UsageProgressBars = ({ workspace }: Props) => {
             </Skeleton>
             <Text>
               /{' '}
-              {workspaceChatsLimit === -1
+              {workspaceChatsLimit === 'inf'
                 ? scopedT('unlimited')
                 : parseNumberWithCommas(workspaceChatsLimit)}
             </Text>
@@ -90,9 +91,8 @@ export const UsageProgressBars = ({ workspace }: Props) => {
           h="5px"
           value={chatsPercentage}
           rounded="full"
-          hasStripe
           isIndeterminate={isLoading}
-          colorScheme={totalChatsUsed >= workspaceChatsLimit ? 'red' : 'blue'}
+          colorScheme={'blue'}
         />
       </Stack>
     </Stack>

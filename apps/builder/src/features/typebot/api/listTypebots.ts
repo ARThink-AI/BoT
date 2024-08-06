@@ -32,6 +32,7 @@ export const listTypebots = authenticatedProcedure
     })
   )
   .query(async ({ input: { workspaceId, folderId }, ctx: { user } }) => {
+    console.log("inputttt", workspaceId , folderId  );
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       select: { members: true },
