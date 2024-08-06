@@ -8,9 +8,9 @@ import {
 } from 'date-fns'
 
 export const timeFilterValues = [
-  'today',
-  'last7Days',
-  'last30Days',
+  'DAILY',
+  'WEEKLY',
+  'MONTHLY',
   // 'monthToDate',
   // 'lastMonth',
   // 'yearToDate',
@@ -21,16 +21,16 @@ export const timeFilterLabels: Record<
   (typeof timeFilterValues)[number],
   string
 > = {
-  today: 'Today',
-  last7Days: 'Last 7 days',
-  last30Days: 'Last 30 days',
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
   // monthToDate: 'Month to date',
   // lastMonth: 'Last month',
   // yearToDate: 'Year to date',
   // allTime: 'All time',
 }
 
-export const defaultTimeFilter = 'last7Days' as const
+export const defaultTimeFilter = 'DAILY' as const
 
 export const parseFromDateFromTimeFilter = (
   timeFilter: (typeof timeFilterValues)[number]
@@ -38,11 +38,11 @@ export const parseFromDateFromTimeFilter = (
   const now = new Date()
 
   switch (timeFilter) {
-    case 'today':
+    case 'DAILY':
       return startOfDay(now)
-    case 'last7Days':
+    case 'WEEKLY':
       return subDays(startOfDay(now), 6)
-    case 'last30Days':
+    case 'MONTHLY':
       return subDays(startOfDay(now), 29)
     // case 'lastMonth':
     //   return subMonths(startOfMonth(now), 1)
@@ -64,9 +64,9 @@ export const parseToDateFromTimeFilter = (
     // case 'lastMonth':
     //   return subMonths(endOfMonth(now), 1)
     // case 'allTime':
-    case 'last30Days':
-    case 'last7Days':
-    case 'today':
+    case 'MONTHLY':
+    case 'WEEKLY':
+    case 'DAILY':
       // case 'monthToDate':
       // case 'yearToDate':
       return null

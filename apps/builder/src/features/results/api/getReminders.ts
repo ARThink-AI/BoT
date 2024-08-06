@@ -23,7 +23,7 @@ export const getReminders = authenticatedProcedure
   .input(
     z.object({
       typebotId: z.string(),
-      timeFilter: z.enum(timeFilterValues).default('last7Days').optional(),
+      timeFilter: z.enum(timeFilterValues).default('DAILY').optional(),
     })
   )
   .query(async ({ input, ctx: { user } }) => {
