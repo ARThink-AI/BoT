@@ -1,9 +1,9 @@
 name: Publish @typebot.io/nextjs package to NPM
 
-on:
-  push:
-    tags:
-      - 'nextjs-v*'
+# on:
+#   push:
+#     tags:
+#       - 'nextjs-v*'
 
 jobs:
   publish:
