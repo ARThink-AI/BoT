@@ -1,9 +1,9 @@
 name: Automatically add issues to projects when labeled
 
-on:
-  issues:
-    # types:
-    #   - labeled
+on: workflow_dispatch
+  # issues:
+  #   # types:
+  #   #   - labeled
 
 jobs:
   add-to-project:

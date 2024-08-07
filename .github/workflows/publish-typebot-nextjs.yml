@@ -1,7 +1,7 @@
 name: Publish @typebot.io/nextjs package to NPM
 
-on:
-  push:
+on: workflow_dispatch
+  # push:
     # tags:
     #   - 'nextjs-v*'
 
