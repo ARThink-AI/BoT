@@ -211,6 +211,7 @@ export default {
   'editor.headers.settingsButton.label': 'Configurações',
   'editor.headers.shareButton.label': 'Compartilhar',
   'editor.headers.resultsButton.label': 'Resultados',
+  'editor.headers.remindersButton.label': 'Reminders',
   'editor.headers.helpButton.label': 'Ajuda',
   'editor.headers.savingSpinner.label': 'Salvando...',
   'editor.headers.previewButton.label': 'Visualizar',

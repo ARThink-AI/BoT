@@ -1,246 +1,8 @@
-// import React, { useEffect, useMemo, useState } from 'react'
-// import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, TableCaption, Text } from '@chakra-ui/react'
-// import { useTypebot } from '@/features/editor/providers/TypebotProvider'
-// import { trpc } from '@/lib/trpc'
-// import { isDefined } from '@udecode/plate-common'
-// import { TypebotHeader } from '@/features/editor/components/TypebotHeader'
-// import TimeFilterDropdown from '../helpers/TimeFilterDropdown'
-// import { defaultTimeFilter, timeFilterValues } from '../api/constants'
-// import { parseResultHeader } from '@typebot.io/lib/results'
-// import { LogicBlockType } from '@typebot.io/schemas'
-// import { convertResultsToTableData } from '../helpers/convertResultsToTableData'
 
 
 
-
-// export const RemindersTableContainer = () => {
-//   const { typebot, publishedTypebot } = useTypebot()
-//   // @ts-ignore
-//   const [selectedTimeFilter, setSelectedTimeFilter] = useState<(typeof timeFilterValues)[number]>(defaultTimeFilter)
-//   const [selectedType, setSelectedType] = useState('Email')
-//   const [emails, setEmails] = useState([])
-//   const [emailValid, setEmailValid] = useState(true);
-//   const [duplicateEmail, setDuplicateEmail] = useState<boolean>(false);
-
-
-
-//   const { data } = trpc.results.getReminders.useQuery(
-//     {
-//       typebotId: typebot?.id as string,
-//       timeFilter: selectedTimeFilter
-
-//     },
-//     { enabled: isDefined(publishedTypebot) }
-//   )
-
-
-//   console.log("reminderssss data", data)
-
-//   const linkedTypebotIds =
-//     publishedTypebot?.groups
-//       .flatMap((group) => group.blocks)
-//       .reduce<string[]>(
-//         (typebotIds, block) =>
-//           block.type === LogicBlockType.TYPEBOT_LINK &&
-//             isDefined(block.options.typebotId) &&
-//             !typebotIds.includes(block.options.typebotId) &&
-//             block.options.mergeResults !== false
-//             ? [...typebotIds, block.options.typebotId]
-//             : typebotIds,
-//         []
-//       ) ?? []
-
-//   const { data: linkedTypebotsData } = trpc.getLinkedTypebots.useQuery(
-//     {
-//       typebotId: typebot?.id as string,
-//     },
-//     {
-//       enabled: linkedTypebotIds.length > 0,
-//     }
-//   )
-
-
-//   const resultHeader = useMemo(
-//     () =>
-//       publishedTypebot
-//         ? parseResultHeader(publishedTypebot, linkedTypebotsData?.typebots)
-//         : [],
-//     [linkedTypebotsData?.typebots, publishedTypebot]
-//   )
-
-
-
-//   // const tableData = useMemo(
-//   //   () =>
-//   //     publishedTypebot
-//   //       ? convertResultsToTableData(
-//   //         data?.flatMap((d) => d.results) ?? [],
-//   //         resultHeader
-//   //       )
-//   //       : [],
-//   //   [publishedTypebot, data, resultHeader]
-//   // )
-//   const tableData = useMemo(
-//     () =>
-//       publishedTypebot
-//         ? convertResultsToTableData(
-//           data?.results,
-//           resultHeader
-//         )
-//         : [],
-//     [publishedTypebot, data, resultHeader]
-//   )
-
-//   const handleTypeChange = (e) => {
-//     const value = e.target.value;
-//     setSelectedType(value)
-
-//   }
-
-//   console.log("tabledataaaaaaa", tableData)
-//   console.log("headerssssss", resultHeader)
-
-//   // const generateTableHTML = (resultHeader: any[], data: any[]) => {
-//   //   const headerHTML = resultHeader.map(header => `<th>${header.label}</th>`).join('');
-//   //   const rowsHTML = data.map(row => {
-//   //     const cellsHTML = resultHeader.map(header => `<td>${row[header.id] || ''}</td>`).join('');
-//   //     return `<tr>${cellsHTML}</tr>`;
-//   //   }).join('');
-
-//   //   return `
-//   //     <table style="width: 100%; border-collapse: collapse;">
-//   //       <thead>
-//   //         <tr>${headerHTML}</tr>
-//   //       </thead>
-//   //       <tbody>${rowsHTML}</tbody>
-//   //     </table>
-//   //   `;
-//   // };
-
-//   // const htmlTable = generateTableHTML(resultHeader, tableData);
-//   const types = [
-//     'Email',
-//     'Whatsapp',
-//     'Text'
-//   ]
-
-
-//   const validateEmail = (email: string) => {
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return emailRegex.test(email);
-//   }
-
-//   // @ts-ignore
-//   const handleInputChange = (index, event) => {
-//     const newEmails = [...emails];
-//     // @ts-ignore
-//     newEmails[index] = event.target.value;
-//     // @ts-ignore
-//     // console.log(`reminder email ${index}`, newEmails[index] = event.target.value)
-
-//     // @ts-ignore
-//     setEmailValid(validateEmail(newEmails[index] = event.target.value))
-//     setDuplicateEmail(newEmails.filter((e, i) => newEmails.indexOf(e) !== i).length > 0);
-//     setEmails(newEmails);
-//   };
-
-//   const handleAddEmail = () => {
-//     // @ts-ignore
-//     setEmails([...emails, '']); // Add a new empty email field
-//   };
-//   // @ts-ignore
-//   const handleRemoveEmail = (index) => {
-//     const newEmails = emails.filter((_, i) => i !== index);
-//     setEmails(newEmails);
-//   };
-//   // console.log("reminder emailsss", emails)
-//   return (
-//     <Flex overflowY={'auto'} overflowX={'hidden'} h="100vh" flexDir="column">
-//       <TypebotHeader />
-
-//       {/* <TimeFilterDropdown
-//         selectedTimeFilter={selectedTimeFilter}
-//         onChange={setSelectedTimeFilter}
-//         placeholder="Choose a time filter"
-//       /> */}
-
-//       <Box mt={'5%'} mx={'auto'} w={'max-content'} p={4}>
-//         {/* <h1 style={{ textAlign: 'center' }}>Reminders</h1>
-//          */}
-
-//         <Table variant="simple">
-//           <TableCaption>Reminders</TableCaption>
-//           <Thead>
-//             <Tr>
-//               <Th>Type</Th>
-//               <Th>Frequency</Th>
-//               <Th>Typebot ID</Th>
-//               <Th>Emails</Th>
-//               <Th>Action</Th>
-//               {/* <Th>Created At</Th>
-//               <Th>Updated At</Th> */}
-//             </Tr>
-//           </Thead>
-//           <Tbody>
-
-//             <Tr >
-//               <Td>
-//                 <Select onChange={handleTypeChange} value={selectedType}>
-//                   {types.map((type, index) => (<option key={index}>{type}</option>)
-//                   )}
-//                 </Select>
-//               </Td>
-//               <Td>
-//                 <TimeFilterDropdown
-//                   selectedTimeFilter={selectedTimeFilter}
-//                   onChange={setSelectedTimeFilter}
-//                   placeholder="Choose a frequency"
-//                 />
-//               </Td>
-//               <Td>{typebot?.id}</Td>
-//               <Td>
-//                 {!emailValid && (
-//                   // <p style={} className="text-red-500 text-sm">Please enter a valid email address.</p>
-//                   <Text color={'red.500'} fontSize={'sm'}>Please enter a valid email address.</Text>
-//                 )}
-//                 {duplicateEmail && (
-//                   <Text color="red.500" fontSize="sm">Duplicate email address found.</Text>
-//                 )}
-//                 {emails.map((email, index) => (
-//                   <Flex wrap={'wrap'}>
-
-//                     <Input
-//                       key={index}
-//                       type="email"
-//                       value={email}
-//                       onChange={(event) => handleInputChange(index, event)}
-//                       placeholder={`Email ${index + 1}`}
-//                     />
-//                     <Button m={2} type="button" onClick={() => handleRemoveEmail(index)}>
-//                       Remove
-//                     </Button>
-//                   </Flex>
-//                 ))}
-//                 <Button onClick={handleAddEmail}>Add</Button>
-
-//                 {/* <Input placeholder='Please enter your email' type='email' /> */}
-//               </Td>
-//               <Td><Button>Save</Button> <Button>Delete</Button> </Td>
-//               {/* <Td>{ }</Td>
-//               <Td>{ }</Td> */}
-//             </Tr>
-
-//           </Tbody>
-//         </Table>
-//       </Box>
-
-
-//     </Flex>
-//   )
-// }
-
-import React, { useEffect, useMemo, useState } from 'react'
-import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, TableCaption, Text } from '@chakra-ui/react'
+import React, { useMemo, useState } from 'react'
+import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, Text, Heading, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { trpc } from '@/lib/trpc'
 import { isDefined } from '@udecode/plate-common'
@@ -250,6 +12,7 @@ import { defaultTimeFilter, timeFilterValues } from '../api/constants'
 import { parseResultHeader } from '@typebot.io/lib/results'
 import { LogicBlockType } from '@typebot.io/schemas'
 import { convertResultsToTableData } from '../helpers/convertResultsToTableData'
+// import { Frequency } from '@typebot.io/prisma'
 
 export const RemindersTableContainer = () => {
   const { typebot, publishedTypebot } = useTypebot()
@@ -258,8 +21,11 @@ export const RemindersTableContainer = () => {
   const [emails, setEmails] = useState([])
   const [emailValid, setEmailValid] = useState(true);
   const [duplicateEmail, setDuplicateEmail] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState(true);
-
+  // const [isEditing, setIsEditing] = useState(true);
+  const [isUpdating, setUpdating] = useState<string | null>(null);
+  const [updateFormData, setUpdateFormData] = useState({ type: '', frequency: '', emails: [], jobId: '', typebotId: '' });
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  // const [jobId, setJobId] = useState<string | null>(null)
   const { data } = trpc.results.getReminders.useQuery(
     {
       typebotId: typebot?.id as string,
@@ -267,6 +33,7 @@ export const RemindersTableContainer = () => {
     },
     { enabled: isDefined(publishedTypebot) }
   )
+  console.log("get remindersfsnjsd", data)
 
   const linkedTypebotIds =
     publishedTypebot?.groups
@@ -298,7 +65,7 @@ export const RemindersTableContainer = () => {
         : [],
     [linkedTypebotsData?.typebots, publishedTypebot]
   )
-
+  console.log("result headersss", resultHeader)
   const tableData = useMemo(
     () =>
       publishedTypebot
@@ -309,7 +76,9 @@ export const RemindersTableContainer = () => {
         : [],
     [publishedTypebot, data, resultHeader]
   )
-
+  // console.log("reminder table headerss", resultHeader)
+  // console.log("reminder table table data", tableData)
+  // @ts-ignore
   const handleTypeChange = (e) => {
     const value = e.target.value;
     setSelectedType(value)
@@ -319,9 +88,10 @@ export const RemindersTableContainer = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-
+  //@ts-ignore
   const handleInputChange = (index, event) => {
     const newEmails = [...emails];
+    //@ts-ignore
     newEmails[index] = event.target.value;
     setEmailValid(validateEmail(newEmails[index]));
     setDuplicateEmail(newEmails.filter((e, i) => newEmails.indexOf(e) !== i).length > 0);
@@ -329,32 +99,36 @@ export const RemindersTableContainer = () => {
   };
 
   const handleAddEmail = () => {
+    //@ts-ignore
     setEmails([...emails, '']); // Add a new empty email field
   };
-
+  //@ts-ignore
   const handleRemoveEmail = (index) => {
     const newEmails = emails.filter((_, i) => i !== index);
     setEmails(newEmails);
   };
 
-
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-  console.log("selected frequencyy", selectedTimeFilter)
+  // const handleEdit = () => {
+  //   setIsEditing(true);
+  // };
+  // console.log("selected frequency", selectedTimeFilter)
 
   const mutation = trpc.results.reminderCreate.useMutation();
   const updateMutation = trpc.results.updateReminder.useMutation();
   const deleteMutation = trpc.results.deleteReminder.useMutation();
 
+  //@ts-ignore
+  const { data: reminders, isLoading, error } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
 
-  const addReminder = async () => {
+  const addReminder = async (jobId: string) => {
     try {
       const newReminder = await mutation.mutateAsync({
-        jobId: 'example-job-id',
-        payload: { 'emails': emails },
+        //@ts-ignore
+        jobId: jobId,
+        payload: { 'emails': emails, resultHeader: resultHeader },
+        //@ts-ignore
         typebotId: typebot?.id,
+        //@ts-ignore
         type: selectedType,
         frequency: selectedTimeFilter,
       });
@@ -363,14 +137,24 @@ export const RemindersTableContainer = () => {
       console.error('Error adding reminder:', error);
     }
   };
-
-  const updateReminder = async (id: string, updates: Partial<ReminderType>) => {
+  //@ts-ignore
+  const handleUpdate = async (reminderId) => {
     try {
       const updatedReminder = await updateMutation.mutateAsync({
-        id,
-        updates,
+        id: reminderId,
+        updates: {
+          //@ts-ignore
+          type: updateFormData.type,
+          //@ts-ignore
+          frequency: updateFormData.frequency,
+          payload: { emails: updateFormData.emails },
+          jobId: updateFormData.jobId,
+          typebotId: updateFormData.typebotId
+        },
       });
+      window.location.reload()
       console.log('Reminder updated:', updatedReminder);
+      setUpdating(null); // Reset the updating state
     } catch (error) {
       console.error('Error updating reminder:', error);
     }
@@ -379,341 +163,308 @@ export const RemindersTableContainer = () => {
   const deleteReminder = async (id: string) => {
     try {
       const result = await deleteMutation.mutateAsync(id);
+      window.location.reload()
       console.log('Reminder deleted:', result);
     } catch (error) {
       console.error('Error deleting reminder:', error);
     }
   };
 
+  const scheduledJob = async (typebotId: string, type: string, payload: JSON, frequency: string) => {
+    try {
+      const url = 'http://localhost:4000/schedule_job'
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "typebotId": typebotId,
+          "type": type,
+          "payload": { payload, resultHeader: resultHeader },
+          "frequency": frequency,
+        })
+      })
+      const response = await res.json()
+      if (response) {
+        // setJobId(response.jobId)
+        setTimeout(() => { addReminder(response.jobId) }, 1000)
 
+      }
+      console.log("response of scheduled job", response)
+    }
+    catch (error) {
+      console.log('error occur while scheduled job', error)
+    }
+  }
+
+
+
+
+
+
+  const cancelJob = async (id: string, jobId: string) => {
+    try {
+      const url = `http://localhost:4000/cancel_job?id=${jobId}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+      }).then((res) => res.json())
+
+      if (response) {
+        deleteReminder(id);
+      }
+      console.log("response for cancel job", response)
+
+    } catch (error) {
+      console.log("error while canceling job", error)
+    }
+  }
+
+  const updateJob = async (id: string, jobId: string) => {
+    try {
+      const url = 'http://localhost:4000/update_job'
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "typebotId": updateFormData.typebotId,
+          "type": updateFormData.type,
+          "payload": updateFormData.emails,
+          "frequency": updateFormData.frequency,
+          "jobId": jobId,
+        })
+      }).then((res) => res.json())
+      if (response) {
+        updateFormData.jobId = response.jobId
+        handleUpdate(id)
+      }
+      console.log("response for update job", response)
+    } catch (error) {
+      console.log("error occur while updating job")
+    }
+  }
+
+  // console.log("job iddddddd", jobId)
   const handleSave = async () => {
-    setIsEditing(false);
-    addReminder()
-
-  };
-  const handleDelete = async (id) => {
     // setIsEditing(false);
-    deleteReminder(id)
+    // addReminder();
+    setSelectedType('EMAIL');
+    setEmails([]);
+    setSelectedTimeFilter(defaultTimeFilter);
+    // @ts-ignore
+    scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter)
+    onClose()
+    // window.location.reload()
+  };
+  //@ts-ignore
+  const handleDelete = async (id, jobId) => {
+    // deleteReminder(id);
+    cancelJob(id, jobId)
+  };
 
+  const handleUpdateReminderData = async (id: string, jobId: string) => {
+    // handleUpdate(id)
+    updateJob(id, jobId)
+  }
+
+  // const handleUpdateReminder = (reminder) => {
+  //   setUpdating(reminder.id);
+  //   setUpdateFormData({
+  //     type: reminder.type,
+  //     frequency: reminder.frequency,
+  //     emails: reminder.payload.emails,
+  //   });
+  // };
+  //@ts-ignore
+  const handleUpdateReminder = (reminder) => {
+    setUpdating(reminder.id);
+    setUpdateFormData({
+      type: reminder.type,
+      frequency: reminder.frequency,
+      emails: reminder.payload.emails,
+      jobId: reminder.jobId, // Include jobId in the form data
+      typebotId: reminder.typebotId // Include typebotId in the form data
+    });
   };
 
 
-  // const { data: reminders, isLoading, error } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id });
-  // console.log("reminderss", reminders)
+
+  console.log("reminders", reminders);
+
+
   return (
     <Flex overflowY={'auto'} overflowX={'hidden'} h="100vh" flexDir="column">
       <TypebotHeader />
-      <Box mt={'5%'} mx={'auto'} w={'max-content'} p={4}>
-        <h1 style={{ textAlign: 'center' }}>Reminders</h1>
-        <Table variant="simple">
+      <Box mx={'auto'} p={4}>
+        <Modal size={'5xl'} blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Reminder</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>Type</Th>
+                    <Th>Frequency</Th>
+                    {/* <Th>Typebot ID</Th> */}
+                    <Th>Emails</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>
 
-          <Thead>
-            <Tr>
-              <Th>Type</Th>
-              <Th>Frequency</Th>
-              <Th>Typebot ID</Th>
-              <Th>Emails</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>
-                {isEditing ? (
-                  <Select onChange={handleTypeChange} value={selectedType}>
-                    {['EMAIL', 'WHATSAPP', 'TEXT'].map((type, index) => (
-                      <option key={index}>{type}</option>
-                    ))}
-                  </Select>
-                ) : (
-                  <Text>{selectedType}</Text>
-                )}
-              </Td>
-              <Td>
-                {isEditing ? (
-                  <TimeFilterDropdown
-                    selectedTimeFilter={selectedTimeFilter}
-                    onChange={setSelectedTimeFilter}
-                    placeholder="Choose a frequency"
-                  />
-                ) : (
-                  <Text>{selectedTimeFilter.toUpperCase()}</Text>
-                )}
-              </Td>
-              <Td>{typebot?.id}</Td>
-              <Td>
-                {!emailValid && (
-                  <Text color={'red.500'} fontSize={'sm'}>Please enter a valid email address.</Text>
-                )}
-                {duplicateEmail && (
-                  <Text color="red.500" fontSize="sm">Duplicate email address found.</Text>
-                )}
-                {isEditing ? (
-                  emails.map((email, index) => (
-                    <Flex key={index} wrap={'wrap'}>
-                      <Input
-                        type="email"
-                        value={email}
-                        onChange={(event) => handleInputChange(index, event)}
-                        placeholder={`Email ${index + 1}`}
+                      <Select onChange={handleTypeChange} value={selectedType}>
+                        {['EMAIL', 'WHATSAPP', 'TEXT'].map((type, index) => (
+                          <option key={index}>{type}</option>
+                        ))}
+                      </Select>
+
+                    </Td>
+                    <Td>
+
+                      <TimeFilterDropdown
+                        selectedTimeFilter={selectedTimeFilter}
+                        onChange={setSelectedTimeFilter}
+                        placeholder="Choose a frequency"
                       />
-                      <Button m={2} type="button" onClick={() => handleRemoveEmail(index)}>
-                        Remove
-                      </Button>
-                    </Flex>
-                  ))
-                ) : (
-                  emails.map((email, index) => (
-                    <Text key={index}>{email}</Text>
-                  ))
-                )}
-                {isEditing && (
-                  <Button onClick={handleAddEmail}>Add</Button>
-                )}
-              </Td>
-              <Td>
-                {isEditing ? (<>
-                  <Button onClick={handleSave}>Save</Button>
-                  <Button onClick={() => { handleDelete('clzgx4f8i0007v7ow7n9r0ig8') }}>delete</Button>
 
-                </>
-                ) : (<>
-                  <Button onClick={handleEdit}>Edit</Button>
+                    </Td>
+                    {/* <Td>{typebot?.id}</Td> */}
+                    <Td>
+                      {!emailValid && (
+                        <Text color={'red.500'} fontSize={'sm'}>Please enter a valid email address.</Text>
+                      )}
+                      {duplicateEmail && (
+                        <Text color="red.500" fontSize="sm">Duplicate email address found.</Text>
+                      )}
+                      {emails.map((email, index) => (
+                        <Flex key={index} wrap={'wrap'}>
+                          <Input
+                            type="email"
+                            value={email}
+                            onChange={(event) => handleInputChange(index, event)}
+                            placeholder={`Email ${index + 1}`}
+                          />
+                          <Button color={'white'} _hover={{ bg: 'red.700' }} bg={'red.500'} mb={2} mt={2} type="button" onClick={() => handleRemoveEmail(index)}>
+                            Remove
+                          </Button>
+                        </Flex>
+                      ))}
+                      <Button color={'white'} _hover={{ bg: 'green.600' }} bg={'green.400'} onClick={handleAddEmail}>Add</Button>
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </ModalBody>
 
-                </>
-                )}
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button onClick={handleSave} variant='ghost'>Save</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Button color={'white'} _hover={{ bg: 'blue.700' }} bg={'blue.500'} onClick={onOpen}>Add Reminder</Button>
+
+
+        <Box overflowX="auto" maxW="100%">
+          {reminders && reminders.length > 0 &&
+            <Table variant="simple" size="md">
+              <Thead>
+                <Tr>
+                  <Th>Created At</Th>
+                  <Th>Type</Th>
+                  <Th>Frequency</Th>
+                  {/* <Th>Typebot ID</Th> */}
+                  <Th>Emails</Th>
+                  <Th>Action</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {reminders && reminders.map((reminder) => (
+                  <Tr key={reminder.id}>
+                    <Td>{new Date(reminder.createdAt).toLocaleDateString()}</Td>
+                    <Td>
+                      {isUpdating === reminder.id ? (
+                        <Select
+                          onChange={(e) => setUpdateFormData({ ...updateFormData, type: e.target.value })}
+                          value={updateFormData.type}
+                        >
+                          {['EMAIL', 'WHATSAPP', 'TEXT'].map((type, index) => (
+                            <option key={index}>{type}</option>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Text>{reminder.type}</Text>
+                      )}
+                    </Td>
+                    <Td>
+                      {isUpdating === reminder.id ? (
+                        <TimeFilterDropdown
+                          //@ts-ignore
+                          selectedTimeFilter={updateFormData.frequency}
+                          onChange={(value) => setUpdateFormData({ ...updateFormData, frequency: value })}
+                          placeholder="Choose a frequency"
+                        />
+                      ) : (
+                        <Text>{reminder.frequency}</Text>
+                      )}
+                    </Td>
+                    {/* <Td>{reminder.typebotId}</Td> */}
+                    <Td>
+                      {isUpdating === reminder.id ? (
+                        updateFormData.emails.map((email, index) => (
+                          <Flex key={index} wrap={'wrap'}>
+                            <Input
+                              type="email"
+                              value={email}
+                              onChange={(event) => {
+                                const newEmails = [...updateFormData.emails];
+                                //@ts-ignore
+                                newEmails[index] = event.target.value;
+                                setUpdateFormData({ ...updateFormData, emails: newEmails });
+                              }}
+                              placeholder={`Email ${index + 1}`}
+                            />
+                            <Button m={2} type="button" onClick={() => {
+                              const newEmails = updateFormData.emails.filter((_, i) => i !== index);
+                              setUpdateFormData({ ...updateFormData, emails: newEmails });
+                            }}>
+                              Remove
+                            </Button>
+                          </Flex>
+                        ))
+                      ) : (
+                        //@ts-ignore
+                        reminder.payload.emails.map((email, index) => (
+                          <Text key={index}>{email}</Text>
+                        ))
+                      )}
+                    </Td>
+                    <Td>
+                      {isUpdating === reminder.id ? (
+                        // <Button mr={2} onClick={() => handleUpdate(reminder.id)}>Save</Button>
+                        <Button mr={2} onClick={() => handleUpdateReminderData(reminder.id, reminder.jobId)}>Save</Button>
+                      ) : (
+                        <Button ml={2} color={'white'} _hover={{ bg: 'gray.600' }} bg={'gray.400'} mr={2} onClick={() => handleUpdateReminder(reminder)}>Update</Button>
+                      )}
+                      <Button color={'white'} _hover={{ bg: 'red.700' }} bg={'red.500'} onClick={() => handleDelete(reminder.id, reminder.jobId)}>Delete</Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>}
+        </Box>
       </Box>
     </Flex>
   )
 }
 
 
-// import React, { useEffect, useMemo, useState } from 'react'
-// import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, TableCaption, Text } from '@chakra-ui/react'
-// import { useTypebot } from '@/features/editor/providers/TypebotProvider'
-// import { trpc } from '@/lib/trpc'
-// import { isDefined } from '@udecode/plate-common'
-// import { TypebotHeader } from '@/features/editor/components/TypebotHeader'
-// import TimeFilterDropdown from '../helpers/TimeFilterDropdown'
-// import { defaultTimeFilter, timeFilterValues } from '../api/constants'
-// import { parseResultHeader } from '@typebot.io/lib/results'
-// import { LogicBlockType } from '@typebot.io/schemas'
-// import { convertResultsToTableData } from '../helpers/convertResultsToTableData'
 
-// export const RemindersTableContainer = () => {
-//   const { typebot, publishedTypebot } = useTypebot()
-//   const [selectedTimeFilter, setSelectedTimeFilter] = useState<(typeof timeFilterValues)[number]>(defaultTimeFilter)
-//   const [selectedType, setSelectedType] = useState('Email')
-//   const [emails, setEmails] = useState(['']) // Initialize with one empty email
-//   const [emailValid, setEmailValid] = useState(true);
-//   const [duplicateEmail, setDuplicateEmail] = useState<boolean>(false);
-//   const [isEditing, setIsEditing] = useState(true);
-//   const [reminders, setReminders] = useState([{ type: 'Email', frequency: defaultTimeFilter, emails: [''] }]); // Initialize with one reminder
-//   const [checkIsEmailEmpty, setcheckIsEmailEmpty] = useState(false)
-//   const { data } = trpc.results.getReminders.useQuery(
-//     {
-//       typebotId: typebot?.id as string,
-//       timeFilter: selectedTimeFilter
-//     },
-//     { enabled: isDefined(publishedTypebot) }
-//   )
 
-//   const linkedTypebotIds =
-//     publishedTypebot?.groups
-//       .flatMap((group) => group.blocks)
-//       .reduce<string[]>(
-//         (typebotIds, block) =>
-//           block.type === LogicBlockType.TYPEBOT_LINK &&
-//             isDefined(block.options.typebotId) &&
-//             !typebotIds.includes(block.options.typebotId) &&
-//             block.options.mergeResults !== false
-//             ? [...typebotIds, block.options.typebotId]
-//             : typebotIds,
-//         []
-//       ) ?? []
-
-//   const { data: linkedTypebotsData } = trpc.getLinkedTypebots.useQuery(
-//     {
-//       typebotId: typebot?.id as string,
-//     },
-//     {
-//       enabled: linkedTypebotIds.length > 0,
-//     }
-//   )
-
-//   const resultHeader = useMemo(
-//     () =>
-//       publishedTypebot
-//         ? parseResultHeader(publishedTypebot, linkedTypebotsData?.typebots)
-//         : [],
-//     [linkedTypebotsData?.typebots, publishedTypebot]
-//   )
-
-//   const tableData = useMemo(
-//     () =>
-//       publishedTypebot
-//         ? convertResultsToTableData(
-//           data?.results,
-//           resultHeader
-//         )
-//         : [],
-//     [publishedTypebot, data, resultHeader]
-//   )
-
-//   useEffect(() => {
-//     if (data?.results) {
-//       setReminders([{ type: 'Email', frequency: defaultTimeFilter, emails: [''] }]);
-//     }
-//   }, [data]);
-
-//   const handleTypeChange = (index, e) => {
-//     const newReminders = [...reminders];
-//     newReminders[index].type = e.target.value;
-//     setReminders(newReminders);
-//   }
-
-//   const handleFrequencyChange = (index, newFrequency) => {
-//     const newReminders = [...reminders];
-//     newReminders[index].frequency = newFrequency;
-//     console.log("frequency", newReminders)
-//     setSelectedTimeFilter(newReminders.frequency)
-//     setReminders(newReminders);
-//   }
-
-//   const validateEmail = (email) => {
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return emailRegex.test(email);
-//   }
-
-//   const handleEmailChange = (reminderIndex, emailIndex, event) => {
-//     const newReminders = [...reminders];
-//     newReminders[reminderIndex].emails[emailIndex] = event.target.value;
-//     console.log("is email emty", newReminders[reminderIndex].emails[emailIndex] = event.target.value == '')
-//     // if (newReminders[reminderIndex].emails[emailIndex] = event.target.value == '') {
-//     //   setcheckIsEmailEmpty(true)
-//     // }
-//     setEmailValid(validateEmail(event.target.value));
-//     setDuplicateEmail(newReminders[reminderIndex].emails.filter((e, i) => newReminders[reminderIndex].emails.indexOf(e) !== i).length > 0);
-//     setReminders(newReminders);
-//   };
-
-//   const handleAddEmail = (index) => {
-//     const newReminders = [...reminders];
-//     newReminders[index].emails.push('');
-//     setReminders(newReminders);
-//   };
-
-//   const handleRemoveEmail = (reminderIndex, emailIndex) => {
-//     const newReminders = [...reminders];
-//     newReminders[reminderIndex].emails = newReminders[reminderIndex].emails.filter((_, i) => i !== emailIndex);
-//     setReminders(newReminders);
-//   };
-
-//   const handleSave = () => {
-//     setIsEditing(false);
-//     if (checkIsEmailEmpty) {
-//       setIsEditing(true)
-//     }
-//   };
-
-//   const handleEdit = () => {
-//     setIsEditing(true);
-//   };
-
-//   const handleDelete = (index) => {
-//     const newReminders = reminders.filter((_, i) => i !== index);
-//     setReminders(newReminders);
-//   };
-
-//   return (
-//     <Flex overflowY={'auto'} overflowX={'hidden'} h="100vh" flexDir="column">
-//       <TypebotHeader />
-//       <Box mt={'5%'} mx={'auto'} w={'max-content'} p={4}>
-//         <Table variant="simple">
-//           <TableCaption>Reminders</TableCaption>
-//           <Thead>
-//             <Tr>
-//               <Th>Type</Th>
-//               <Th>Frequency</Th>
-//               <Th>Typebot ID</Th>
-//               <Th>Emails</Th>
-//               <Th>Action</Th>
-//             </Tr>
-//           </Thead>
-//           <Tbody>
-//             {reminders.map((reminder, index) => (
-//               <Tr key={index}>
-//                 <Td>
-//                   {isEditing ? (
-//                     <Select onChange={(e) => handleTypeChange(index, e)} value={reminder.type}>
-//                       {['Email', 'Whatsapp', 'Text'].map((type, idx) => (
-//                         <option key={idx}>{type}</option>
-//                       ))}
-//                     </Select>
-//                   ) : (
-//                     <Text>{reminder.type}</Text>
-//                   )}
-//                 </Td>
-//                 <Td>
-//                   {isEditing ? (
-//                     <TimeFilterDropdown
-//                       selectedTimeFilter={reminder.frequency}
-//                       onChange={(newFrequency) => handleFrequencyChange(index, newFrequency)}
-//                       placeholder="Choose a frequency"
-//                     />
-//                   ) : (
-//                     <Text>{reminder.frequency.label}</Text>
-//                   )}
-//                 </Td>
-//                 <Td>{typebot?.id}</Td>
-//                 <Td>
-//                   {!emailValid && (
-//                     <Text color={'red.500'} fontSize={'sm'}>Please enter a valid email address.</Text>
-//                   )}
-//                   {duplicateEmail && (
-//                     <Text color="red.500" fontSize="sm">Duplicate email address found.</Text>
-//                   )}
-//                   {/* {checkIsEmailEmpty && (<Text color="red.500" fontSize="sm">Please add email first.</Text>)} */}
-//                   {isEditing ? (
-//                     reminder.emails.map((email, emailIndex) => (
-//                       <Flex key={emailIndex} wrap={'wrap'}>
-//                         <Input
-//                           type="email"
-//                           value={email}
-//                           onChange={(event) => handleEmailChange(index, emailIndex, event)}
-//                           placeholder={`Email ${emailIndex + 1}`}
-//                         />
-//                         <Button m={2} type="button" onClick={() => handleRemoveEmail(index, emailIndex)}>
-//                           Remove
-//                         </Button>
-//                       </Flex>
-//                     ))
-//                   ) : (
-//                     reminder.emails.map((email, emailIndex) => (
-//                       <Text key={emailIndex}>{email}</Text>
-//                     ))
-//                   )}
-//                   {isEditing && (
-//                     <Button onClick={() => handleAddEmail(index)}>Add</Button>
-//                   )}
-//                 </Td>
-//                 <Td>
-//                   {isEditing ? (
-//                     <Button onClick={handleSave}>Save</Button>
-//                   ) : (
-//                     <Button onClick={handleEdit}>Edit</Button>
-//                   )}
-//                   <Button ml={2} onClick={() => handleDelete(index)}>Delete</Button>
-//                 </Td>
-//               </Tr>
-//             ))}
-//           </Tbody>
-//         </Table>
-//       </Box>
-//     </Flex>
-//   )
-// }

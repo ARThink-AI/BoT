@@ -86,8 +86,10 @@ import { authenticatedProcedure } from '@/helpers/server/trpc'
 import { z } from 'zod'
 import { ReminderSchema } from '@typebot.io/schemas' // Adjust import path as needed
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
+import { TRPCError } from '@trpc/server'
+import { canReadTypebots } from '@/helpers/databaseRules'
 
-const { typebot, publishedTypebot } = useTypebot()
+// const { typebot, publishedTypebot } = useTypebot()
 
 export const reminderRouter = {
   // Create a new reminder
@@ -111,10 +113,38 @@ export const reminderRouter = {
     }),
 
   // Update an existing reminder
+  // updateReminder: authenticatedProcedure
+  //   .meta({
+  //     openapi: {
+  //       method: 'PATCH',
+  //       path: '/reminders/{id}',
+  //       protect: true,
+  //       summary: 'Update an existing reminder',
+  //       tags: ['Reminder'],
+  //     },
+  //   })
+  //   .input(
+  //     z.object({
+  //       id: z.string(),
+  //       updates: ReminderSchema.omit({
+  //         id: true,
+  //         createdAt: true,
+  //         updatedAt: true,
+  //       }).partial(),
+  //     })
+  //   )
+  //   .output(ReminderSchema)
+  //   .mutation(async ({ input: { id, updates } }) => {
+  //     const updatedReminder = await prisma.reminder.update({
+  //       where: { id },
+  //       data: updates,
+  //     })
+  //     return updatedReminder
+  //   }),
   updateReminder: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'PATCH',
+        method: 'PUT',
         path: '/reminders/{id}',
         protect: true,
         summary: 'Update an existing reminder',
@@ -128,14 +158,17 @@ export const reminderRouter = {
           id: true,
           createdAt: true,
           updatedAt: true,
-        }).partial(),
+        }),
       })
     )
     .output(ReminderSchema)
     .mutation(async ({ input: { id, updates } }) => {
       const updatedReminder = await prisma.reminder.update({
         where: { id },
-        data: updates,
+        data: {
+          ...updates,
+          updatedAt: new Date(), // Automatically update updatedAt
+        },
       })
       return updatedReminder
     }),
@@ -181,4 +214,46 @@ export const reminderRouter = {
   //     // console.log('reminder', reminders)
   //     return reminders
   //   }),
+  getReminders: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/reminders/typebot/{typebotId}',
+        protect: true,
+        summary: 'Get reminders by typebotId',
+        tags: ['Reminder'],
+      },
+    })
+    .input(
+      z.object({
+        typebotId: z.string(),
+      })
+    )
+    .output(z.array(ReminderSchema))
+    .query(async ({ input: { typebotId }, ctx: { user } }) => {
+      // Check if the user can read typebots
+      const typebot = await prisma.typebot.findFirst({
+        where: canReadTypebots(typebotId, user),
+        select: { publishedTypebot: true },
+      })
+
+      if (!typebot) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have access to this typebot',
+        })
+      }
+
+      // Query reminders based on typebotId and optional date range
+      const reminders = await prisma.reminder.findMany({
+        where: {
+          typebotId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+
+      return reminders
+    }),
 }

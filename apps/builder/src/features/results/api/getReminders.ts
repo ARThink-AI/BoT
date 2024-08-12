@@ -1,5 +1,5 @@
 import prisma from '@typebot.io/lib/prisma'
-import { authenticatedProcedure } from '@/helpers/server/trpc'
+import { authenticatedProcedure, publicProcedure } from '@/helpers/server/trpc'
 import { TRPCError } from '@trpc/server'
 import { ResultWithAnswers } from '@typebot.io/schemas'
 import { z } from 'zod'
@@ -10,11 +10,11 @@ import {
   timeFilterValues,
 } from './constants' // Update import path if necessary
 
-export const getReminders = authenticatedProcedure
+export const getReminders = publicProcedure
   .meta({
     openapi: {
       method: 'GET',
-      path: '/typebots/{typebotId}/results/reminders',
+      path: '/typebots/{typebotId}/reminders',
       protect: true,
       summary: 'List results ordered by descending creation date',
       tags: ['Reminders'],

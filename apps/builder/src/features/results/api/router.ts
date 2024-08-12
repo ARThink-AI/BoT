@@ -15,5 +15,5 @@ export const resultsRouter = router({
   reminderCreate: reminderRouter.createReminder,
   updateReminder: reminderRouter.updateReminder,
   deleteReminder: reminderRouter.deleteReminder,
-  // fetchReminders: reminderRouter.getReminders,
+  fetchReminders: reminderRouter.getReminders,
 })
