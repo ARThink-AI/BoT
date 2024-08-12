@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import {
- 
+
   ChevronLeftIcon,
   RedoIcon,
   UndoIcon,
@@ -31,8 +31,11 @@ import { useTypebot } from '../providers/TypebotProvider'
 import { SupportBubble } from '@/components/SupportBubble'
 import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { useScopedI18n } from '@/locales'
+import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+import { WorkspaceRole } from '@typebot.io/prisma'
 
 export const TypebotHeader = () => {
+
   const scopedT = useScopedI18n('editor.headers')
   const router = useRouter()
   const {
@@ -46,6 +49,10 @@ export const TypebotHeader = () => {
     canRedo,
     isSavingLoading,
   } = useTypebot()
+  const { currentRole, workspace } = useWorkspace()
+  console.log("workpsace", workspace);
+  const hasFullAccess =
+    (currentRole && currentRole !== WorkspaceRole.GUEST) || false
   const { setRightPanel, rightPanel, setStartPreviewAtGroup } = useEditor()
   const [isUndoShortcutTooltipOpen, setUndoShortcutTooltipOpen] =
     useState(false)
@@ -98,42 +105,50 @@ export const TypebotHeader = () => {
         pos={{ base: 'absolute', xl: 'static' }}
         right={{ base: 280, xl: 0 }}
       >
-        <Button
-          as={Link}
-          href={`/typebots/${typebot?.id}/edit`}
-          colorScheme={router.pathname.includes('/edit') ? 'blue' : 'gray'}
-          variant={router.pathname.includes('/edit') ? 'outline' : 'ghost'}
-          size="sm"
-        >
-          {scopedT('flowButton.label')}
-        </Button>
-        <Button
-          as={Link}
-          href={`/typebots/${typebot?.id}/theme`}
-          colorScheme={router.pathname.endsWith('theme') ? 'blue' : 'gray'}
-          variant={router.pathname.endsWith('theme') ? 'outline' : 'ghost'}
-          size="sm"
-        >
-          {scopedT('themeButton.label')}
-        </Button>
-        <Button
-          as={Link}
-          href={`/typebots/${typebot?.id}/settings`}
-          colorScheme={router.pathname.endsWith('settings') ? 'blue' : 'gray'}
-          variant={router.pathname.endsWith('settings') ? 'outline' : 'ghost'}
-          size="sm"
-        >
-          {scopedT('settingsButton.label')}
-        </Button>
-        <Button
-          as={Link}
-          href={`/typebots/${typebot?.id}/share`}
-          colorScheme={router.pathname.endsWith('share') ? 'blue' : 'gray'}
-          variant={router.pathname.endsWith('share') ? 'outline' : 'ghost'}
-          size="sm"
-        >
-          {scopedT('shareButton.label')}
-        </Button>
+        {hasFullAccess && (
+          <>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/edit`}
+              colorScheme={router.pathname.includes('/edit') ? 'blue' : 'gray'}
+              variant={router.pathname.includes('/edit') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('flowButton.label')}
+            </Button>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/theme`}
+              colorScheme={router.pathname.endsWith('theme') ? 'blue' : 'gray'}
+              variant={router.pathname.endsWith('theme') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('themeButton.label')}
+            </Button>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/settings`}
+              colorScheme={router.pathname.endsWith('settings') ? 'blue' : 'gray'}
+              variant={router.pathname.endsWith('settings') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('settingsButton.label')}
+            </Button>
+            <Button
+              as={Link}
+              href={`/typebots/${typebot?.id}/share`}
+              colorScheme={router.pathname.endsWith('share') ? 'blue' : 'gray'}
+              variant={router.pathname.endsWith('share') ? 'outline' : 'ghost'}
+              size="sm"
+            >
+              {scopedT('shareButton.label')}
+            </Button>
+          </>
+        )}
+
+
+
+
         {isDefined(publishedTypebot) && (
           <Button
             as={Link}
@@ -162,8 +177,8 @@ export const TypebotHeader = () => {
               pathname: router.query.parentId
                 ? '/typebots/[typebotId]/edit'
                 : typebot?.folderId
-                ? '/typebots/folders/[folderId]'
-                : '/typebots',
+                  ? '/typebots/folders/[folderId]'
+                  : '/typebots',
               query: {
                 folderId: typebot?.folderId ?? [],
                 parentId: Array.isArray(router.query.parentId)
@@ -250,7 +265,7 @@ export const TypebotHeader = () => {
             {scopedT('previewButton.label')}
           </Button>
         )}
-        <PublishButton size="sm" />
+        {hasFullAccess && <PublishButton size="sm" />}
       </HStack>
     </Flex>
   )

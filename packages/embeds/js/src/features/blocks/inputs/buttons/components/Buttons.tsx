@@ -195,7 +195,7 @@ export const Buttons = (props: Props) => {
       <Show when={props.options?.isDropdown} >
         <div class={'flex flex-wrap justify-end gap-2'} >
           <div style={{ display: "flex", "flex-direction": "column", "gap": "8px", "align-items": "flex-end" }} >
-            <select onChange={(e) => setSelectedDropdownItem(e?.target?.value)} value={selectedDropdownItem()} >
+            <select class='p-2 border-2 border-gray-300 focus:outline-none focus:ring focus:ring-blue-700 appearance-none , rounded-md px-4 py-2 lg:w-72 md:w-[70%] sm:w-full' onChange={(e) => setSelectedDropdownItem(e?.target?.value)} value={selectedDropdownItem()} >
               <option disabled selected value="" > Select Item  </option>
               <For each={filteredItems()}>
                 {(item, index) => (
@@ -203,7 +203,7 @@ export const Buttons = (props: Props) => {
                 )}
               </For>
             </select>
-            <button onClick={handleDropdownSubmit} > Send  </button>
+            <button class="p-2.5 mt-2 lg:w-72 md:w-2/3 sm:w-full text-white bg-blue-700 rounded" onClick={handleDropdownSubmit} > Send  </button>
           </div>
 
 

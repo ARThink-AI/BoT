@@ -57,6 +57,7 @@ export const EmbedBubble = (props: Props) => {
             }}
           >
             <iframe
+              allow="camera"
               id="embed-bubble-content"
               src={props.content.url}
               class={'w-full h-full '}

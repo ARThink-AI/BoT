@@ -17,6 +17,9 @@ export const TextInputSettings = ({ options, onOptionsChange }: Props) => {
     onOptionsChange({ ...options, labels: { ...options.labels, button } })
   const handleLongChange = (isLong: boolean) =>
     onOptionsChange({ ...options, isLong })
+  const handleisWordCloudChange = (isWordCloud: boolean) =>
+    onOptionsChange({ ...options, isWordCloud })
+
   const handleVariableChange = (variable?: Variable) =>
     onOptionsChange({ ...options, variableId: variable?.id })
 
@@ -27,6 +30,12 @@ export const TextInputSettings = ({ options, onOptionsChange }: Props) => {
         initialValue={options?.isLong ?? false}
         onCheckChange={handleLongChange}
       />
+      <SwitchWithLabel
+        label="Word Cloud Enabled?"
+        initialValue={options?.isWordCloud ?? false}
+        onCheckChange={handleisWordCloudChange}
+      />
+
       <TextInput
         label="Placeholder:"
         defaultValue={options.labels.placeholder}

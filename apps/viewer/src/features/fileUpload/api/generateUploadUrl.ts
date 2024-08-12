@@ -153,7 +153,8 @@ export const generateUploadUrl = publicProcedure
         code: 'BAD_REQUEST',
         message: "Can't find session",
       })
-
+ // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
     const typebotId = session.state.typebotsQueue[0].typebot.id
 
     const publicTypebot = await prisma.publicTypebot.findFirst({
@@ -185,6 +186,8 @@ export const generateUploadUrl = publicProcedure
     const fileUploadBlock = publicTypebotSchema._def.schema.shape.groups
       .parse(publicTypebot.groups)
       .flatMap((group) => group.blocks)
+       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
       .find((block) => block.id === session.state.currentBlock?.blockId)
 
     if (fileUploadBlock?.type !== InputBlockType.FILE)

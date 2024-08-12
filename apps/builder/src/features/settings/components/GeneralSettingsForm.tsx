@@ -16,6 +16,8 @@ import { DropdownList } from '@/components/DropdownList'
 import { MoreInfoTooltip } from '@/components/MoreInfoTooltip'
 import { TextInput } from '@/components/inputs'
 
+// import { TextInput } from '@/components/inputs'
+// import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 type Props = {
   generalSettings: GeneralSettings
   onGeneralSettingsChange: (generalSettings: GeneralSettings) => void
@@ -25,6 +27,8 @@ export const GeneralSettingsForm = ({
   generalSettings,
   onGeneralSettingsChange,
 }: Props) => {
+  // const { typebot, updateTypebot } = useTypebot()
+  // console.log("ttt", typebot);
 
   const toggleRememberUser = (isEnabled: boolean) =>
     onGeneralSettingsChange({
@@ -78,9 +82,49 @@ export const GeneralSettingsForm = ({
       quadzBaseUrl
     })
 
+  const handleTwilioChange = (isTwilioEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isTwilioEnabled,
+    })
+
+  const handleCustomInputChange = (isCustomInputEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isCustomInputEnabled,
+    })
+
+  const handleAutoRefreshInputChange = (isAutoRefreshEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isAutoRefreshEnabled,
+    })
+
+  const handlePublicIdInputChange = (publicId: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      publicId,
+    })
 
 
 
+
+  // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
+  //   onGeneralSettingsChange({
+  //     ...generalSettings,
+  //     twilioPhoneNumber,
+  //   })
+
+  const handleSessionTimoutTime = (sessionTimout: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      sessionTimout
+    })
+  const handleHideBranding = (hideBranding: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      hideBranding
+    })
 
 
 
@@ -96,6 +140,7 @@ export const GeneralSettingsForm = ({
       },
     })
 
+  // let twilioUrl = `https://www.twilio.com/authorize/CN01eb83649eb3514ba70c7dd777ec69de?state=${typebot.id}`;
   return (
     <Stack spacing={6}>
       <SwitchWithLabel
@@ -103,6 +148,12 @@ export const GeneralSettingsForm = ({
         initialValue={generalSettings.isInputPrefillEnabled ?? true}
         onCheckChange={handleInputPrefillChange}
         moreInfoContent="Inputs are automatically pre-filled whenever their associated variable has a value"
+      />
+      <SwitchWithLabel
+        label="Hide Branding"
+        initialValue={generalSettings.hideBranding ?? false}
+        onCheckChange={handleHideBranding}
+        moreInfoContent="Hide Footer"
       />
       <SwitchWithLabel
         label="Hide query params on bot start"
@@ -154,6 +205,74 @@ export const GeneralSettingsForm = ({
           />
         </>
       )}
+      <SwitchWithLabel
+        label="Twilio Enabled"
+        initialValue={generalSettings.isTwilioEnabled ?? false}
+        onCheckChange={handleTwilioChange}
+        moreInfoContent="Toggle to Enable Twilio"
+      />
+      <SwitchWithLabel
+        label="Auto Refresh Enabled"
+        initialValue={generalSettings.isAutoRefreshEnabled ?? true}
+        onCheckChange={handleAutoRefreshInputChange}
+        moreInfoContent="Toggle to Enable Auto Refresh"
+      />
+
+      <>
+        {/* <Text> Session Timeout  </Text> */}
+        <TextInput
+          label="Session Timeout"
+          onChange={handleSessionTimoutTime}
+          withVariableButton={false}
+          defaultValue={generalSettings.sessionTimout ?? '20'}
+
+        />
+        {/* <input
+        
+          // defaultValue={generalSettings.sessionTimout ? generalSettings.sessionTimout : ""}
+          onChange={e => handleSessionTimoutTime(e)}
+          defaultValue={20}
+          value={20}
+
+        /> */}
+      </>
+      {/* {generalSettings.isTwilioEnabled && (
+        <TextInput
+          label="Twilio Phone Number"
+          onChange={handlePhoneNumberChange}
+          defaultValue={generalSettings.twilioPhoneNumber ?? ''}
+          placeholder="Phone Number"
+          withVariableButton={false}
+        />
+      )} */}
+      {/* {
+        generalSettings.isTwilioEnabled && !generalSettings.twilioAccountId && (
+          <>
+            <a
+              href={twilioUrl}
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "#0042DA", width: "180px", height: "36px", paddingRight: "5px", color: "white", border: "none", borderRadius: "4px", textDecoration: "none", fontSize: "14px", fontWeight: "600", lineHeight: "20px" }}  >
+              <span style={{ marginTop: "4px", width: "40px" }} ><img src="data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCA2MCI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNmZmY7fTwvc3R5bGU+PC9kZWZzPgoJPHRpdGxlPnR3aWxpby1sb2dvbWFyay13aGl0ZUFydGJvYXJkIDE8L3RpdGxlPgoJPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMzAsMTVBMTUsMTUsMCwxLDAsNDUsMzAsMTUsMTUsMCwwLDAsMzAsMTVabTAsMjZBMTEsMTEsMCwxLDEsNDEsMzAsMTEsMTEsMCwwLDEsMzAsNDFabTYuOC0xNC43YTMuMSwzLjEsMCwxLDEtMy4xLTMuMUEzLjEyLDMuMTIsMCwwLDEsMzYuOCwyNi4zWm0wLDcuNGEzLjEsMy4xLDAsMSwxLTMuMS0zLjFBMy4xMiwzLjEyLDAsMCwxLDM2LjgsMzMuN1ptLTcuNCwwYTMuMSwzLjEsMCwxLDEtMy4xLTMuMUEzLjEyLDMuMTIsMCwwLDEsMjkuNCwzMy43Wm0wLTcuNGEzLjEsMy4xLDAsMSwxLTMuMS0zLjFBMy4xMiwzLjEyLDAsMCwxLDI5LjQsMjYuM1oiLz4KPC9zdmc+" /></span>
+              Twilio Connect
+            </a>
+          </>
+        )
+      } */}
+
+      <SwitchWithLabel
+        label="Custom Input Enabled on bot start"
+        initialValue={generalSettings.isCustomInputEnabled ?? false}
+        onCheckChange={handleCustomInputChange}
+        moreInfoContent="Toggle for Custom Input"
+      />
+      {generalSettings.isCustomInputEnabled && (
+        <TextInput
+          label="Public Id"
+          onChange={handlePublicIdInputChange}
+          defaultValue={generalSettings.publicId ?? ''}
+          placeholder="Public Id "
+          withVariableButton={false}
+        />
+      )}
 
 
 
@@ -198,3 +317,4 @@ export const GeneralSettingsForm = ({
     </Stack>
   )
 }
+

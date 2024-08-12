@@ -32,10 +32,14 @@ export const sendMessageV2 = publicProcedure
       console.log("send message v2 called", sessionId , message );
   
       const session = sessionId ? await getSession(sessionId) : null
-      
+      console.log("session init",session);
       const isSessionExpired =
         session &&
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         isDefined(session.state.expiryTimeout) &&
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         session.updatedAt.getTime() + session.state.expiryTimeout < Date.now()
 
       if (isSessionExpired)
@@ -108,6 +112,8 @@ export const sendMessageV2 = publicProcedure
           newSessionState,
           logs,
           lastMessageNewFormat,
+           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore 
         } = await continueBotFlow(message, { version: 2, state: session.state })
         console.log("entered elsee after continue bot flow v2 send message end")
         const allLogs = clientLogs ? [...(logs ?? []), ...clientLogs] : logs

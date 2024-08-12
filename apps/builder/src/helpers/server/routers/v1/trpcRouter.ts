@@ -17,6 +17,7 @@ import { openAIRouter } from '@/features/blocks/integrations/openai/api/router'
 import { generateUploadUrl } from '@/features/upload/api/generateUploadUrl'
 import { zemanticAiRouter } from '@/features/blocks/integrations/zemanticAi/api/router'
 import { trudeskRouter } from '@/features/blocks/integrations/trudesk/api/router'
+import { WhatsappRouter } from '@/features/blocks/integrations/whatsapp/api/router'
 
 export const trpcRouter = router({
   getAppVersionProcedure,
@@ -36,7 +37,8 @@ export const trpcRouter = router({
   openAI: openAIRouter,
   generateUploadUrl,
   zemanticAi: zemanticAiRouter,
-  trudesk : trudeskRouter
+  trudesk: trudeskRouter,
+  Whatsapp: WhatsappRouter
 })
 
 export type AppRouter = typeof trpcRouter

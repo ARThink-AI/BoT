@@ -11,6 +11,7 @@
     "test:report": "pnpm playwright show-report"
   },
   "dependencies": {
+    "twilio": "^5.0.4",
     "socket.io-client":"4.7.2",
     "@google-cloud/translate" : "8.0.2",
     "@google-cloud/speech": "^6.1.0",

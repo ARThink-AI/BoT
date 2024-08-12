@@ -13,35 +13,47 @@ export const sendMessageQuery = ({
   })
 
 
-  export const storeLiveChatQuery = ({
-     // @ts-ignore
-    apiHost ,
-    // @ts-ignore
-    typebotId ,
-    // @ts-ignore
-    resultId ,
-    ...body
-  }) =>
-    sendRequest({
-      method: 'PATCH',
-      url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/typebots/${typebotId}/results/${resultId}`,
-      body,
-    })  
+export const storeLiveChatQuery = ({
+  // @ts-ignore
+  apiHost,
+  // @ts-ignore
+  typebotId,
+  // @ts-ignore
+  resultId,
+  ...body
+}) =>
+  sendRequest({
+    method: 'PATCH',
+    url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/typebots/${typebotId}/results/${resultId}`,
+    body,
+  })
 
 export const getTicketIdQuery = ({
-    // @ts-ignore
-    apiHost ,
-    // @ts-ignore
-    typebotId ,
-    // @ts-ignore
-    resultId ,
-    // @ts-ignore
-    ticketIdVariable ,
-    // @ts-ignore 
-    accessTokenVariable 
-}) => 
+  // @ts-ignore
+  apiHost,
+  // @ts-ignore
+  typebotId,
+  // @ts-ignore
+  resultId,
+  // @ts-ignore
+  ticketIdVariable,
+  // @ts-ignore 
+  accessTokenVariable
+}) =>
   sendRequest({
-    method : "GET",
-    url : `${isNotEmpty(apiHost) ? apiHost : guessApiHost() }/api/typebots/${typebotId}/results/${resultId}/ticket/${ticketIdVariable}/get?accessTokenVariable=${accessTokenVariable}`  
-    
-  })    
+    method: "GET",
+    url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/typebots/${typebotId}/results/${resultId}/ticket/${ticketIdVariable}/get?accessTokenVariable=${accessTokenVariable}`
+
+  })
+export const initiateCall = ({
+  // @ts-ignore
+  apiHost,
+
+  // @ts-ignore
+  ...body
+}) =>
+  sendRequest({
+    method: 'POST',
+    url: `${isNotEmpty(apiHost) ? apiHost : guessApiHost()}/api/integrations/twilio/call`,
+    body,
+  })  

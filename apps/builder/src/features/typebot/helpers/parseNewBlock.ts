@@ -110,9 +110,9 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
     case InputBlockType.PICTURE_CHOICE:
       return defaultPictureChoiceOptions
     case InputBlockType.BARCODE_READER:
-     return defaultBarCodeInputOptions
+      return defaultBarCodeInputOptions
     case InputBlockType.CARD:
-      return defaultCardInputOptions 
+      return defaultCardInputOptions
     case InputBlockType.PAYMENT:
       return defaultPaymentInputOptions
     case InputBlockType.RATING:
@@ -141,7 +141,7 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
     case IntegrationBlockType.PABBLY_CONNECT:
     case IntegrationBlockType.MAKE_COM:
     case IntegrationBlockType.WEBHOOK:
-    case IntegrationBlockType.FLOWWISE:  
+    case IntegrationBlockType.FLOWWISE:
       return defaultWebhookOptions(createId())
     case IntegrationBlockType.EMAIL:
       return defaultSendEmailOptions
@@ -150,7 +150,9 @@ const parseDefaultBlockOptions = (type: BlockWithOptionsType): BlockOptions => {
     case IntegrationBlockType.OPEN_AI:
       return {}
     case IntegrationBlockType.TRUDESK:
-      return {}  
+      return {}
+    case IntegrationBlockType.WHATSAPP:
+      return {}
     case IntegrationBlockType.PIXEL:
       return {}
     case IntegrationBlockType.ZEMANTIC_AI:

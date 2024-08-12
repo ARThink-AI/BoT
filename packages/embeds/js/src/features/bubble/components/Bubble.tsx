@@ -15,7 +15,7 @@ import { BubbleParams } from '../types'
 import { Bot, BotProps } from '../../../components/Bot'
 import { getPaymentInProgressInStorage } from '@/features/blocks/inputs/payment/helpers/paymentInProgressStorage'
 import { io } from "socket.io-client";
-import jsPDF from 'jspdf/dist/jspdf.umd.js'
+// import jsPDF from 'jspdf/dist/jspdf.umd.js'
 
 export type BubbleProps = BotProps &
   BubbleParams & {
@@ -164,64 +164,64 @@ export const Bubble = (props: BubbleProps) => {
 
 
   // a4 pdf the convertHTMLtoPDF function
-  function convertHTMLtoPDF() {
-    // Select the typebot-standard element
-    const typebotStandard = document.querySelector('typebot-bubble');
+  // function convertHTMLtoPDF() {
+  //   // Select the typebot-standard element
+  //   const typebotStandard = document.querySelector('typebot-bubble');
 
-    // Check if the typebot-standard element exists
-    if (typebotStandard) {
-      // Access the shadow root of typebot-standard
-      const shadowRoot = typebotStandard.shadowRoot;
+  //   // Check if the typebot-standard element exists
+  //   if (typebotStandard) {
+  //     // Access the shadow root of typebot-standard
+  //     const shadowRoot = typebotStandard.shadowRoot;
 
-      // Check if the shadow root exists
-      if (shadowRoot) {
-        // Select the chatContainerDiv element inside the shadow root
-        const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
+  //     // Check if the shadow root exists
+  //     if (shadowRoot) {
+  //       // Select the chatContainerDiv element inside the shadow root
+  //       const chatContainer = shadowRoot.querySelector('#chatContainerDiv');
 
-        // Check if the chatContainerDiv element exists
-        if (chatContainer) {
-          // Create a new jsPDF instance
-          let doc = new jsPDF('p', 'px', 'a4');
+  //       // Check if the chatContainerDiv element exists
+  //       if (chatContainer) {
+  //         // Create a new jsPDF instance
+  //         let doc = new jsPDF('p', 'px', 'a4');
 
-          // Get the dimensions of the content
-          let containerWidth = chatContainer.offsetWidth;
-          let containerHeight = chatContainer.offsetHeight;
+  //         // Get the dimensions of the content
+  //         let containerWidth = chatContainer.offsetWidth;
+  //         let containerHeight = chatContainer.offsetHeight;
 
-          // Get the dimensions of the PDF page
-          let pageWidth = doc.internal.pageSize.getWidth();
-          let pageHeight = doc.internal.pageSize.getHeight();
+  //         // Get the dimensions of the PDF page
+  //         let pageWidth = doc.internal.pageSize.getWidth();
+  //         let pageHeight = doc.internal.pageSize.getHeight();
 
-          // Set the desired margin from the top and sides
-          let marginTop = 20;
-          let marginLeft = 20;
-          let marginRight = 20;
+  //         // Set the desired margin from the top and sides
+  //         let marginTop = 20;
+  //         let marginLeft = 20;
+  //         let marginRight = 20;
 
-          // Calculate the position to center the content horizontally
-          // let xPos = marginLeft;
-          let xPos = marginLeft + ((pageWidth - marginLeft - marginRight - containerWidth) / 2);
+  //         // Calculate the position to center the content horizontally
+  //         // let xPos = marginLeft;
+  //         let xPos = marginLeft + ((pageWidth - marginLeft - marginRight - containerWidth) / 2);
 
-          // Calculate the position to start the content vertically
-          let yPos = marginTop;
+  //         // Calculate the position to start the content vertically
+  //         let yPos = marginTop;
 
-          // Add the chatContainerDiv content to PDF
-          doc.html(chatContainer, {
-            callback: function (doc) {
-              doc.save("chat_history.pdf");
-            },
-            x: xPos,
-            y: yPos,
-            width: pageWidth - marginLeft - marginRight
-          });
-        } else {
-          console.log("chatContainerDiv not found inside shadow root");
-        }
-      } else {
-        console.log("Shadow root not found for typebot-standard");
-      }
-    } else {
-      console.log("typebot-standard not found in the DOM");
-    }
-  }
+  //         // Add the chatContainerDiv content to PDF
+  //         doc.html(chatContainer, {
+  //           callback: function (doc) {
+  //             doc.save("chat_history.pdf");
+  //           },
+  //           x: xPos,
+  //           y: yPos,
+  //           width: pageWidth - marginLeft - marginRight
+  //         });
+  //       } else {
+  //         console.log("chatContainerDiv not found inside shadow root");
+  //       }
+  //     } else {
+  //       console.log("Shadow root not found for typebot-standard");
+  //     }
+  //   } else {
+  //     console.log("typebot-standard not found in the DOM");
+  //   }
+  // }
 
 
 
@@ -280,7 +280,7 @@ export const Bubble = (props: BubbleProps) => {
                   <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
                     <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
                     <ul>
-                      <li><button onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' >Download Chat</button></li>
+                      {/* <li><button onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' >Download Chat</button></li> */}
                       <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
                       <li><button class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' onClick={() => {
                         console.log("stop clicked restart");
