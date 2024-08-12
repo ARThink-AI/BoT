@@ -118,14 +118,14 @@ export const RemindersTableContainer = () => {
   const deleteMutation = trpc.results.deleteReminder.useMutation();
 
   //@ts-ignore
-  const { data: reminders, isLoading, error } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
+  const { data: reminders, refetch, isLoading, error } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
 
   const addReminder = async (jobId: string) => {
     try {
       const newReminder = await mutation.mutateAsync({
         //@ts-ignore
         jobId: jobId,
-        payload: { 'emails': emails, resultHeader: resultHeader },
+        payload: { 'emails': emails },
         //@ts-ignore
         typebotId: typebot?.id,
         //@ts-ignore
@@ -133,6 +133,7 @@ export const RemindersTableContainer = () => {
         frequency: selectedTimeFilter,
       });
       console.log('Reminder added:', newReminder);
+      refetch()
     } catch (error) {
       console.error('Error adding reminder:', error);
     }
@@ -152,7 +153,8 @@ export const RemindersTableContainer = () => {
           typebotId: updateFormData.typebotId
         },
       });
-      window.location.reload()
+      // window.location.reload()
+      refetch()
       console.log('Reminder updated:', updatedReminder);
       setUpdating(null); // Reset the updating state
     } catch (error) {
@@ -163,7 +165,8 @@ export const RemindersTableContainer = () => {
   const deleteReminder = async (id: string) => {
     try {
       const result = await deleteMutation.mutateAsync(id);
-      window.location.reload()
+      // window.location.reload()
+      refetch()
       console.log('Reminder deleted:', result);
     } catch (error) {
       console.error('Error deleting reminder:', error);
@@ -181,7 +184,7 @@ export const RemindersTableContainer = () => {
         body: JSON.stringify({
           "typebotId": typebotId,
           "type": type,
-          "payload": { payload, resultHeader: resultHeader },
+          "payload": { payload },
           "frequency": frequency,
         })
       })

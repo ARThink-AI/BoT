@@ -3,7 +3,11 @@ import { TextToSpeechClient } from '@google-cloud/text-to-speech'
 import { TranslationServiceClient } from '@google-cloud/translate'
 import { SpeechClient } from '@google-cloud/speech'
 import { env } from '@typebot.io/env'
-import { LogicBlockType, ResultWithAnswers } from '@typebot.io/schemas'
+import {
+  LogicBlockType,
+  ResultWithAnswers,
+  typebotSchema,
+} from '@typebot.io/schemas'
 import prisma from '@typebot.io/lib/prisma'
 import {
   startOfDay,
@@ -13,8 +17,10 @@ import {
   endOfMonth,
   subMonths,
 } from 'date-fns'
-// import { parseResultHeader } from '@typebot.io/lib/results'
-// import { useMemo } from 'react'
+import { isDefined } from '@typebot.io/lib'
+import { CollaboratorsOnTypebots, Typebot, User } from '@typebot.io/prisma'
+import { parseResultHeader } from '@typebot.io/lib/results'
+import { useMemo } from 'react'
 // import { isDefined } from '@typebot.io/lib'
 
 const responseHeaders = {
@@ -76,6 +82,28 @@ export const parseToDateFromTimeFilter = (
   }
 }
 
+export const isReadTypebotForbidden = async (
+  typebot: Pick<Typebot, 'workspaceId'> & {
+    collaborators: Pick<CollaboratorsOnTypebots, 'userId'>[]
+  },
+  user: Pick<User, 'email' | 'id'>
+) => {
+  if (
+    env.ADMIN_EMAIL === user.email ||
+    typebot.collaborators.find(
+      (collaborator) => collaborator.userId === user.id
+    )
+  )
+    return false
+  const memberInWorkspace = await prisma.memberInWorkspace.findFirst({
+    where: {
+      workspaceId: typebot.workspaceId,
+      userId: user.id,
+    },
+  })
+  return memberInWorkspace === null
+}
+
 // const linkedTypebotIds =
 //     publishedTypebot?.groups
 //       .flatMap((group) => group.blocks)
@@ -119,19 +147,38 @@ export async function POST(req: Request) {
     const adjustedStartDate = parseFromDateFromTimeFilter(timeFilter)
     const adjustedEndDate = parseToDateFromTimeFilter(timeFilter)
 
-    const typebot = await prisma.typebot.findUnique({
+    // const typebot = await prisma.typebot.findUnique({
+    //   where: {
+    //     id: typebotId,
+    //   },
+    //   select: {
+    //     id: true,
+    //     workspaceId: true,
+    //     variables: true,
+    //     groups: true,
+    //     collaborators: {
+    //       select: {
+    //         userId: true,
+    //         type: true,
+    //       },
+    //     },
+    //   },
+    // })
+    const typebot = await prisma.typebot.findFirst({
       where: {
         id: typebotId,
       },
       select: {
         id: true,
-        workspaceId: true,
-        variables: true,
         groups: true,
+        variables: true,
+        name: true,
+        createdAt: true,
+        workspaceId: true,
         collaborators: {
           select: {
-            userId: true,
             type: true,
+            userId: true,
           },
         },
       },
@@ -144,6 +191,62 @@ export async function POST(req: Request) {
       )
     }
 
+    const linkedTypebotIds =
+      typebotSchema._def.schema.shape.groups
+        .parse(typebot.groups)
+        .flatMap((group) => group.blocks)
+        .reduce<string[]>(
+          (typebotIds, block) =>
+            block.type === LogicBlockType.TYPEBOT_LINK &&
+            isDefined(block.options.typebotId) &&
+            !typebotIds.includes(block.options.typebotId) &&
+            block.options.mergeResults !== false
+              ? [...typebotIds, block.options.typebotId]
+              : typebotIds,
+          []
+        ) ?? []
+
+    // if (!linkedTypebotIds.length) return { typebots: [] }
+
+    // console.log('linkedd typebotid', linkedTypebotIds)
+    const typebots = (
+      await prisma.typebot.findMany({
+        where: {
+          isArchived: { not: true },
+          id: { in: linkedTypebotIds },
+        },
+        select: {
+          id: true,
+          groups: true,
+          variables: true,
+          name: true,
+          createdAt: true,
+          workspaceId: true,
+          collaborators: {
+            select: {
+              type: true,
+              userId: true,
+            },
+          },
+        },
+      })
+    )
+      .filter(async (typebot) => !(await isReadTypebotForbidden(typebot, user)))
+      // To avoid the out of sort memory error, we sort the typebots manually
+      .sort((a, b) => {
+        return b.createdAt.getTime() - a.createdAt.getTime()
+      })
+      .map((typebot) => ({
+        ...typebot,
+        groups: typebotSchema._def.schema.shape.groups.parse(typebot.groups),
+        variables: typebotSchema._def.schema.shape.variables.parse(
+          typebot.variables
+        ),
+      }))
+
+    const resultHeader = parseResultHeader(typebot, typebots)
+
+    console.log('dhfjdhfjdhfj', resultHeader)
     const results = (await prisma.result.findMany({
       where: {
         typebotId: typebot.id,
@@ -162,7 +265,7 @@ export async function POST(req: Request) {
 
     // return { results }
     return NextResponse.json(
-      { message: results },
+      { message: results, resultHeader: resultHeader },
       { status: 200, headers: responseHeaders }
     )
   } catch (error) {
