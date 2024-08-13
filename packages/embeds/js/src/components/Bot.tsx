@@ -182,6 +182,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
           <>
             <BotContent
               initializeBot={initializeBot}
+              selectedLanguage={selectedLanguage}
+              setSelectedLanguage={setSelectedLanguage}
               socket={props.socket}
               class={props.class}
               initialChatReply={{
@@ -212,26 +214,10 @@ export const Bot = (props: BotProps & { class?: string }) => {
               onAnswer={props.onAnswer}
               onEnd={props.onEnd}
             />
-            <Show when={initialChatReply.typebot.settings.general.isVoiceEnabled} >
-              <div style={!isMobile() ? { position: "fixed", top: "1%", left: "50%" } : { position: "fixed", top: "1%", left: "50%" }} >
-                <select class='p-[3px]' value={selectedLanguage()} onChange={(evt) => {
-                  console.log("vall", evt?.target?.value);
-                  setSelectedLanguage(evt?.target?.value);
-                  initializeBot();
-                }} >
-                  <option value="en-IN" > English  </option>
-                  <option value="hi-IN" > Hindi  </option>
-                  <option value="te-IN" > Telugu  </option>
-                  <option value="ta-IN">  Tamil </option>
-                  <option value="mr-IN" > Marathi  </option>
-                  <option value="kn-IN" > Kannada  </option>
-                  <option value="ml-IN" > Malayalam  </option>
-                  <option value="bn-IN" > Bengali </option>
-                </select>
-              </div>
-            </Show>
+
           </>
         )}
+
         {/* <div style={{ position : "relative" , top  :"-50%" , left : "80%" , width : "100px" }} >
       <select>
         <option> English  </option>
@@ -255,6 +241,8 @@ type BotContentProps = {
   onEnd?: () => void
   onNewLogs?: (logs: OutgoingLog[]) => void
   socket: any
+  selectedLanguage: any;
+  setSelectedLanguage: any;
 }
 
 const BotContent = (props: BotContentProps) => {
@@ -560,7 +548,6 @@ const BotContent = (props: BotContentProps) => {
         </div>
         </div> */}
         <div ref={conversationContainer} class="flex w-full h-full justify-center">
-
           <ConversationContainer
             // liveAgent={liveAgent()}
             initializeBot={props.initializeBot}
@@ -571,6 +558,8 @@ const BotContent = (props: BotContentProps) => {
             onAnswer={props.onAnswer}
             onEnd={props.onEnd}
             onNewLogs={props.onNewLogs}
+            selectedLanguage={props?.selectedLanguage}
+            setSelectedLanguage={props?.setSelectedLanguage}
           />
         </div>
         <Show
