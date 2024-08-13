@@ -1,10 +1,10 @@
 import {
   startOfDay,
   subDays,
-  startOfYear,
-  startOfMonth,
-  endOfMonth,
-  subMonths,
+  // startOfYear,
+  // startOfMonth,
+  // endOfMonth,
+  // subMonths,
 } from 'date-fns'
 
 export const timeFilterValues = [
@@ -58,7 +58,7 @@ export const parseFromDateFromTimeFilter = (
 export const parseToDateFromTimeFilter = (
   timeFilter: (typeof timeFilterValues)[number]
 ): Date | null => {
-  const now = new Date()
+  // const now = new Date()
 
   switch (timeFilter) {
     // case 'lastMonth':

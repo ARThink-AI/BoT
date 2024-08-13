@@ -1,5 +1,5 @@
 import prisma from '@typebot.io/lib/prisma'
-import { authenticatedProcedure, publicProcedure } from '@/helpers/server/trpc'
+import { publicProcedure } from '@/helpers/server/trpc'
 import { TRPCError } from '@trpc/server'
 import { ResultWithAnswers } from '@typebot.io/schemas'
 import { z } from 'zod'
@@ -30,7 +30,11 @@ export const getReminders = publicProcedure
     const { timeFilter } = input
 
     // Calculate start and end dates based on timeFilter
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const adjustedStartDate = parseFromDateFromTimeFilter(timeFilter)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const adjustedEndDate = parseToDateFromTimeFilter(timeFilter)
 
     const typebot = await prisma.typebot.findUnique({
@@ -49,6 +53,8 @@ export const getReminders = publicProcedure
         },
       },
     })
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
 
     if (!typebot || (await isReadTypebotForbidden(typebot, user)))
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Typebot not found' })

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/dist/server/web/spec-extension/response'
-import { TextToSpeechClient } from '@google-cloud/text-to-speech'
-import { TranslationServiceClient } from '@google-cloud/translate'
-import { SpeechClient } from '@google-cloud/speech'
+// import { TextToSpeechClient } from '@google-cloud/text-to-speech'
+// import { TranslationServiceClient } from '@google-cloud/translate'
+// import { SpeechClient } from '@google-cloud/speech'
 import { env } from '@typebot.io/env'
 import {
   LogicBlockType,
@@ -12,15 +12,15 @@ import prisma from '@typebot.io/lib/prisma'
 import {
   startOfDay,
   subDays,
-  startOfYear,
-  startOfMonth,
-  endOfMonth,
-  subMonths,
+  // startOfYear,
+  // startOfMonth,
+  // endOfMonth,
+  // subMonths,
 } from 'date-fns'
 import { isDefined } from '@typebot.io/lib'
 import { CollaboratorsOnTypebots, Typebot, User } from '@typebot.io/prisma'
 import { parseResultHeader } from '@typebot.io/lib/results'
-import { useMemo } from 'react'
+// import { useMemo } from 'react'
 // import { isDefined } from '@typebot.io/lib'
 
 const responseHeaders = {
@@ -31,6 +31,15 @@ const responseHeaders = {
 // import { trpc } from '@/lib/trpc'
 // const { typebot, publishedTypebot } = useTypebot()
 
+// export const timeFilterValues = [
+//   'DAILY',
+//   'WEEKLY',
+//   'MONTHLY',
+//   // 'monthToDate',
+//   // 'lastMonth',
+//   // 'yearToDate',
+//   // 'allTime',
+// ] as const
 export const timeFilterValues = [
   'DAILY',
   'WEEKLY',
@@ -67,7 +76,7 @@ export const parseFromDateFromTimeFilter = (
 export const parseToDateFromTimeFilter = (
   timeFilter: (typeof timeFilterValues)[number]
 ): Date | null => {
-  const now = new Date()
+  // const now = new Date()
 
   switch (timeFilter) {
     // case 'lastMonth':
@@ -144,7 +153,11 @@ export async function POST(req: Request) {
     }
 
     // Calculate start and end dates based on timeFilter
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const adjustedStartDate = parseFromDateFromTimeFilter(timeFilter)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const adjustedEndDate = parseToDateFromTimeFilter(timeFilter)
 
     // const typebot = await prisma.typebot.findUnique({
@@ -186,7 +199,7 @@ export async function POST(req: Request) {
 
     if (!typebot) {
       return NextResponse.json(
-        { message: 'Error converting text to speech' },
+        { message: 'Error to getting typebot' },
         { status: 500, headers: responseHeaders }
       )
     }
@@ -231,6 +244,8 @@ export async function POST(req: Request) {
         },
       })
     )
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       .filter(async (typebot) => !(await isReadTypebotForbidden(typebot, user)))
       // To avoid the out of sort memory error, we sort the typebots manually
       .sort((a, b) => {
@@ -243,10 +258,11 @@ export async function POST(req: Request) {
           typebot.variables
         ),
       }))
-
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const resultHeader = parseResultHeader(typebot, typebots)
 
-    console.log('dhfjdhfjdhfj', resultHeader)
+    // console.log('dhfjdhfjdhfj', resultHeader)
     const results = (await prisma.result.findMany({
       where: {
         typebotId: typebot.id,
@@ -271,7 +287,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Error:', error)
     return NextResponse.json(
-      { message: 'Error converting text to speech' },
+      { message: 'Error in getting results' },
       { status: 500, headers: responseHeaders }
     )
   }

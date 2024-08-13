@@ -2,7 +2,7 @@
 
 
 import React, { useMemo, useState } from 'react'
-import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, Text, Heading, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
+import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, Text, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { trpc } from '@/lib/trpc'
 import { isDefined } from '@udecode/plate-common'
@@ -77,7 +77,8 @@ export const RemindersTableContainer = () => {
     [publishedTypebot, data, resultHeader]
   )
   // console.log("reminder table headerss", resultHeader)
-  // console.log("reminder table table data", tableData)
+  console.log("reminder table table data", tableData)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const handleTypeChange = (e) => {
     const value = e.target.value;
@@ -88,10 +89,12 @@ export const RemindersTableContainer = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleInputChange = (index, event) => {
     const newEmails = [...emails];
-    //@ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     newEmails[index] = event.target.value;
     setEmailValid(validateEmail(newEmails[index]));
     setDuplicateEmail(newEmails.filter((e, i) => newEmails.indexOf(e) !== i).length > 0);
@@ -99,10 +102,12 @@ export const RemindersTableContainer = () => {
   };
 
   const handleAddEmail = () => {
-    //@ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     setEmails([...emails, '']); // Add a new empty email field
   };
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleRemoveEmail = (index) => {
     const newEmails = emails.filter((_, i) => i !== index);
     setEmails(newEmails);
@@ -117,18 +122,22 @@ export const RemindersTableContainer = () => {
   const updateMutation = trpc.results.updateReminder.useMutation();
   const deleteMutation = trpc.results.deleteReminder.useMutation();
 
-  //@ts-ignore
-  const { data: reminders, refetch, isLoading, error } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const { data: reminders, refetch } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
 
   const addReminder = async (jobId: string) => {
     try {
       const newReminder = await mutation.mutateAsync({
-        //@ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         jobId: jobId,
         payload: { 'emails': emails },
-        //@ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         typebotId: typebot?.id,
-        //@ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         type: selectedType,
         frequency: selectedTimeFilter,
       });
@@ -138,15 +147,18 @@ export const RemindersTableContainer = () => {
       console.error('Error adding reminder:', error);
     }
   };
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleUpdate = async (reminderId) => {
     try {
       const updatedReminder = await updateMutation.mutateAsync({
         id: reminderId,
         updates: {
-          //@ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           type: updateFormData.type,
-          //@ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           frequency: updateFormData.frequency,
           payload: { emails: updateFormData.emails },
           jobId: updateFormData.jobId,
@@ -256,12 +268,14 @@ export const RemindersTableContainer = () => {
     setSelectedType('EMAIL');
     setEmails([]);
     setSelectedTimeFilter(defaultTimeFilter);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter)
     onClose()
     // window.location.reload()
   };
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleDelete = async (id, jobId) => {
     // deleteReminder(id);
     cancelJob(id, jobId)
@@ -280,7 +294,8 @@ export const RemindersTableContainer = () => {
   //     emails: reminder.payload.emails,
   //   });
   // };
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleUpdateReminder = (reminder) => {
     setUpdating(reminder.id);
     setUpdateFormData({
@@ -409,7 +424,8 @@ export const RemindersTableContainer = () => {
                     <Td>
                       {isUpdating === reminder.id ? (
                         <TimeFilterDropdown
-                          //@ts-ignore
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          // @ts-ignore
                           selectedTimeFilter={updateFormData.frequency}
                           onChange={(value) => setUpdateFormData({ ...updateFormData, frequency: value })}
                           placeholder="Choose a frequency"
@@ -428,7 +444,8 @@ export const RemindersTableContainer = () => {
                               value={email}
                               onChange={(event) => {
                                 const newEmails = [...updateFormData.emails];
-                                //@ts-ignore
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
                                 newEmails[index] = event.target.value;
                                 setUpdateFormData({ ...updateFormData, emails: newEmails });
                               }}
@@ -443,7 +460,8 @@ export const RemindersTableContainer = () => {
                           </Flex>
                         ))
                       ) : (
-                        //@ts-ignore
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         reminder.payload.emails.map((email, index) => (
                           <Text key={index}>{email}</Text>
                         ))

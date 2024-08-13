@@ -85,7 +85,7 @@ import prisma from '@typebot.io/lib/prisma'
 import { authenticatedProcedure } from '@/helpers/server/trpc'
 import { z } from 'zod'
 import { ReminderSchema } from '@typebot.io/schemas' // Adjust import path as needed
-import { useTypebot } from '@/features/editor/providers/TypebotProvider'
+// import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { TRPCError } from '@trpc/server'
 import { canReadTypebots } from '@/helpers/databaseRules'
 
@@ -107,6 +107,8 @@ export const reminderRouter = {
     .output(ReminderSchema)
     .mutation(async ({ input }) => {
       const newReminder = await prisma.reminder.create({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         data: input,
       })
       return newReminder
