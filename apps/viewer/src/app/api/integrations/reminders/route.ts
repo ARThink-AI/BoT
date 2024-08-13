@@ -40,78 +40,6 @@ const responseHeaders = {
 //   // 'yearToDate',
 //   // 'allTime',
 // ] as const
-export const timeFilterValues = [
-  'DAILY',
-  'WEEKLY',
-  'MONTHLY',
-  // 'monthToDate',
-  // 'lastMonth',
-  // 'yearToDate',
-  // 'allTime',
-] as const
-
-export const parseFromDateFromTimeFilter = (
-  timeFilter: (typeof timeFilterValues)[number]
-): Date | null => {
-  const now = new Date()
-
-  switch (timeFilter) {
-    case 'DAILY':
-      return startOfDay(now)
-    case 'WEEKLY':
-      return subDays(startOfDay(now), 6)
-    case 'MONTHLY':
-      return subDays(startOfDay(now), 29)
-    // case 'lastMonth':
-    //   return subMonths(startOfMonth(now), 1)
-    // case 'monthToDate':
-    //   return startOfMonth(now)
-    // case 'yearToDate':
-    //   return startOfYear(now)
-    // case 'allTime':
-    // return null
-  }
-}
-
-export const parseToDateFromTimeFilter = (
-  timeFilter: (typeof timeFilterValues)[number]
-): Date | null => {
-  // const now = new Date()
-
-  switch (timeFilter) {
-    // case 'lastMonth':
-    //   return subMonths(endOfMonth(now), 1)
-    // case 'allTime':
-    case 'MONTHLY':
-    case 'WEEKLY':
-    case 'DAILY':
-      // case 'monthToDate':
-      // case 'yearToDate':
-      return null
-  }
-}
-
-export const isReadTypebotForbidden = async (
-  typebot: Pick<Typebot, 'workspaceId'> & {
-    collaborators: Pick<CollaboratorsOnTypebots, 'userId'>[]
-  },
-  user: Pick<User, 'email' | 'id'>
-) => {
-  if (
-    env.ADMIN_EMAIL === user.email ||
-    typebot.collaborators.find(
-      (collaborator) => collaborator.userId === user.id
-    )
-  )
-    return false
-  const memberInWorkspace = await prisma.memberInWorkspace.findFirst({
-    where: {
-      workspaceId: typebot.workspaceId,
-      userId: user.id,
-    },
-  })
-  return memberInWorkspace === null
-}
 
 // const linkedTypebotIds =
 //     publishedTypebot?.groups
@@ -150,6 +78,79 @@ export async function POST(req: Request) {
     const { typebotId, timeFilter } = (await req.json()) as {
       typebotId: string
       timeFilter: string
+    }
+
+    const timeFilterValues = [
+      'DAILY',
+      'WEEKLY',
+      'MONTHLY',
+      // 'monthToDate',
+      // 'lastMonth',
+      // 'yearToDate',
+      // 'allTime',
+    ] as const
+
+    const parseFromDateFromTimeFilter = (
+      timeFilter: (typeof timeFilterValues)[number]
+    ): Date | null => {
+      const now = new Date()
+
+      switch (timeFilter) {
+        case 'DAILY':
+          return startOfDay(now)
+        case 'WEEKLY':
+          return subDays(startOfDay(now), 6)
+        case 'MONTHLY':
+          return subDays(startOfDay(now), 29)
+        // case 'lastMonth':
+        //   return subMonths(startOfMonth(now), 1)
+        // case 'monthToDate':
+        //   return startOfMonth(now)
+        // case 'yearToDate':
+        //   return startOfYear(now)
+        // case 'allTime':
+        // return null
+      }
+    }
+
+    const parseToDateFromTimeFilter = (
+      timeFilter: (typeof timeFilterValues)[number]
+    ): Date | null => {
+      // const now = new Date()
+
+      switch (timeFilter) {
+        // case 'lastMonth':
+        //   return subMonths(endOfMonth(now), 1)
+        // case 'allTime':
+        case 'MONTHLY':
+        case 'WEEKLY':
+        case 'DAILY':
+          // case 'monthToDate':
+          // case 'yearToDate':
+          return null
+      }
+    }
+
+    const isReadTypebotForbidden = async (
+      typebot: Pick<Typebot, 'workspaceId'> & {
+        collaborators: Pick<CollaboratorsOnTypebots, 'userId'>[]
+      },
+      user: Pick<User, 'email' | 'id'>
+    ) => {
+      if (
+        env.ADMIN_EMAIL === user.email ||
+        typebot.collaborators.find(
+          (collaborator) => collaborator.userId === user.id
+        )
+      )
+        return false
+      const memberInWorkspace = await prisma.memberInWorkspace.findFirst({
+        where: {
+          workspaceId: typebot.workspaceId,
+          userId: user.id,
+        },
+      })
+      return memberInWorkspace === null
     }
 
     // Calculate start and end dates based on timeFilter
