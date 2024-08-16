@@ -11,5 +11,6 @@ export enum IntegrationBlockType {
   PIXEL = 'Pixel',
   ZEMANTIC_AI = 'Zemantic AI',
   FLOWWISE = 'Flow Wise',
-  TRUDESK = 'TruDesk Ticketing'
+  TRUDESK = 'TruDesk Ticketing' ,
+  WHATSAPP = 'Whatsapp'
 }

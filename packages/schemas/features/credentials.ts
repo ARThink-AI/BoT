@@ -1,10 +1,11 @@
 import { z } from 'zod'
-import { stripeCredentialsSchema , razorpayCredentialsSchema } from './blocks/inputs/payment/schemas'
+import { stripeCredentialsSchema, razorpayCredentialsSchema } from './blocks/inputs/payment/schemas'
 import { googleSheetsCredentialsSchema } from './blocks/integrations/googleSheets/schemas'
 import { openAICredentialsSchema } from './blocks/integrations/openai'
-import {  trudeskCredentialsSchema } from "./blocks/integrations/trudesk"
+import { trudeskCredentialsSchema } from "./blocks/integrations/trudesk"
 import { smtpCredentialsSchema } from './blocks/integrations/sendEmail'
 import { whatsAppCredentialsSchema } from './whatsapp'
+import { WhatsappCredentialsSchema } from "./blocks/integrations/whatsapp";
 import { zemanticAiCredentialsSchema } from './blocks'
 
 export const credentialsSchema = z.discriminatedUnion('type', [
@@ -16,6 +17,7 @@ export const credentialsSchema = z.discriminatedUnion('type', [
   whatsAppCredentialsSchema,
   zemanticAiCredentialsSchema,
   trudeskCredentialsSchema,
+  WhatsappCredentialsSchema
 ])
 
 export type Credentials = z.infer<typeof credentialsSchema>
