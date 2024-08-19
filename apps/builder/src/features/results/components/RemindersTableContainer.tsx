@@ -187,7 +187,7 @@ export const RemindersTableContainer = () => {
 
   const scheduledJob = async (typebotId: string, type: string, payload: JSON, frequency: string) => {
     try {
-      const url = `http://172.178.92.219:5080/schedule_job`
+      const url = 'https://scheduler.arthink.ai/schedule_job'
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -220,7 +220,7 @@ export const RemindersTableContainer = () => {
 
   const cancelJob = async (id: string, jobId: string) => {
     try {
-      const url = `http://172.178.92.219:5080/cancel_job?id=${jobId}`
+      const url = `https://scheduler.arthink.ai/cancel_job?id=${jobId}`
       const response = await fetch(url, {
         method: 'DELETE',
       }).then((res) => res.json())
@@ -237,7 +237,7 @@ export const RemindersTableContainer = () => {
 
   const updateJob = async (id: string, jobId: string) => {
     try {
-      const url = 'http://172.178.92.219:5080/update_job'
+      const url = 'https://scheduler.arthink.ai/update_job'
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
