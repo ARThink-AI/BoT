@@ -1,10 +1,11 @@
 import prisma from '@typebot.io/lib/prisma'
 import { authenticatedProcedure } from '@/helpers/server/trpc'
 import { TRPCError } from '@trpc/server'
-import { stripeCredentialsSchema , razorpayCredentialsSchema } from '@typebot.io/schemas/features/blocks/inputs/payment/schemas'
+import { stripeCredentialsSchema, razorpayCredentialsSchema } from '@typebot.io/schemas/features/blocks/inputs/payment/schemas'
 import { googleSheetsCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/googleSheets/schemas'
 import { openAICredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/openai'
-import {  trudeskCredentialsSchema } from "@typebot.io/schemas/features/blocks/integrations/trudesk";
+import { trudeskCredentialsSchema } from "@typebot.io/schemas/features/blocks/integrations/trudesk";
+import { WhatsappCredentialsSchema } from "@typebot.io/schemas/features/blocks/integrations/whatsapp";
 import { smtpCredentialsSchema } from '@typebot.io/schemas/features/blocks/integrations/sendEmail'
 import { z } from 'zod'
 import { isReadWorkspaceFobidden } from '@/features/workspace/helpers/isReadWorkspaceFobidden'
@@ -31,7 +32,8 @@ export const listCredentials = authenticatedProcedure
         .or(whatsAppCredentialsSchema.shape.type)
         .or(zemanticAiCredentialsSchema.shape.type)
         .or(razorpayCredentialsSchema.shape.type)
-        .or( trudeskCredentialsSchema.shape.type ),
+        .or(trudeskCredentialsSchema.shape.type)
+        .or(WhatsappCredentialsSchema.shape.type),
     })
   )
   .output(

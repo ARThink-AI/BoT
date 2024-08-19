@@ -37,8 +37,9 @@ import {
   sendEmailBlockSchema,
   webhookBlockSchema,
   zapierBlockSchema,
-  flowwiseBlockSchema ,
-  trudeskBlockSchema
+  flowwiseBlockSchema,
+  trudeskBlockSchema,
+  whatsappBlockSchema
 } from './integrations'
 import { openAIBlockSchema } from './integrations/openai'
 import {
@@ -137,6 +138,7 @@ export const blockSchema = z.discriminatedUnion('type', [
   zemanticAiBlockSchema,
   flowwiseBlockSchema,
   trudeskBlockSchema,
+  whatsappBlockSchema
 ])
 
 export type Block = z.infer<typeof blockSchema>
@@ -150,8 +152,8 @@ export type InputBlockOptions = InputBlock['options']
 export type LogicBlock = Extract<Block, { type: LogicBlockType }>
 export type LogicBlockOptions = LogicBlock extends
   | {
-      options?: infer Options
-    }
+    options?: infer Options
+  }
   | {}
   ? Options
   : never

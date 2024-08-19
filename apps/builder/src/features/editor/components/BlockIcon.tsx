@@ -7,6 +7,7 @@ import {
   BlockType,
 } from '@typebot.io/schemas'
 import React from 'react'
+import { WhatsAppLogo } from '@/components/logos/WhatsAppLogo'
 import { FlagIcon, SendEmailIcon, WebhookIcon } from '@/components/icons'
 import { WaitIcon } from '@/features/blocks/logic/wait/components/WaitIcon'
 import { ScriptIcon } from '@/features/blocks/logic/script/components/ScriptIcon'
@@ -123,6 +124,8 @@ export const BlockIcon = ({ type, ...props }: BlockIconProps): JSX.Element => {
       return <OpenAILogo fill={openAIColor} {...props} />
     case IntegrationBlockType.TRUDESK:
       return <WebhookIcon {...props} />
+    case IntegrationBlockType.WHATSAPP:
+      return <WhatsAppLogo {...props} />
     case IntegrationBlockType.PIXEL:
       return <PixelLogo {...props} />
     case IntegrationBlockType.ZEMANTIC_AI:

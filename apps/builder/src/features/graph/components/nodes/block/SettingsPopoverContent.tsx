@@ -52,7 +52,7 @@ import { SettingsHoverBar } from './SettingsHoverBar'
 import { PixelSettings } from '@/features/blocks/integrations/pixel/components/PixelSettings'
 import { ZemanticAiSettings } from '@/features/blocks/integrations/zemanticAi/ZemanticAiSettings'
 import { TrudeskSettings } from '@/features/blocks/integrations/trudesk/TrudeskSettings'
-
+import { WhatsAppSettings } from '@/features/blocks/integrations/whatsapp/WhatsappSettings'
 type Props = {
   block: BlockWithOptions
   onExpandClick: () => void
@@ -334,6 +334,8 @@ export const BlockSettings = ({
     case IntegrationBlockType.TRUDESK: {
       return <TrudeskSettings block={block} onOptionsChange={updateOptions} />
     }
+    case IntegrationBlockType.WHATSAPP:
+      return <WhatsAppSettings block={block} onOptionsChange={updateOptions} />
     case IntegrationBlockType.PIXEL: {
       return (
         <PixelSettings
