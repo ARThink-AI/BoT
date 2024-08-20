@@ -866,6 +866,11 @@ export const ConversationContainer = (props: Props) => {
 
     try {
       console.log("live changedd", live());
+      if (!live()) {
+        console.log("userrrrrrr disconnectttttttttttttttt", liveSocketInstance())
+
+
+      }
       if (live() && !liveSocketInstance()) {
         console.log("live if statement");
         const ticketIdResponse = await getTicketIdQuery({
@@ -894,6 +899,7 @@ export const ConversationContainer = (props: Props) => {
               ticketId: ticketIdResponse?.data?.ticketId,
               roomId: props.initialChatReply.resultId,
               typebotId: props.context.typebot.id,
+              isLiveChat: live(),
               message: ''
             })
           });
@@ -955,6 +961,7 @@ export const ConversationContainer = (props: Props) => {
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
             reconnectionDelayMax: 5000, // Maximum delay (in ms) between reconnection attempts
           });
+
           socketInstance.on("connect", () => {
             // @ts-ignore
             setLiveSocketInstance(socketInstance);
@@ -968,6 +975,10 @@ export const ConversationContainer = (props: Props) => {
               sessionStorage.removeItem("chatchunks");
               sessionStorage.removeItem("live");
               props.initializeBot()
+            })
+            console.log("user disconnected call")
+            socketInstance.on("userDisconnected", () => {
+              console.log("disconecteedddddddddddddddddddddddddddddddddddddddddddddddd")
             })
 
             socketInstance.on("responseFromQuadz", ({ message, id }) => {
@@ -1521,6 +1532,7 @@ export const ConversationContainer = (props: Props) => {
     }
 
   }
+
 
   const closeSnackbar = () => {
     setIsVisible(false);
