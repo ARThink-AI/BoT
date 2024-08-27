@@ -657,6 +657,7 @@ export const ConversationContainer = (props: Props) => {
           sessionStorage.removeItem("bot_init");
           sessionStorage.removeItem("live");
           sessionStorage.removeItem("chatchunks");
+          sessionStorage.removeItem("event_message");
           props.initializeBot();
         }, 3000)
         return
@@ -794,6 +795,7 @@ export const ConversationContainer = (props: Props) => {
         sessionStorage.removeItem("initialize_css");
         sessionStorage.removeItem("bot_init");
         sessionStorage.removeItem("chatchunks");
+        sessionStorage.removeItem("event_message");
         props.initializeBot();
         return
       }, 2000);
@@ -863,9 +865,36 @@ export const ConversationContainer = (props: Props) => {
   createEffect(async () => {
     console.log("live chatttt messssssg", userMessage())
 
-
+    // let event_message = [];
+    // @ts-ignore
+    // let eventMessage = sessionStorage.getItem("event_message") ? JSON.parse(sessionStorage.getItem("event_message")) : [];
     try {
       console.log("live changedd", live());
+      if (!live()) {
+        // @ts-ignore
+        liveSocketInstance()?.emit('userDisconnect', { sessionId: props.initialChatReply.resultId });
+        // @ts-ignore
+        liveSocketInstance()?.on('userDisconnected', (data) => {
+          // let eventMessage = sessionStorage.getItem("event_message") ? JSON.parse(sessionStorage.getItem("event_message")) : [];
+
+          // eventMessage.push({ event: data.message })
+
+          // sessionStorage.setItem("event_message", JSON.stringify(eventMessage))
+          // @ts-ignore
+          let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+          livechatData.push({ event_name: "user_disconnected", message: data.message, label: true })
+          // @ts-ignore
+          sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+          storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+            console.log("error", err);
+          })
+          // @ts-ignore
+          liveSocketInstance()?.disconnect()
+          setLiveSocketInstance(null)
+
+        })
+      }
       if (live() && !liveSocketInstance()) {
         console.log("live if statement");
         const ticketIdResponse = await getTicketIdQuery({
@@ -960,6 +989,37 @@ export const ConversationContainer = (props: Props) => {
             setLiveSocketInstance(socketInstance);
             socketInstance.emit("joinRoom", { sessionId: props.initialChatReply.resultId });
 
+            socketInstance.emit('userConnected', { sessionId: props.initialChatReply.resultId });
+            socketInstance.on('connected', (data) => {
+              console.log("socket connection message", data.message)
+              // event_message.push({ event: data.message })
+              // sessionStorage.setItem("event_message", JSON.stringify(data.message))
+              // storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: event_message }).then().catch(err => {
+              //   console.log("error", err);
+              // })
+              // let eventData = sessionStorage.getItem("eventMessage") ? JSON.parse(sessionStorage.getItem("eventMessage")) : [];
+              // // @ts-ignore
+              // eventData.push({ event: data.message })
+              // // @ts-ignore
+              // sessionStorage.setItem("eventMessage", JSON.stringify(eventData))
+              // // @ts-ignore
+              // storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: eventData }).then().catch(err => {
+              //   console.log("error", err);
+              // }) 
+              // @ts-ignore
+              // let eventMessage = sessionStorage.getItem("event_message") ? JSON.parse(sessionStorage.getItem("event_message")) : [];
+
+              let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+              livechatData.push({ event_name: "user_connected", message: data.message, label: true })
+              // @ts-ignore
+              sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+              storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+                console.log("error", err);
+              })
+
+            })
+
             socketInstance.on("sessionRestarted", () => {
               console.log("session restarting");
               sessionStorage.removeItem("intialize");
@@ -967,6 +1027,7 @@ export const ConversationContainer = (props: Props) => {
               sessionStorage.removeItem("bot_init");
               sessionStorage.removeItem("chatchunks");
               sessionStorage.removeItem("live");
+              sessionStorage.removeItem("event_message");
               props.initializeBot()
             })
 
@@ -1781,6 +1842,7 @@ export const ConversationContainer = (props: Props) => {
                       sessionStorage.removeItem("bot_init");
                       sessionStorage.removeItem("chatchunks");
                       sessionStorage.removeItem("live");
+                      sessionStorage.removeItem("event_message");
                       props.initializeBot()
                     }} >Restart  </button>
                   </li>
