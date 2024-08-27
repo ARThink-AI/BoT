@@ -420,7 +420,7 @@ export const ConversationContainer = (props: Props) => {
     // @ts-ignore
     sessionStorage.setItem("answer", message);
     if (!liveSocketInstance()) {
-      const socketInstance = io("http://localhost:3080", {
+      const socketInstance = io("https://dev.quadz.ai/socket", {
         reconnection: true, // Enable reconnection
         reconnectionAttempts: Infinity, // Retry indefinitely
         reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -977,8 +977,8 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          const socketInstance = io(`http://localhost:3080`, {
-            // const socketInstance = io(`http://localhost:3080`, {
+          const socketInstance = io(`https://dev.quadz.ai/socket`, {
+            // const socketInstance = io(`https://dev.quadz.ai/socket`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -1753,8 +1753,7 @@ export const ConversationContainer = (props: Props) => {
       class="flex flex-col overflow-y-scroll w-full min-h-full px-3  relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
-
-      <header class="bg-blue-500 text-white p-3 h-10  w-full" >
+      {props.context.typebot.settings.general.isLiveChatEnabled && <header class="bg-blue-500 text-white p-3 h-10  w-full" >
         {props.context.typebot.settings.general.isLiveChatEnabled && (
           // <div style={{ "margin-top": "10px", "cursor": "pointer" }} >
 
@@ -1912,6 +1911,8 @@ export const ConversationContainer = (props: Props) => {
 
         </div>
       </header >
+      }
+
 
 
       {/* snackbar for session timout */}
