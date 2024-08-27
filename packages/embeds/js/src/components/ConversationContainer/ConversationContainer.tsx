@@ -420,7 +420,7 @@ export const ConversationContainer = (props: Props) => {
     // @ts-ignore
     sessionStorage.setItem("answer", message);
     if (!liveSocketInstance()) {
-      const socketInstance = io("https://dev.quadz.ai/socket", {
+      const socketInstance = io("https://socket.quadz.ai", {
         reconnection: true, // Enable reconnection
         reconnectionAttempts: Infinity, // Retry indefinitely
         reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -977,8 +977,8 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          const socketInstance = io(`https://dev.quadz.ai/socket`, {
-            // const socketInstance = io(`https://dev.quadz.ai/socket`, {
+          const socketInstance = io(`https://socket.quadz.ai`, {
+            // const socketInstance = io(`https://socket.quadz.ai`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -1028,6 +1028,15 @@ export const ConversationContainer = (props: Props) => {
               sessionStorage.removeItem("chatchunks");
               sessionStorage.removeItem("live");
               sessionStorage.removeItem("event_message");
+              // @ts-ignore
+              let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+              livechatData.push({ event_name: "session_restart", message: "You have restarted session", label: true })
+              // @ts-ignore
+              sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+              storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+                console.log("error", err);
+              })
               props.initializeBot()
             })
 
