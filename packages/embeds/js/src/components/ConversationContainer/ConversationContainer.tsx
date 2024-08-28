@@ -2151,7 +2151,7 @@ export const ConversationContainer = (props: Props) => {
 
     <div
       ref={chatContainer}
-      class="flex flex-col overflow-y-scroll w-full min-h-full px-3  relative scrollable-container typebot-chat-view scroll-smooth gap-2"
+      class="flex flex-col overflow-y-scroll w-full min-h-full  relative scrollable-container typebot-chat-view scroll-smooth gap-2"
       style={{ position: "relative" }}
     >
       {props.context.typebot.settings.general.isLiveChatEnabled && <header class="bg-blue-500 text-white p-3 h-10  w-full" >
@@ -2314,109 +2314,112 @@ export const ConversationContainer = (props: Props) => {
       </header >
       }
 
+      <div class='wrapper-container px-3 mt-[5%]'>
 
 
-      {/* snackbar for session timout */}
-      <div class={`fixed bottom-[90px] right-[-125px]   transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-        <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-          <span>{"Session timeout restart to continue"}</span>
-          <button class="ml-3   text-white" onClick={closeSnackbar}>
-            {/* ✖ */}
-            X
-          </button>
-        </div>
-      </div >
-
-      {/* snackbar for session timout */}
-      <div class={`fixed bottom-[90px] right-[-125px]   transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-        <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
-          <span>{"Session timeout restart to continue"}</span>
-          <button class="ml-3   text-white" onClick={closeSnackbar}>
-            {/* ✖ */}
-            X
-          </button>
-        </div>
-      </div>
 
 
-      <For each={chatChunks()}>
-        {(chatChunk, index) => {
-          console.log("chat chunk", chatChunk, index);
-          return (
-            <ChatChunk
-              inputIndex={index()}
-              messages={chatChunk.messages}
-              input={chatChunk.input}
-              theme={theme()}
-              settings={props.initialChatReply.typebot.settings}
-              streamingMessageId={chatChunk.streamingMessageId}
-              context={props.context}
-              hideAvatar={
-                !chatChunk.input &&
-                ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
-                  chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
-                  isSending())
-              }
-              hasError={hasError() && index() === chatChunks().length - 1}
-              onNewBubbleDisplayed={handleNewBubbleDisplayed}
-              onAllBubblesDisplayed={handleAllBubblesDisplayed}
-              onSubmit={sendMessage}
-              onScrollToBottom={autoScrollToBottom}
-              onSkip={handleSkip}
-            />
-          )
-
-        }}
-      </For>
-      <Show when={isSending()}>
-        <LoadingChunk theme={theme()} />
-      </Show>
-      <Show when={blockedPopupUrl()} keyed>
-        {(blockedPopupUrl) => (
-          <div class="flex justify-end">
-            <PopupBlockedToast
-              url={blockedPopupUrl}
-              onLinkClick={() => setBlockedPopupUrl(undefined)}
-            />
+        {/* snackbar for session timout */}
+        <div class={`fixed bottom-[90px] right-[-125px]   transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
+          <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
+            <span>{"Session timeout restart to continue"}</span>
+            <button class="ml-3   text-white" onClick={closeSnackbar}>
+              {/* ✖ */}
+              X
+            </button>
           </div>
-        )}
-      </Show>
-      {
-        live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-items": "center", width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
-          <div style={{ display: "flex", "flex-direction": "row", "gap": "4" }} >
-            <input value={userMessage()} type="text" placeholder='type your message' style={{ border: '1px solid black' }} class=" w-[200px] mr-2 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" onChange={e => setUserMessage(e.target.value)} />
-            <button class="rounded-full bg-[#0077CC]" onClick={() => userMessageLiveChat(userMessage())} >
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_63_137)">
-                  <rect width="36" height="36" rx="18" fill="#0077CC" />
-                  <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_63_137">
-                    <rect width="36" height="36" rx="18" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>  </button>
+        </div >
+
+        {/* snackbar for session timout */}
+        <div class={`fixed bottom-[90px] right-[-125px]   transform -translate-x-1/2 ${isVisible() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
+          <div class="bg-[#0077CC] text-white px-4 py-2 rounded shadow-lg flex items-center">
+            <span>{"Session timeout restart to continue"}</span>
+            <button class="ml-3   text-white" onClick={closeSnackbar}>
+              {/* ✖ */}
+              X
+            </button>
           </div>
         </div>
-      }
 
-      <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
-        <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
-          <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
+        <For each={chatChunks()}>
+          {(chatChunk, index) => {
+            console.log("chat chunk", chatChunk, index);
+            return (
+              <ChatChunk
+                inputIndex={index()}
+                messages={chatChunk.messages}
+                input={chatChunk.input}
+                theme={theme()}
+                settings={props.initialChatReply.typebot.settings}
+                streamingMessageId={chatChunk.streamingMessageId}
+                context={props.context}
+                hideAvatar={
+                  !chatChunk.input &&
+                  ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
+                    chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
+                    isSending())
+                }
+                hasError={hasError() && index() === chatChunks().length - 1}
+                onNewBubbleDisplayed={handleNewBubbleDisplayed}
+                onAllBubblesDisplayed={handleAllBubblesDisplayed}
+                onSubmit={sendMessage}
+                onScrollToBottom={autoScrollToBottom}
+                onSkip={handleSkip}
+              />
+            )
 
-            <input placeholder='Ask' onKeyDown={handleSubmitOnEnter} class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
-            <div class='flex justify-center items-center gap-[5px]'>
-              {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
-              {isRecording() && (
+          }}
+        </For>
+        <Show when={isSending()}>
+          <LoadingChunk theme={theme()} />
+        </Show>
+        <Show when={blockedPopupUrl()} keyed>
+          {(blockedPopupUrl) => (
+            <div class="flex justify-end">
+              <PopupBlockedToast
+                url={blockedPopupUrl}
+                onLinkClick={() => setBlockedPopupUrl(undefined)}
+              />
+            </div>
+          )}
+        </Show>
+        {
+          live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-items": "center", width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
+            <div style={{ display: "flex", "flex-direction": "row", "gap": "4" }} >
+              <input value={userMessage()} type="text" placeholder='type your message' style={{ border: '1px solid black' }} class=" w-[200px] mr-2 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" onChange={e => setUserMessage(e.target.value)} />
+              <button class="rounded-full bg-[#0077CC]" onClick={() => userMessageLiveChat(userMessage())} >
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_63_137)">
+                    <rect width="36" height="36" rx="18" fill="#0077CC" />
+                    <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_63_137">
+                      <rect width="36" height="36" rx="18" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>  </button>
+            </div>
+          </div>
+        }
 
-                <button class='h-[40px] w-[40px]' onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img src="https://quadz.blob.core.windows.net/demo1/mic.gif" class='h-[40px] w-[40px]' />  </button>
-                // {/* <div style={{ "font-size": "8px" }} > Listening... </div> */}
+        <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
-              )}
-              <button disabled={userInput() ? false : true} onClick={userInputClicked} class={`${!userInput() ? 'cursor-not-allowed opacity-50' : ''} `}>
-                {/* <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
+            <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
+
+              <input placeholder='Ask' onKeyDown={handleSubmitOnEnter} class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
+              <div class='flex justify-center items-center gap-[5px]'>
+                {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
+                {isRecording() && (
+
+                  <button class='h-[40px] w-[40px]' onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img src="https://quadz.blob.core.windows.net/demo1/mic.gif" class='h-[40px] w-[40px]' />  </button>
+                  // {/* <div style={{ "font-size": "8px" }} > Listening... </div> */}
+
+                )}
+                <button disabled={userInput() ? false : true} onClick={userInputClicked} class={`${!userInput() ? 'cursor-not-allowed opacity-50' : ''} `}>
+                  {/* <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_63_137)">
                     <rect width="36" height="36" rx="18" fill="#0077CC" />
                     <path d="M17.0834 15.0666L14.4251 17.725C14.257 17.893 14.0431 17.977 13.7834 17.977C13.5237 17.977 13.3098 17.893 13.1417 17.725C12.9737 17.5569 12.8896 17.343 12.8896 17.0833C12.8896 16.8236 12.9737 16.6097 13.1417 16.4416L17.3584 12.225C17.5417 12.0416 17.7556 11.95 18.0001 11.95C18.2445 11.95 18.4584 12.0416 18.6417 12.225L22.8584 16.4416C23.0265 16.6097 23.1105 16.8236 23.1105 17.0833C23.1105 17.343 23.0265 17.5569 22.8584 17.725C22.6903 17.893 22.4765 17.977 22.2167 17.977C21.957 17.977 21.7431 17.893 21.5751 17.725L18.9167 15.0666V22.5833C18.9167 22.843 18.8289 23.0607 18.6532 23.2364C18.4775 23.4121 18.2598 23.5 18.0001 23.5C17.7403 23.5 17.5226 23.4121 17.3469 23.2364C17.1712 23.0607 17.0834 22.843 17.0834 22.5833V15.0666Z" fill="white" />
@@ -2427,58 +2430,59 @@ export const ConversationContainer = (props: Props) => {
                     </clipPath>
                   </defs>
                 </svg> */}
-                <svg xmlns="
+                  <svg xmlns="
 http://www.w3.org/2000/svg"
-                  viewBox="0 0 512 512" width="25px" height="25px" fill="" color="white" class="send-icon flex ">
-                  <path d="M476.59 227.05l-.16-.07L49.35 49.84A23.56 23.56 0 0027.14 52 24.65 24.65 0 0016 72.59v113.29a24 24 0 0019.52 23.57l232.93 43.07a4 4 0 010 7.86L35.53 303.45A24 24 0 0016 327v113.31A23.57 23.57 0 0026.59 460a23.94 23.94 0 0013.22 4 24.55 24.55 0 009.52-1.93L476.4 285.94l.19-.09a32 32 0 000-58.8z"></path>
-                </svg>
-              </button>
+                    viewBox="0 0 512 512" width="25px" height="25px" fill="" color="white" class="send-icon flex ">
+                    <path d="M476.59 227.05l-.16-.07L49.35 49.84A23.56 23.56 0 0027.14 52 24.65 24.65 0 0016 72.59v113.29a24 24 0 0019.52 23.57l232.93 43.07a4 4 0 010 7.86L35.53 303.45A24 24 0 0016 327v113.31A23.57 23.57 0 0026.59 460a23.94 23.94 0 0013.22 4 24.55 24.55 0 009.52-1.93L476.4 285.94l.19-.09a32 32 0 000-58.8z"></path>
+                  </svg>
+                </button>
+              </div>
+
+
             </div>
-
-
           </div>
-        </div>
-      </Show>
-      <Show when={props.initialChatReply.typebot.settings.general?.isTwilioEnabled}>
-        <div class='fixed bottom-[100px] right-[40px]'>
-          <button onclick={openModal} class='transition-all duration-500 transform'>
-            <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M17.3545 22.2323C15.3344 21.7262 11.1989 20.2993 7.44976 16.5502C3.70065 12.8011 2.2738 8.66559 1.76767 6.6455C1.47681 5.48459 2.00058 4.36434 2.88869 3.72997L5.21694 2.06693C6.57922 1.09388 8.47432 1.42407 9.42724 2.80051L10.893 4.91776C11.5152 5.8165 11.3006 7.0483 10.4111 7.68365L9.24234 8.51849C9.41923 9.1951 9.96939 10.5846 11.6924 12.3076C13.4154 14.0306 14.8049 14.5807 15.4815 14.7576L16.3163 13.5888C16.9517 12.6994 18.1835 12.4847 19.0822 13.1069L21.1995 14.5727C22.5759 15.5257 22.9061 17.4207 21.933 18.783L20.27 21.1113C19.6356 21.9994 18.5154 22.5232 17.3545 22.2323ZM8.86397 15.136C12.2734 18.5454 16.0358 19.8401 17.8405 20.2923C18.1043 20.3583 18.4232 20.2558 18.6425 19.9488L20.3056 17.6205C20.6299 17.1665 20.5199 16.5348 20.061 16.2171L17.9438 14.7513L17.0479 16.0056C16.6818 16.5182 16.0047 16.9202 15.2163 16.7501C14.2323 16.5378 12.4133 15.8569 10.2782 13.7218C8.1431 11.5867 7.46219 9.7677 7.24987 8.7837C7.07977 7.9953 7.48181 7.31821 7.99439 6.95208L9.24864 6.05618L7.78285 3.93893C7.46521 3.48011 6.83351 3.37005 6.37942 3.6944L4.05117 5.35744C3.74413 5.57675 3.64162 5.89565 3.70771 6.15943C4.15989 7.96418 5.45459 11.7266 8.86397 15.136Z" fill="#0F0F0F" />
-            </svg>
-          </button>
-        </div>
-      </Show>
+        </Show>
+        <Show when={props.initialChatReply.typebot.settings.general?.isTwilioEnabled}>
+          <div class='fixed bottom-[100px] right-[40px]'>
+            <button onclick={openModal} class='transition-all duration-500 transform'>
+              <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M17.3545 22.2323C15.3344 21.7262 11.1989 20.2993 7.44976 16.5502C3.70065 12.8011 2.2738 8.66559 1.76767 6.6455C1.47681 5.48459 2.00058 4.36434 2.88869 3.72997L5.21694 2.06693C6.57922 1.09388 8.47432 1.42407 9.42724 2.80051L10.893 4.91776C11.5152 5.8165 11.3006 7.0483 10.4111 7.68365L9.24234 8.51849C9.41923 9.1951 9.96939 10.5846 11.6924 12.3076C13.4154 14.0306 14.8049 14.5807 15.4815 14.7576L16.3163 13.5888C16.9517 12.6994 18.1835 12.4847 19.0822 13.1069L21.1995 14.5727C22.5759 15.5257 22.9061 17.4207 21.933 18.783L20.27 21.1113C19.6356 21.9994 18.5154 22.5232 17.3545 22.2323ZM8.86397 15.136C12.2734 18.5454 16.0358 19.8401 17.8405 20.2923C18.1043 20.3583 18.4232 20.2558 18.6425 19.9488L20.3056 17.6205C20.6299 17.1665 20.5199 16.5348 20.061 16.2171L17.9438 14.7513L17.0479 16.0056C16.6818 16.5182 16.0047 16.9202 15.2163 16.7501C14.2323 16.5378 12.4133 15.8569 10.2782 13.7218C8.1431 11.5867 7.46219 9.7677 7.24987 8.7837C7.07977 7.9953 7.48181 7.31821 7.99439 6.95208L9.24864 6.05618L7.78285 3.93893C7.46521 3.48011 6.83351 3.37005 6.37942 3.6944L4.05117 5.35744C3.74413 5.57675 3.64162 5.89565 3.70771 6.15943C4.15989 7.96418 5.45459 11.7266 8.86397 15.136Z" fill="#0F0F0F" />
+              </svg>
+            </button>
+          </div>
+        </Show>
 
-      {/* twillio calling modal */}
-      <div class={`${isOpen() ? 'block' : 'hidden'} fixed z-10 inset-0 overflow-y-auto`}>
-        <div class="flex items-center justify-center min-h-screen ">
-          <div class="relative bg-white w-96 rounded-lg border-2 border-solid border-slate-400">
-            <div class="p-8">
-              <h2 class="text-xl font-bold p-2 mb-4">Enter Your Phone Number</h2>
-              {!phoneValidation() && (
-                <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
-              )}
-              <input onKeyPress={inputPhoneTenDigitHandle} value={phoneNumber()} onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
-              {/* <p class="mb-8">Modal content goes here.</p> */}
-              <div class="flex justify-end">
-                <button class="mr-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all duration-500 transform" onClick={closeModal}>
-                  Cancel
-                </button>
-                <button disabled={!phoneNumber()} class="px-4 py-2 transition-all duration-500 transform bg-blue-500 text-white hover:bg-blue-600 rounded" onClick={handleSubmit}>
-                  Submit
-                </button>
+        {/* twillio calling modal */}
+        <div class={`${isOpen() ? 'block' : 'hidden'} fixed z-10 inset-0 overflow-y-auto`}>
+          <div class="flex items-center justify-center min-h-screen ">
+            <div class="relative bg-white w-96 rounded-lg border-2 border-solid border-slate-400">
+              <div class="p-8">
+                <h2 class="text-xl font-bold p-2 mb-4">Enter Your Phone Number</h2>
+                {!phoneValidation() && (
+                  <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                )}
+                <input onKeyPress={inputPhoneTenDigitHandle} value={phoneNumber()} onInput={(e) => handleInputChange(e)} class='call-input w-full mb-2 p-2' type="number" placeholder='enter your phone number' />
+                {/* <p class="mb-8">Modal content goes here.</p> */}
+                <div class="flex justify-end">
+                  <button class="mr-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all duration-500 transform" onClick={closeModal}>
+                    Cancel
+                  </button>
+                  <button disabled={!phoneNumber()} class="px-4 py-2 transition-all duration-500 transform bg-blue-500 text-white hover:bg-blue-600 rounded" onClick={handleSubmit}>
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
 
-      </div >
+        </div >
 
 
 
 
-      < BottomSpacer />
+        < BottomSpacer />
+      </div>
     </div >
 
   )
