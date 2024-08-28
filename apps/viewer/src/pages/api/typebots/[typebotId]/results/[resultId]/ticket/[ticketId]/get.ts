@@ -19,19 +19,27 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const ticketId =
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       result?.variables?.filter((v) => v.name == ticketIdVariableName).length >
-      0
+        0
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         ? result?.variables?.filter((v) => v.name == ticketIdVariableName)[0]
-            ?.value
+          ?.value
         : null
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const accessToken =
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       result?.variables?.filter((v) => v.name == accessTokenVariableName)
         .length > 0
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         ? result?.variables?.filter((v) => v.name == accessTokenVariableName)[0]
-            ?.value
+          ?.value
         : null
 
     return res.json({
