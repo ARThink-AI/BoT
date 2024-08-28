@@ -58,6 +58,30 @@ export const GeneralSettingsForm = ({
       isVoiceEnabled,
     })
 
+  const handleLiveChatChange = (isLiveChatEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isLiveChatEnabled
+    })
+
+  const handleTicketVariableNameChange = (ticketVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      ticketVariableName
+    })
+
+  const handleAccessTokenVariableNameChange = (accessTokenVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      accessTokenVariableName
+    })
+
+  const handleQuadzBaseUrlChange = (quadzBaseUrl: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      quadzBaseUrl
+    })
+
   const handleTwilioChange = (isTwilioEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
@@ -143,6 +167,44 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
       />
+      <SwitchWithLabel
+        label="Live chat on BoT"
+        initialValue={generalSettings.isLiveChatEnabled ? generalSettings.isLiveChatEnabled : false}
+        onCheckChange={handleLiveChatChange}
+        moreInfoContent="Toggle for live chat"
+      />
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Ticket Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.ticketVariableName ? generalSettings.ticketVariableName : ""}
+            onChange={e => handleTicketVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Access Token  Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.accessTokenVariableName ? generalSettings.accessTokenVariableName : ""}
+            onChange={e => handleAccessTokenVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Quadz Base Url   </Text>
+          <TextInput
+            defaultValue={generalSettings.quadzBaseUrl ? generalSettings.quadzBaseUrl : ""}
+            onChange={e => handleQuadzBaseUrlChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
       <SwitchWithLabel
         label="Twilio Enabled"
         initialValue={generalSettings.isTwilioEnabled ?? false}
@@ -255,3 +317,4 @@ export const GeneralSettingsForm = ({
     </Stack>
   )
 }
+

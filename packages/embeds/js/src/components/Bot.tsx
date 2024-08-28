@@ -71,7 +71,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     }
     // @ts-ignore  
     if (!Object.hasOwn(prefilledVariables, 'reset') && sessionStorage.getItem("bot_init") && JSON.parse(sessionStorage.getItem("bot_init")) == true) {
-
+      console.log("return without initializing")
       return
     } else {
       // sessionStorage.setItem("bot_init", "true");
@@ -81,6 +81,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     sessionStorage.removeItem("answer");
     sessionStorage.removeItem("live");
     sessionStorage.removeItem("liveChat");
+    // sessionStorage.removeItem("resultId");
 
 
     const typebotIdFromProps =
@@ -125,6 +126,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
         typebotIdFromProps,
         data.resultId
       )
+
+    // sessionStorage.setItem("resultId", data.resultId as string);
 
     setInitialChatReply(data);
     sessionStorage.setItem("intialize", JSON.stringify(data));

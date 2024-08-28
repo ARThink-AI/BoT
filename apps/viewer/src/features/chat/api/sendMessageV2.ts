@@ -85,77 +85,7 @@ export const sendMessageV2 = publicProcedure
               clientSideActions,
             })
        console.log("restarting session");
-      //  if ( typebot?.settings?.general?.isTicketEnabled && typebot?.settings?.general?.ticketInfo?.trim() != "" ) {
-      //     try {
-      //     console.log("is Ticket enabled");
-      //     const key = "4467015e7000fd73d88f1feec4dc801b0612a15e342fcaaeae9c3c62f2fea6b6";
-      //     const decipher = crypto.createDecipher('aes-256-cbc', key);
-      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //     // @ts-ignore
-      //     let decryptedData = decipher.update( typebot?.settings?.general?.ticketInfo , 'hex', 'utf-8');
-      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //     // @ts-ignore
-      //     decryptedData += decipher.final('utf-8');
-      //     console.log("decrypted data", decryptedData );
-      //     let resp1 = await fetch("https://quadz.arthink.ai/api/v1/login", {
-      //       method : "POST",
-      //       headers: {
-      //         "Content-type" : "application/json"
-      //       },
-      //       body : decryptedData
-
-      //     });
-      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //     // @ts-ignore
-          
-      //     resp1=  await resp1.json();
-      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //     // @ts-ignore
-      //     console.log("ticket login data", resp1.accessToken );
-      //     return {
-      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //       // @ts-ignore
-      //       ticketAccessToken : resp1.accessToken,
-      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //       // @ts-ignore
-      //       ticketOwnerId : resp1.user._id ,
-      //       sessionId: session.id,
-      //       typebot: typebot
-      //         ? {
-      //             id: typebot.id,
-      //             theme: typebot.theme,
-      //             settings: typebot.settings,
-      //           }
-      //         : undefined,
-      //       messages,
-      //       input,
-      //       resultId,
-      //       dynamicTheme,
-      //       logs,
-      //       clientSideActions,
-      //     }
-
-      //   } catch(err) {
-      //     console.log("error happened while login");
-      //     return {
-      //       sessionId: session.id,
-      //       typebot: typebot
-      //         ? {
-      //             id: typebot.id,
-      //             theme: typebot.theme,
-      //             settings: typebot.settings,
-      //           }
-      //         : undefined,
-      //       messages,
-      //       input,
-      //       resultId,
-      //       dynamicTheme,
-      //       logs,
-      //       clientSideActions,
-      //     }
-      //   } 
-
-      //  } else {
+    
         return {
           sessionId: session.id,
           typebot: typebot
@@ -172,23 +102,7 @@ export const sendMessageV2 = publicProcedure
           logs,
           clientSideActions,
         }
-      //  }
-        // return {
-        //   sessionId: session.id,
-        //   typebot: typebot
-        //     ? {
-        //         id: typebot.id,
-        //         theme: typebot.theme,
-        //         settings: typebot.settings,
-        //       }
-        //     : undefined,
-        //   messages,
-        //   input,
-        //   resultId,
-        //   dynamicTheme,
-        //   logs,
-        //   clientSideActions,
-        // }
+      
       } else {
         console.log("entered elsee after continue bot flow v2 send message start")
         const {
@@ -215,52 +129,7 @@ export const sendMessageV2 = publicProcedure
             clientSideActions,
           })
         console.log("messages after continue bot flow",JSON.stringify(messages));
-        // const  replyMessages = [];
-        // for ( let i=0; i < messages.length;i++ ) {
-        //  if ( messages[i].type == "text" ) {
-        //    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        //     for ( let j=0; j < messages[i].content.richText.length ; j++ ) {
-        //        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        //       replyMessages.push( messages[i].content.richText[j].children[0].children[0].text );
-        //     }
-        //  }
-        // }
-        // console.log("reply messages", replyMessages.join("\n")  );
-        // let  ticketdata = await fetch(`http://20.219.184.176:8118/api/v1/tickets`, {
-        //   method : "GET" ,
-        //   headers : {
-        //     "Content-Type" : "application/json",
-        //      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        //     "accesstoken" : loginData?.accessToken
-        //   }
-        // } );
-        // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        // ticketdata = await ticketdata.json();
-        // console.log("ticketData",ticketdata); 
-        //  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        // const  sessionTicket = ticketdata.filter( ticket => ticket.subject == `Convo for user with sessionId ${sessionId}` );
-        // const  sessionTicketId = sessionTicket[0]._id;
-        //   console.log("session ticket id",sessionTicketId);
-        //   let createNoteData = await fetch(`http://20.219.184.176:8118/api/v1/tickets/addnote`,  {
-        //     method : "POST",
-        //     headers : {
-        //       "Content-Type":  "application/json",
-        //        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        //       "accesstoken" : loginData?.accessToken
-        //     },
-        //     body : JSON.stringify({ ticketid : String(sessionTicketId) , note : replyMessages.join("\n")
-        //     })
-        //   } );
-        //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //   // @ts-ignore
-        //   createNoteData = await createNoteData.json();
-        //   console.log("createNoteData",createNoteData);
+        
 
         return {
           messages,

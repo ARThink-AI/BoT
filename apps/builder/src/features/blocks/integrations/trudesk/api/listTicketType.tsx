@@ -128,7 +128,7 @@ export const listTicketType = authenticatedProcedure.meta({
             accessToken: `${loginData.accessToken}`
           }
         }).json();
-
+        console.log(JSON.stringify(ticketUsersAndAssigneesResponse))
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         resData.users = ticketUsersAndAssigneesResponse.filter(assignee => assignee?.role?.isAgent == true).map(usr => {

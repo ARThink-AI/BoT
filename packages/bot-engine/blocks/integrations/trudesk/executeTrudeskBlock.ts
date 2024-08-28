@@ -72,6 +72,7 @@ export const executeTrudeskBlock = async (
 
   } else  if ( block.options.task == "Create Ticket" ) {
     let customerId;
+    
     let variableRegex = /{{(.*?)}}/g;
      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -880,7 +881,7 @@ export const createTicket = async (data :  { userName: string, password: string,
         statusCode: 200,
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-        response: { id : createTicketResponse.ticket._id , uid:  createTicketResponse.ticket.uid  },
+        response: { id : createTicketResponse.ticket._id , uid:  createTicketResponse.ticket.uid , accessToken : loginData.accessToken  },
       },
     })
     return {
@@ -889,7 +890,7 @@ export const createTicket = async (data :  { userName: string, password: string,
         statusCode: 200,
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-        data: { id : createTicketResponse.ticket._id , uid:  createTicketResponse.ticket.uid },
+        data: { id : createTicketResponse.ticket._id , uid:  createTicketResponse.ticket.uid , accessToken : loginData.accessToken },
       },
       logs,
     }

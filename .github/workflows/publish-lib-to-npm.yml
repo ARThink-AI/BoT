@@ -1,9 +1,9 @@
 name: Publish typebot-js to NPM
 
-on:
-  push:
-    tags:
-      - 'js-lib-v*'
+on: workflow_dispatch
+  # push:
+    # tags:
+    #   - 'js-lib-v*'
 
 jobs:
   publish:

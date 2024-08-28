@@ -143,7 +143,6 @@ export const TypebotHeader = () => {
             >
               {scopedT('shareButton.label')}
             </Button>
-
           </>
         )}
 

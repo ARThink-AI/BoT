@@ -1,9 +1,9 @@
 name: Publish @typebot.io/react package to NPM
 
-on:
-  push:
-    tags:
-      - 'react-v*'
+on: workflow_dispatch
+  # push:
+    # tags:
+    #   - 'react-v*'
 
 jobs:
   publish:
