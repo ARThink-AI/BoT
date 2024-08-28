@@ -15,13 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const accessTokenVariableName = req.query.accessTokenVariable as string
 
     const result = await prisma.result.findUnique({ where: { id: resultId } })
-    console.log('variables', result?.variables)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    console.log(
-      'filter',
-      result?.variables?.filter((v) => v.name == ticketIdVariableName)
-    )
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const ticketId =
