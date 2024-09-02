@@ -70,6 +70,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     }
     // @ts-ignore  
+    if (sessionStorage.getItem('live') && JSON.parse(sessionStorage.getItem('live')) == true) {
+      console.log("live chat enable")
+      return
+    }
+    // @ts-ignore  
     if (!Object.hasOwn(prefilledVariables, 'reset') && sessionStorage.getItem("bot_init") && JSON.parse(sessionStorage.getItem("bot_init")) == true) {
       console.log("return without initializing")
       return

@@ -84,24 +84,45 @@ export const ConversationContainer = (props: Props) => {
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   // ])
-
-  // const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? [
+  // @ts-ignore
+  // const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(!sessionStorage.getItem("chatchunks") ? ([
   //   {
   //     input: props.initialChatReply.input,
   //     messages: props.initialChatReply.messages,
   //     clientSideActions: props.initialChatReply.clientSideActions,
   //   },
   //   // @ts-ignore
-  // ] : JSON.parse(sessionStorage.getItem("chatchunks")))
+  // ]) : sessionStorage.getItem('live') && JSON.parse(sessionStorage.getItem('live')) == false ?
+  //   [
+  //     {
+  //       input: props.initialChatReply.input,
+  //       messages: props.initialChatReply.messages,
+  //       clientSideActions: props.initialChatReply.clientSideActions,
+  //     },
+  //     // @ts-ignore
+  //   ] : JSON.parse(sessionStorage.getItem("chatchunks")))
 
-  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>([
-    {
-      input: props.initialChatReply.input,
-      messages: props.initialChatReply.messages,
-      clientSideActions: props.initialChatReply.clientSideActions,
-    },
+  const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>(
     // @ts-ignore
-  ])
+    JSON.parse(sessionStorage.getItem('live')) === true ?
+      JSON.parse(sessionStorage.getItem("chatchunks") || '[]') :
+      [
+        {
+          input: props.initialChatReply.input,
+          messages: props.initialChatReply.messages,
+          clientSideActions: props.initialChatReply.clientSideActions,
+        }
+      ]
+  );
+
+  // const [chatChunks, setChatChunks] = createSignal<ChatChunkType[]>([
+  //   {
+  //     input: props.initialChatReply.input,
+  //     messages: props.initialChatReply.messages,
+  //     clientSideActions: props.initialChatReply.clientSideActions,
+  //   },
+  //   // @ts-ignore
+  // ])
 
 
   const [dynamicTheme, setDynamicTheme] = createSignal<
@@ -421,7 +442,7 @@ export const ConversationContainer = (props: Props) => {
     // @ts-ignore
     sessionStorage.setItem("answer", message);
     if (!liveSocketInstance()) {
-      const socketInstance = io("https://socket.quadz.ai", {
+      const socketInstance = io("http://localhost:3080", {
         reconnection: true, // Enable reconnection
         reconnectionAttempts: Infinity, // Retry indefinitely
         reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -979,8 +1000,8 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          const socketInstance = io(`https://socket.quadz.ai`, {
-            // const socketInstance = io(`https://socket.quadz.ai`, {
+          const socketInstance = io(`http://localhost:3080`, {
+            // const socketInstance = io(`http://localhost:3080`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -2264,7 +2285,8 @@ export const ConversationContainer = (props: Props) => {
                         chunks.push(
                           {
                             // @ts-ignore
-                            input: lastInput(),
+                            //removed lastinput
+                            input: '',
                             messages: [
                               {
                                 id: "unhxagqgd46929s701gnz5z8",
@@ -2385,7 +2407,7 @@ export const ConversationContainer = (props: Props) => {
           )}
         </Show>
         {
-          live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-items": "center", width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
+          live() && liveSocketInstance() != null && <div style={{ display: "flex", "justify-content": 'center', width: "100%", "align-items": "center", "flex-direction": "inherit", "margin-top": "15px" }} >
             <div style={{ display: "flex", "flex-direction": "row", "gap": "4" }} >
               <input value={userMessage()} type="text" placeholder='type your message' style={{ border: '1px solid black' }} class=" w-[200px] mr-2 lg:w-full md:w-full sm:w-full rounded-md text-[#364652] p-1" onChange={e => setUserMessage(e.target.value)} />
               <button class="rounded-full bg-[#0077CC]" onClick={() => userMessageLiveChat(userMessage())} >

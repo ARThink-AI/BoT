@@ -67,7 +67,7 @@ export const Bubble = (props: BubbleProps) => {
 
   onMount(() => {
     console.log("checking socket connection");
-    const socketInstance = io("http://localhost:3080", {
+    const socketInstance = io("https://socket.quadz.ai", {
       reconnection: true, // Enable reconnection
       reconnectionAttempts: Infinity, // Retry indefinitely
       reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -268,7 +268,7 @@ export const Bubble = (props: BubbleProps) => {
         }
       >
         <Show when={isBotStarted()}>
-          <header class="bg-blue-500 text-white p-4 h-12 absolute top-[-50px]  w-[100%]" >
+          {/* <header class="bg-blue-500 text-white p-4 h-12 absolute top-[-50px]  w-[100%]" >
             <div class="flex justify-between items-center">
               <div class="">
                 <button id="burgerIcon" onClick={toggleBurgerIcon} class="text-white focus:outline-none">
@@ -280,7 +280,7 @@ export const Bubble = (props: BubbleProps) => {
                   <div onMouseLeave={() => setBurgerMenu(false)} class="absolute w-[275px] h-[248px] z-50 top-10 left-0 rounded-r-2xl bg-white text-black p-4">
                     <div class='p-3 flex gap-2.5 text-[#ABB4C4]'>Menu</div>
                     <ul>
-                      {/* <li><button onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' >Download Chat</button></li> */}
+                      <li><button onClick={() => convertHTMLtoPDF()} class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' >Download Chat</button></li>
                       <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Live Support Agent</a></li>
                       <li><button class='rounded-xl p-3 w-full hover:bg-[#E6F1FA] flex gap-3 no-underline' onClick={() => {
                         console.log("stop clicked restart");
@@ -291,10 +291,10 @@ export const Bubble = (props: BubbleProps) => {
                         sessionStorage.removeItem("live");
 
                       }} >Restart  </button></li>
-                      {/* <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Restart</a></li> */}
-                      {/* Add more menu items as needed */}
+                      <li><a class='rounded-xl p-3 hover:bg-[#E6F1FA] flex gap-3 no-underline' href="#">Restart</a></li>
+                
                     </ul>
-                    {/* <button onClick={closeBurgerMenu} class="text-black focus:outline-none mt-2">Close</button> */}
+                    <button onClick={closeBurgerMenu} class="text-black focus:outline-none mt-2">Close</button>
                   </div>
 
                 )}
@@ -315,7 +315,7 @@ export const Bubble = (props: BubbleProps) => {
                 </button>
               </div>
             </div>
-          </header>
+          </header> */}
           <Bot
             {...botProps}
             socket1={socketInstance()}
