@@ -162,6 +162,32 @@ export const ConversationContainer = (props: Props) => {
   const toggleBurgerIcon = () => {
     setBurgerMenu(!burgerMenu())
   }
+
+  createEffect(() => {
+    window.addEventListener('beforeunload', function (e) {
+      e.preventDefault();
+      // @ts-ignore
+      liveSocketInstance()?.emit('userDisconnect', { sessionId: props.initialChatReply.resultId });
+
+      // @ts-ignore
+      liveSocketInstance()?.on('userDisconnected', (data) => {
+
+        // @ts-ignore
+        let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+        livechatData.push({ event_name: "user_disconnected", message: "User disconnected", label: true })
+        // @ts-ignore
+        sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+        storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+          console.log("error", err);
+        })
+        // @ts-ignore
+        liveSocketInstance()?.disconnect()
+        setLiveSocketInstance(null)
+      })
+
+    });
+  }, [])
   // createEffect( () => {
   //   console.log("props live agent changed", props.liveAgent );
   //   if ( props.liveAgent != live()  ) {
@@ -442,7 +468,7 @@ export const ConversationContainer = (props: Props) => {
     // @ts-ignore
     sessionStorage.setItem("answer", message);
     if (!liveSocketInstance()) {
-      const socketInstance = io("http://localhost:3080", {
+      const socketInstance = io("https://socket.quadz.ai", {
         reconnection: true, // Enable reconnection
         reconnectionAttempts: Infinity, // Retry indefinitely
         reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -888,6 +914,44 @@ export const ConversationContainer = (props: Props) => {
   createEffect(async () => {
     console.log("live chatttt messssssg", userMessage())
 
+    // window.addEventListener('beforeunload', function (e) {
+    //   e.preventDefault();
+    //   liveSocketInstance()?.emit('userDisconnect', { sessionId: props.initialChatReply.resultId });
+    //   // @ts-ignore
+    //   // liveSocketInstance()?.on('userDisconnected', (data) => {
+    //   //   // let eventMessage = sessionStorage.getItem("event_message") ? JSON.parse(sessionStorage.getItem("event_message")) : [];
+
+    //   //   // eventMessage.push({ event: data.message })
+
+    //   //   // sessionStorage.setItem("event_message", JSON.stringify(eventMessage))
+    //   //   // @ts-ignore
+    //   //   let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
+
+    //   //   livechatData.push({ event_name: "user_disconnected", message: "User disconnected", label: true })
+    //   //   // @ts-ignore
+    //   //   sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+    //   //   storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+    //   //     console.log("error", err);
+    //   //   })
+    //   //   // @ts-ignore
+    //   //   liveSocketInstance()?.disconnect()
+    //   //   setLiveSocketInstance(null)
+
+    //   // })
+    //   // e.returnValue = '';
+    // });
+
+    // let hasEmitted = false;
+
+    // window.addEventListener('beforeunload', function (e) {
+    //   if (!hasEmitted) {
+    //     e.preventDefault();
+    //     liveSocketInstance()?.emit('userDisconnect', { sessionId: props.initialChatReply.resultId }, () => {
+    //       hasEmitted = true;
+    //     });
+    //   }
+    // });
+
     // let event_message = [];
     // @ts-ignore
     // let eventMessage = sessionStorage.getItem("event_message") ? JSON.parse(sessionStorage.getItem("event_message")) : [];
@@ -906,7 +970,7 @@ export const ConversationContainer = (props: Props) => {
           // @ts-ignore
           let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
 
-          livechatData.push({ event_name: "user_disconnected", message: data.message, label: true })
+          livechatData.push({ event_name: "user_disconnected", message: "User disconnected", label: true })
           // @ts-ignore
           sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
           storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
@@ -956,7 +1020,10 @@ export const ConversationContainer = (props: Props) => {
           let chunks = [...chatChunks()];
           // @ts-ignore
           setLastInput(chunks[chunks.length - 1].input);
-          sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
+          if (chunks[chunks.length - 1].input != undefined) {
+            sessionStorage.setItem("lastinput", JSON.stringify(chunks[chunks.length - 1].input));
+          }
+
 
           console.log("last input", chunks[chunks.length - 1].input);
 
@@ -1000,8 +1067,8 @@ export const ConversationContainer = (props: Props) => {
           setChatChunks(chunks);
           console.log("after chat chunk");
           setLive(true);
-          const socketInstance = io(`http://localhost:3080`, {
-            // const socketInstance = io(`http://localhost:3080`, {
+          const socketInstance = io(`https://socket.quadz.ai`, {
+            // const socketInstance = io(`https://socket.quadz.ai`, {
             reconnection: true, // Enable reconnection
             reconnectionAttempts: Infinity, // Retry indefinitely
             reconnectionDelay: 1000, // Initial delay (in ms) before the first reconnection attempt
@@ -1011,7 +1078,19 @@ export const ConversationContainer = (props: Props) => {
             // @ts-ignore
             setLiveSocketInstance(socketInstance);
             socketInstance.emit("joinRoom", { sessionId: props.initialChatReply.resultId });
+            // socketInstance.on('disconnect', () => {
+            //   console.log('A user disconnected');
+            //   // @ts-ignore
+            //   let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
 
+            //   livechatData.push({ event_name: "user_disconnected_refresh", message: "User disconnected", label: true })
+            //   // @ts-ignore
+            //   sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
+            //   storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
+            //     console.log("error", err);
+            //   })
+
+            // });
             socketInstance.emit('userConnected', { sessionId: props.initialChatReply.resultId });
             socketInstance.on('connected', (data) => {
               console.log("socket connection message", data.message)
@@ -1034,7 +1113,7 @@ export const ConversationContainer = (props: Props) => {
 
               let livechatData = sessionStorage.getItem("liveChat") ? JSON.parse(sessionStorage.getItem("liveChat")) : [];
 
-              livechatData.push({ event_name: "user_connected", message: data.message, label: true })
+              livechatData.push({ event_name: "user_connected", message: "User connected", label: true })
               // @ts-ignore
               sessionStorage.setItem("liveChat", JSON.stringify(livechatData))
               storeLiveChatQuery({ apiHost: props.context.apiHost, typebotId: props.context.typebot.id, resultId: props.initialChatReply.resultId, livechat: livechatData }).then().catch(err => {
@@ -1042,6 +1121,8 @@ export const ConversationContainer = (props: Props) => {
               })
 
             })
+
+
 
             socketInstance.on("sessionRestarted", () => {
               console.log("session restarting");
