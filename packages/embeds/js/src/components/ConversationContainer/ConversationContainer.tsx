@@ -131,6 +131,7 @@ export const ConversationContainer = (props: Props) => {
   const [theme, setTheme] = createSignal(props.initialChatReply.typebot.theme);
   const [sessionId, setSessionId] = createSignal(null);
   const [userInput, setUserInput] = createSignal("");
+
   const [isSending, setIsSending] = createSignal(false)
   const [blockedPopupUrl, setBlockedPopupUrl] = createSignal<string>()
   const [hasError, setHasError] = createSignal(false)
@@ -1968,10 +1969,109 @@ export const ConversationContainer = (props: Props) => {
             clientSideActions: undefined
           })
 
-          setChatChunks(chunks);
+          // setChatChunks(chunks);
 
           // setUserInput("");
           sessionStorage.removeItem("answer");
+          // follow up code
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+            console.log("entered upper if");
+            let inputs = [];
+            for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "name") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "y1durrr4tq4esgtm64loai7f",
+                  "type": "text",
+                  "label": "Your Name",
+                  "placeholder": "Enter your name",
+                  "answerVariableId": "vdr2ch5r1jegp5hnmx4bs6ud3",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                });
+
+              }
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
+                  "type": "email",
+                  "label": "Your Email",
+                  "placeholder": "Enter your Email",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "a3lxz9phhdpo5eqjmolji3m5",
+                  "type": "phone",
+                  "label": "Your Phone",
+                  "placeholder": "Enter Phone Number",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vocfhc3qkrt3kos7cqynubatf",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+            }
+            // add chunk 
+            chunks.push({
+              messages: [],
+              clientSideActions: undefined,
+              //  input :  {
+              "input": {
+                "id": "rbihqsrvpr12xv7ui2bbph6r",
+                "groupId": "nqxy3upgjfsl2zv3y459o1o1",
+                "outgoingEdgeId": "u0fqch1goo6ce9fsggdi14dw",
+                // @ts-ignore
+                "type": "card input",
+                "customInput": true,
+                "options": {
+                  "heading": "heading",
+                  "subHeading": "subheading",
+                  // @ts-ignore
+                  "inputs": inputs
+                }
+              }
+            });
+            console.log("chunkss", chunks);
+            setChatChunks(chunks);
+          } else {
+            setChatChunks(chunks);
+          }
+
+
+
         }
 
 
