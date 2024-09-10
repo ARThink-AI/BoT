@@ -605,23 +605,47 @@ export const CardInput = (props: any) => {
   }
 
   const handleSubmit = () => {
-    const ans = {};
-    inputs().forEach(input => {
-      console.log("input", input)
-      // ans[input.answerVariableId] = input.userInput ? input?.default : input?.userInput;
-      if (input.type == "text" || input.type == "phone" || input.type == "email" || input.type == "rating" || input.type == "textarea") {
-        ans[input.answerVariableId] = input.values
-      } else {
-        ans[input.answerVariableId] = input.default
-      }
+    if (props.block.customInput === true) {
+      if (props.onSubmit) {
+        var ans = "Details are: ";
+        inputs().forEach(input => {
+          console.log("input", input)
 
-    });
-    console.log("Submitted:", ans);
-    if (props.onSubmit) {
-      props.onSubmit({ label: "Submitted", value: JSON.stringify(ans) });
+          // name
+          if (input.type === "text") {
+            ans += ` name : ${input.values}`
+          } else if (input.type == "email") {
+            ans += ` email: ${input.values}`
+          } else if (input.type == "phone") {
+            ans += ` phone: ${input.values}`
+          }
+
+        });
+
+        console.log("custom Input onSubmit prop present");
+        props.onSubmit({ label: ans })
+      }
     } else {
-      console.error("onSubmit prop is not provided.");
+      const ans = {};
+      inputs().forEach(input => {
+        console.log("input", input)
+        // ans[input.answerVariableId] = input.userInput ? input?.default : input?.userInput;
+        if (input.type == "text" || input.type == "phone" || input.type == "email" || input.type == "rating" || input.type == "textarea") {
+          ans[input.answerVariableId] = input.values
+        } else {
+          ans[input.answerVariableId] = input.default
+        }
+
+      });
+      console.log("Submitted:", ans);
+      if (props.onSubmit) {
+        props.onSubmit({ label: "Submitted", value: JSON.stringify(ans) });
+      } else {
+        console.error("onSubmit prop is not provided.");
+      }
     }
+
+
   };
 
 
@@ -646,22 +670,408 @@ export const CardInput = (props: any) => {
     }
 
   })
-
+  console.log("card inputtttttsssss", props.block)
   return (
 
     <>
-      <div class="mx-auto">
-        <div class="p-6 lg:min-w-[450px] min-h-[480px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
-          <div class="flex flex-col h-full gap-2">
-            <div id="headings">
-              <p class="sticky top-0 bg-[#f7f8ff] text-xl">{props.block.options.heading}</p>
-              <p class="sticky top-[48px] bg-[#f7f8ff] text-lg">
-                {props.block.options.subHeading}
-              </p>
-            </div>
-            <div class="p-4  flex-1 mb-2" id="input-container">
+      {props.block && props.block.customInput === true ?
 
-              {/* {inputs().map((input: any, i: number) => {
+        <div class="mx-auto">
+          <div class="p-6 mt-[3%] lg:w-[350px] min-h-[250px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
+            <div class="flex flex-col h-full gap-2">
+              <div id="headings">
+                <p class="sticky top-0 bg-[#f7f8ff] text-xl">{props.block.options.heading}</p>
+                <p class="sticky top-[48px] bg-[#f7f8ff] text-lg">
+                  {props.block.options.subHeading}
+                </p>
+              </div>
+              <div class="p-4  flex-1 mb-2" id="input-container">
+
+                {/* {inputs().map((input: any, i: number) => {
+            switch (input.type) {
+              case "text":
+                return (
+                  <>
+                    <label for="">{input.label}</label>
+                    <input
+
+                      type={input.type}
+                      placeholder={input.placeholder}
+                      class={`border p-2 rounded-md w-full mb-2`}
+                      value={input?.values ? input?.values : ""}
+                      onChange={(e) => handleInputChange(e, i)}
+
+
+
+
+
+
+
+                      required={input.required}
+                    />
+                  </>
+                );
+              case "email":
+                return (
+                  <>
+                    <label for="">{input.label}</label>
+                    <input
+                      type={input.type}
+                      placeholder={input.placeholder}
+                      // class={`border p-2 rounded-md w-full mb-2`}
+                      value={input?.values ? input?.values : ""}
+                      onChange={(e) => handleInputChange(e, i)}
+                      class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
+
+                      required={input.required}
+                    />
+                    {input.type === 'email' && !emailValid() && (
+                      <p class="text-red-500 text-sm">Please enter a valid email address.</p>
+                    )}
+                  </>
+                );
+              case "phone":
+                return (
+                  <>
+                    <label for="">{input.label}</label>
+                    <input
+                      type={input.type}
+                      placeholder={input.placeholder}
+                      // class={`border p-2 rounded-md w-full mb-2`}
+                      class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
+                      value={input?.values ? input?.values : ""}
+                      onChange={(e) => handleInputChange(e, i)}
+
+                      required={input.required}
+                    />
+                    {input.type === 'phone' && !phoneValidation() && (
+                      <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                    )}
+
+                  </>
+                );
+
+              case "dropdown":
+                return (
+                  <>
+                    <label for="">{input.label}</label>
+                    <select
+                      class="w-full p-2 appearance-none border rounded-md mb-2"
+                      value={input?.default ? input?.default : ""}
+                      onChange={(e) => updateInput("default", e.target.value, i)}
+                      required={input.required}
+                    >
+                      <option value="" disabled selected>
+                        {input.placeholder}
+                      </option>
+                      <For each={JSON.parse(input.values)}>{(value) => (
+                        <option value={value}>{value}</option>
+                      )}</For>
+                    </select >
+                  </>
+                )
+
+              case "textarea":
+                return (
+                  <>
+                    <label>{input.label}</label>
+                    < textarea
+                      class="border p-2 rounded-md w-full"
+                      placeholder={input.placeholder}
+                      value={input?.userInput ? input?.userInput : ""}
+                      onChange={(e) =>
+                        updateInput("userInput", e.target.value, i)}
+                      required={input.required}
+                    />
+                  </>
+                )
+              case "radio":
+                return (
+                  <><label for="">{input.label}</label>
+                    <div class="flex justify-start gap-1 mt-2">
+
+                      <For each={JSON.parse(input.values)}>{(value) => (
+                        <>
+                          <input
+                            id={value}
+                            type="radio"
+                            class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                            value={value}
+                            checked={input.userInput === value || (!input.userInput && input.default === value)}
+                            onChange={(e) =>
+                              updateInput("userInput", e.target.value, i)}
+                            required={input.required}
+                          />
+                          <label for={value}>{value}</label>
+                        </>
+                      )}</For>
+                    </div>
+                  </>)
+
+              case "checkbox":
+                return (
+                  <>
+                    <label for="">{input.label}</label>
+                    <div class="flex justify-start flex-col gap-1">
+                      <For each={JSON.parse(input.values)}>{(value) => (
+                        <div class="flex justify-start gap-2">
+                          <input
+                            type="checkbox"
+                            class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                            value={value}
+                            onChange={(e) => {
+                              const isChecked = e.target.checked;
+                              let updatedValues;
+                              if (!input.userInput) {
+                                updatedValues = isChecked ? [value] : [];
+                              } else {
+                                updatedValues = isChecked
+                                  ? [...input.userInput, value]
+                                  : input.userInput.filter((item) => item !== value);
+                              }
+                              updateInput("userInput", updatedValues, i);
+                            }}
+                            checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
+                            required={input.required}
+                          />
+                          <label>{value}</label>
+                        </div>
+                      )}</For>
+
+                    </div >
+                  </>
+                )
+
+
+
+              default:
+                return null;
+            }
+          })} */}
+                <For each={inputs()}>{(input, i) => {
+                  switch (input.type) {
+                    case "rating":
+                      return (
+                        <>
+                          <label class='text-[18px] mb-4' for="">{input.label}</label>
+                          {input.labels.left && (
+                            <div class="text-sm w-full rating-label mt-2">
+                              {input.labels.left}
+                            </div>
+                          )}
+                          <div class="flex flex-wrap justify-center gap-2">
+                            <For
+                              each={Array.from(
+                                Array(
+                                  input.length +
+                                  (input.buttonType === 'Numbers' ? 1 : 0)
+                                )
+                              )}
+                            >
+                              {(_, idx) => (
+                                <RatingButton
+                                  {...input}
+                                  rating={input?.values}
+                                  // rating={input?.values ? input?.values : 5}
+                                  idx={
+                                    idx() + (input.buttonType === 'Numbers' ? 0 : 1)
+                                  }
+                                  onClick={(rating) => {
+                                    // console.log("rating", rating);
+                                    updateInput("values", rating, i());
+                                  }}
+                                />
+                              )}
+                            </For>
+                          </div>
+                          {input.labels.right && (
+                            <div class="text-sm w-full text-right pr-2 rating-label">
+                              {input.labels.right}
+                            </div>
+                          )}
+                        </>
+                      );
+                    case "text":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                        </>
+                      );
+                    case "email":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                          {input.type === 'email' && !emailValid() && (
+                            <p class="text-red-500 text-sm">Please enter a valid email address.</p>
+                          )}
+                        </>
+                      );
+                    case "phone":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                          {input.type === 'phone' && !phoneValidation() && (
+                            <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                          )}
+                        </>
+                      );
+                    case "dropdown":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <select
+                            class="w-full p-2 appearance-none border rounded-md mb-2"
+                            value={input?.default ? input?.default : ""}
+                            onChange={(e) => updateInput("default", e.target.value, i())}
+                            required={input.required}
+                          >
+                            <option value="" disabled selected>
+                              {input.placeholder}
+                            </option>
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <option value={value}>{value}</option>
+                            )}</For>
+                          </select >
+                        </>
+                      )
+                    case "textarea":
+                      return (
+                        <>
+                          <label class='text-[18px]'>{input.label}</label>
+                          < textarea
+                            class="border p-2 rounded-md w-full"
+                            placeholder={input.placeholder}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) =>
+                              updateInput("values", e.target.value, i())}
+                            required={input.required}
+                          />
+                        </>
+                      )
+                    case "radio":
+                      return (
+                        <><label class='text-[18px]' for="">{input.label}</label>
+                          <div class="flex flex-wrap justify-start gap-[10px] p-[6px] mt-2">
+
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <>
+                                <input
+                                  id={value}
+                                  type="radio"
+                                  class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                  value={value}
+                                  checked={input.userInput === value || (!input.userInput && input.default === value)}
+                                  onChange={(e) =>
+                                    updateInput("userInput", e.target.value, i())}
+                                  required={input.required}
+                                />
+                                <label for={value}>{value}</label>
+                              </>
+                            )}</For>
+                          </div>
+                        </>)
+                    case "checkbox":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <div class="flex justify-start flex-col gap-[10px] p-[6px]">
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <div class="flex justify-start gap-2">
+                                <input
+                                  type="checkbox"
+                                  class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                  value={value}
+                                  onChange={(e) => {
+                                    const isChecked = e.target.checked;
+                                    let updatedValues;
+                                    if (!input.userInput) {
+                                      updatedValues = isChecked ? [value] : [];
+                                    } else {
+                                      updatedValues = isChecked
+                                        ? [...input.userInput, value]
+                                        : input.userInput.filter((item) => item !== value);
+                                    }
+                                    updateInput("userInput", updatedValues, i());
+                                  }}
+                                  checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
+                                  required={input.required}
+                                />
+                                <label>{value}</label>
+                              </div>
+                            )}</For>
+
+                          </div >
+                        </>
+                      )
+
+                    // Other cases omitted for brevity
+
+                    default:
+                      return null;
+                  }
+                }}</For>
+
+
+              </div>
+              <div id="buttons" class="flex justify-end mb-2 gap-2">
+                {/* onClick={() => {
+            // props.onSubmit({ label: "Submitted", value: JSON.stringify({ "vcdphidsm5nqdeiarvl11dj5g": "Dropdown1", "vj7dviiwtnnday3u8codhdzgc": "checkbox1" }) })
+            let ans = {};
+            for (let i = 0; i < props?.block?.options?.inputs?.length; i++) {
+              ans[props?.block?.options?.inputs[i].answerVariableId] =
+            }
+          }}  */}
+                {/* {props?.block?.options?.isVoiceFill && (
+            <button> Disable Voice </button>
+          )} */}
+                {props?.block?.options?.isVoiceFill && isRecording() && (
+                  <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
+                    <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
+                    <div style={{ "font-size": "8px" }} > Listening... </div>
+                  </div>
+                )}
+                <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div >
+        </div > : <div class="mx-auto">
+          <div class="p-6 lg:min-w-[450px] min-h-[480px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
+            <div class="flex flex-col h-full gap-2">
+              <div id="headings">
+                <p class="sticky top-0 bg-[#f7f8ff] text-xl">{props.block.options.heading}</p>
+                <p class="sticky top-[48px] bg-[#f7f8ff] text-lg">
+                  {props.block.options.subHeading}
+                </p>
+              </div>
+              <div class="p-4  flex-1 mb-2" id="input-container">
+
+                {/* {inputs().map((input: any, i: number) => {
                 switch (input.type) {
                   case "text":
                     return (
@@ -822,219 +1232,221 @@ export const CardInput = (props: any) => {
                     return null;
                 }
               })} */}
-              <For each={inputs()}>{(input, i) => {
-                switch (input.type) {
-                  case "rating":
-                    return (
-                      <>
-                        <label class='text-[18px] mb-4' for="">{input.label}</label>
-                        {input.labels.left && (
-                          <div class="text-sm w-full rating-label mt-2">
-                            {input.labels.left}
-                          </div>
-                        )}
-                        <div class="flex flex-wrap justify-center gap-2">
-                          <For
-                            each={Array.from(
-                              Array(
-                                input.length +
-                                (input.buttonType === 'Numbers' ? 1 : 0)
-                              )
-                            )}
-                          >
-                            {(_, idx) => (
-                              <RatingButton
-                                {...input}
-                                rating={input?.values}
-                                // rating={input?.values ? input?.values : 5}
-                                idx={
-                                  idx() + (input.buttonType === 'Numbers' ? 0 : 1)
-                                }
-                                onClick={(rating) => {
-                                  // console.log("rating", rating);
-                                  updateInput("values", rating, i());
-                                }}
-                              />
-                            )}
-                          </For>
-                        </div>
-                        {input.labels.right && (
-                          <div class="text-sm w-full text-right pr-2 rating-label">
-                            {input.labels.right}
-                          </div>
-                        )}
-                      </>
-                    );
-                  case "text":
-                    return (
-                      <>
-                        <label class='text-[18px]' for="">{input.label}</label>
-                        <input
-                          type={input.type}
-                          placeholder={input.placeholder}
-                          class={`border p-2 rounded-md w-full mb-2`}
-                          value={input?.values ? input?.values : ""}
-                          onChange={(e) => handleInputChange(e, i())}
-                          required={input.required}
-                        />
-                      </>
-                    );
-                  case "email":
-                    return (
-                      <>
-                        <label class='text-[18px]' for="">{input.label}</label>
-                        <input
-                          type={input.type}
-                          placeholder={input.placeholder}
-                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
-                          value={input?.values ? input?.values : ""}
-                          onChange={(e) => handleInputChange(e, i())}
-                          required={input.required}
-                        />
-                        {input.type === 'email' && !emailValid() && (
-                          <p class="text-red-500 text-sm">Please enter a valid email address.</p>
-                        )}
-                      </>
-                    );
-                  case "phone":
-                    return (
-                      <>
-                        <label class='text-[18px]' for="">{input.label}</label>
-                        <input
-                          type={input.type}
-                          placeholder={input.placeholder}
-                          class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
-                          value={input?.values ? input?.values : ""}
-                          onChange={(e) => handleInputChange(e, i())}
-                          required={input.required}
-                        />
-                        {input.type === 'phone' && !phoneValidation() && (
-                          <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
-                        )}
-                      </>
-                    );
-                  case "dropdown":
-                    return (
-                      <>
-                        <label class='text-[18px]' for="">{input.label}</label>
-                        <select
-                          class="w-full p-2 appearance-none border rounded-md mb-2"
-                          value={input?.default ? input?.default : ""}
-                          onChange={(e) => updateInput("default", e.target.value, i())}
-                          required={input.required}
-                        >
-                          <option value="" disabled selected>
-                            {input.placeholder}
-                          </option>
-                          <For each={JSON.parse(input.values)}>{(value) => (
-                            <option value={value}>{value}</option>
-                          )}</For>
-                        </select >
-                      </>
-                    )
-                  case "textarea":
-                    return (
-                      <>
-                        <label class='text-[18px]'>{input.label}</label>
-                        < textarea
-                          class="border p-2 rounded-md w-full"
-                          placeholder={input.placeholder}
-                          value={input?.values ? input?.values : ""}
-                          onChange={(e) =>
-                            updateInput("values", e.target.value, i())}
-                          required={input.required}
-                        />
-                      </>
-                    )
-                  case "radio":
-                    return (
-                      <><label class='text-[18px]' for="">{input.label}</label>
-                        <div class="flex flex-wrap justify-start gap-[10px] p-[6px] mt-2">
-
-                          <For each={JSON.parse(input.values)}>{(value) => (
-                            <>
-                              <input
-                                id={value}
-                                type="radio"
-                                class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
-                                value={value}
-                                checked={input.userInput === value || (!input.userInput && input.default === value)}
-                                onChange={(e) =>
-                                  updateInput("userInput", e.target.value, i())}
-                                required={input.required}
-                              />
-                              <label for={value}>{value}</label>
-                            </>
-                          )}</For>
-                        </div>
-                      </>)
-                  case "checkbox":
-                    return (
-                      <>
-                        <label class='text-[18px]' for="">{input.label}</label>
-                        <div class="flex justify-start flex-col gap-[10px] p-[6px]">
-                          <For each={JSON.parse(input.values)}>{(value) => (
-                            <div class="flex justify-start gap-2">
-                              <input
-                                type="checkbox"
-                                class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
-                                value={value}
-                                onChange={(e) => {
-                                  const isChecked = e.target.checked;
-                                  let updatedValues;
-                                  if (!input.userInput) {
-                                    updatedValues = isChecked ? [value] : [];
-                                  } else {
-                                    updatedValues = isChecked
-                                      ? [...input.userInput, value]
-                                      : input.userInput.filter((item) => item !== value);
-                                  }
-                                  updateInput("userInput", updatedValues, i());
-                                }}
-                                checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
-                                required={input.required}
-                              />
-                              <label>{value}</label>
+                <For each={inputs()}>{(input, i) => {
+                  switch (input.type) {
+                    case "rating":
+                      return (
+                        <>
+                          <label class='text-[18px] mb-4' for="">{input.label}</label>
+                          {input.labels.left && (
+                            <div class="text-sm w-full rating-label mt-2">
+                              {input.labels.left}
                             </div>
-                          )}</For>
+                          )}
+                          <div class="flex flex-wrap justify-center gap-2">
+                            <For
+                              each={Array.from(
+                                Array(
+                                  input.length +
+                                  (input.buttonType === 'Numbers' ? 1 : 0)
+                                )
+                              )}
+                            >
+                              {(_, idx) => (
+                                <RatingButton
+                                  {...input}
+                                  rating={input?.values}
+                                  // rating={input?.values ? input?.values : 5}
+                                  idx={
+                                    idx() + (input.buttonType === 'Numbers' ? 0 : 1)
+                                  }
+                                  onClick={(rating) => {
+                                    // console.log("rating", rating);
+                                    updateInput("values", rating, i());
+                                  }}
+                                />
+                              )}
+                            </For>
+                          </div>
+                          {input.labels.right && (
+                            <div class="text-sm w-full text-right pr-2 rating-label">
+                              {input.labels.right}
+                            </div>
+                          )}
+                        </>
+                      );
+                    case "text":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                        </>
+                      );
+                    case "email":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                          {input.type === 'email' && !emailValid() && (
+                            <p class="text-red-500 text-sm">Please enter a valid email address.</p>
+                          )}
+                        </>
+                      );
+                    case "phone":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <input
+                            type={input.type}
+                            placeholder={input.placeholder}
+                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) => handleInputChange(e, i())}
+                            required={input.required}
+                          />
+                          {input.type === 'phone' && !phoneValidation() && (
+                            <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
+                          )}
+                        </>
+                      );
+                    case "dropdown":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <select
+                            class="w-full p-2 appearance-none border rounded-md mb-2"
+                            value={input?.default ? input?.default : ""}
+                            onChange={(e) => updateInput("default", e.target.value, i())}
+                            required={input.required}
+                          >
+                            <option value="" disabled selected>
+                              {input.placeholder}
+                            </option>
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <option value={value}>{value}</option>
+                            )}</For>
+                          </select >
+                        </>
+                      )
+                    case "textarea":
+                      return (
+                        <>
+                          <label class='text-[18px]'>{input.label}</label>
+                          < textarea
+                            class="border p-2 rounded-md w-full"
+                            placeholder={input.placeholder}
+                            value={input?.values ? input?.values : ""}
+                            onChange={(e) =>
+                              updateInput("values", e.target.value, i())}
+                            required={input.required}
+                          />
+                        </>
+                      )
+                    case "radio":
+                      return (
+                        <><label class='text-[18px]' for="">{input.label}</label>
+                          <div class="flex flex-wrap justify-start gap-[10px] p-[6px] mt-2">
 
-                        </div >
-                      </>
-                    )
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <>
+                                <input
+                                  id={value}
+                                  type="radio"
+                                  class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                  value={value}
+                                  checked={input.userInput === value || (!input.userInput && input.default === value)}
+                                  onChange={(e) =>
+                                    updateInput("userInput", e.target.value, i())}
+                                  required={input.required}
+                                />
+                                <label for={value}>{value}</label>
+                              </>
+                            )}</For>
+                          </div>
+                        </>)
+                    case "checkbox":
+                      return (
+                        <>
+                          <label class='text-[18px]' for="">{input.label}</label>
+                          <div class="flex justify-start flex-col gap-[10px] p-[6px]">
+                            <For each={JSON.parse(input.values)}>{(value) => (
+                              <div class="flex justify-start gap-2">
+                                <input
+                                  type="checkbox"
+                                  class="border p-2 h-6 w-6 rounded-md mb-2 accent-[#0077CC]"
+                                  value={value}
+                                  onChange={(e) => {
+                                    const isChecked = e.target.checked;
+                                    let updatedValues;
+                                    if (!input.userInput) {
+                                      updatedValues = isChecked ? [value] : [];
+                                    } else {
+                                      updatedValues = isChecked
+                                        ? [...input.userInput, value]
+                                        : input.userInput.filter((item) => item !== value);
+                                    }
+                                    updateInput("userInput", updatedValues, i());
+                                  }}
+                                  checked={input.userInput && input.userInput.includes(value) || (!input.userInput && input.default === value)}
+                                  required={input.required}
+                                />
+                                <label>{value}</label>
+                              </div>
+                            )}</For>
 
-                  // Other cases omitted for brevity
+                          </div >
+                        </>
+                      )
 
-                  default:
-                    return null;
-                }
-              }}</For>
+                    // Other cases omitted for brevity
+
+                    default:
+                      return null;
+                  }
+                }}</For>
 
 
-            </div>
-            <div id="buttons" class="flex justify-end mb-2 gap-2">
-              {/* onClick={() => {
+              </div>
+              <div id="buttons" class="flex justify-end mb-2 gap-2">
+                {/* onClick={() => {
                 // props.onSubmit({ label: "Submitted", value: JSON.stringify({ "vcdphidsm5nqdeiarvl11dj5g": "Dropdown1", "vj7dviiwtnnday3u8codhdzgc": "checkbox1" }) })
                 let ans = {};
                 for (let i = 0; i < props?.block?.options?.inputs?.length; i++) {
                   ans[props?.block?.options?.inputs[i].answerVariableId] =
                 }
               }}  */}
-              {/* {props?.block?.options?.isVoiceFill && (
+                {/* {props?.block?.options?.isVoiceFill && (
                 <button> Disable Voice </button>
               )} */}
-              {props?.block?.options?.isVoiceFill && isRecording() && (
-                <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
-                  <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
-                  <div style={{ "font-size": "8px" }} > Listening... </div>
-                </div>
-              )}
-              <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
-                Submit
-              </button>
+                {props?.block?.options?.isVoiceFill && isRecording() && (
+                  <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", "justify-content": "center" }} >
+                    <button onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img style={{ height: "25px" }} src="https://quadz.blob.core.windows.net/demo1/mic.gif" />  </button>
+                    <div style={{ "font-size": "8px" }} > Listening... </div>
+                  </div>
+                )}
+                <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
+                  Submit
+                </button>
+              </div>
             </div>
-          </div>
+          </div >
         </div >
-      </div >
+      }
+
 
 
     </>

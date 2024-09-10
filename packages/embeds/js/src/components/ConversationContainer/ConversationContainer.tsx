@@ -654,203 +654,214 @@ export const ConversationContainer = (props: Props) => {
     message: string | undefined,
     clientLogs?: SendMessageInput['clientLogs']
   ) => {
-    console.log("live value", live());
-    if (live()) {
-      return sendLiveAgentMessage(message);
 
-    }
-    console.log("message by user", message);
+    if (message?.startsWith("Details are")) {
 
+      console.log("entered submitted custom input");
+      let chunks = [...chatChunks()];
+      chunks.pop();
+      setChatChunks(chunks);
+      userInputClicked(message);
+    } else {
 
-    // @ts-ignore
-    sessionStorage.setItem("answer", message);
-    if (clientLogs) props.onNewLogs?.(clientLogs)
-    setHasError(false)
-    const currentInputBlock = [...chatChunks()].pop()?.input
-    if (currentInputBlock?.id && props.onAnswer && message)
-      props.onAnswer({ message, blockId: currentInputBlock.id })
-    if (currentInputBlock?.type === InputBlockType.FILE)
-      props.onNewLogs?.([
-        {
-          description: 'Files are not uploaded in preview mode',
-          status: 'info',
-        },
-      ])
-    const longRequest = setTimeout(() => {
-      setIsSending(true)
-    }, 1000)
-    const { data, error } = await sendMessageQuery({
-      apiHost: props.context.apiHost,
-      sessionId: props.initialChatReply.sessionId,
-      message,
-      clientLogs,
-    });
-    console.log("send message dataa", data);
-    console.log("error sending data", error);
-    clearTimeout(longRequest)
-    setIsSending(false)
-    if (error) {
-      if (error.message == "Session expired. You need to start a new session.") {
-        console.log("session expireddd");
-        // sessionStorage.removeItem("intialize");
-        // sessionStorage.removeItem("initialize_css");
-        // sessionStorage.removeItem("bot_init");
-        // sessionStorage.removeItem("chatchunks");
-        // props.initializeBot();
-        setIsVisible(true)
-        setTimeout(() => {
-          setIsVisible(false)
-          console.log("set timeout called session timout")
-          sessionStorage.removeItem("intialize");
-          sessionStorage.removeItem("initialize_css");
-          sessionStorage.removeItem("bot_init");
-          sessionStorage.removeItem("chatchunks");
-          sessionStorage.removeItem("live");
-          sessionStorage.removeItem("chatchunks");
-          sessionStorage.removeItem("event_message");
-          props.initializeBot();
-        }, 3000)
-        return
+      console.log("live value", live());
+      if (live()) {
+        return sendLiveAgentMessage(message);
+
       }
-      setHasError(true)
-      props.onNewLogs?.([
-        {
-          description: 'Failed to send the reply',
-          details: error,
-          status: 'error',
-        },
-      ])
-    }
-    if (!data) return
-    if (data.lastMessageNewFormat) {
-      setFormattedMessages([
-        ...formattedMessages(),
-        {
-          inputId: [...chatChunks()].pop()?.input?.id ?? '',
-          formattedMessage: data.lastMessageNewFormat as string,
-        },
-      ])
-    }
-    if (data.logs) props.onNewLogs?.(data.logs)
-    if (data.dynamicTheme) setDynamicTheme(data.dynamicTheme)
-    if (data.input?.id && props.onNewInputBlock) {
-      props.onNewInputBlock({
-        id: data.input.id,
-        groupId: data.input.groupId,
-      })
-    }
+      console.log("message by user", message);
 
-    if (data.clientSideActions) {
-      const actionsBeforeFirstBubble = data.clientSideActions.filter((action) =>
-        isNotDefined(action.lastBubbleBlockId)
-      )
-      for (const action of actionsBeforeFirstBubble) {
-        if (
-          'streamOpenAiChatCompletion' in action ||
-          'webhookToExecute' in action
-        )
-          setIsSending(true)
-        const response = await executeClientSideAction({
-          socket: props.socket,
-          clientSideAction: action,
-          context: {
-            apiHost: props.context.apiHost,
-            sessionId: props.initialChatReply.sessionId,
+
+      // @ts-ignore
+      sessionStorage.setItem("answer", message);
+      if (clientLogs) props.onNewLogs?.(clientLogs)
+      setHasError(false)
+      const currentInputBlock = [...chatChunks()].pop()?.input
+      if (currentInputBlock?.id && props.onAnswer && message)
+        props.onAnswer({ message, blockId: currentInputBlock.id })
+      if (currentInputBlock?.type === InputBlockType.FILE)
+        props.onNewLogs?.([
+          {
+            description: 'Files are not uploaded in preview mode',
+            status: 'info',
           },
-          onMessageStream: streamMessage,
-        })
-        if (response && 'replyToSend' in response) {
-          sendMessage(response.replyToSend, response.logs)
+        ])
+      const longRequest = setTimeout(() => {
+        setIsSending(true)
+      }, 1000)
+      const { data, error } = await sendMessageQuery({
+        apiHost: props.context.apiHost,
+        sessionId: props.initialChatReply.sessionId,
+        message,
+        clientLogs,
+      });
+      console.log("send message dataa", data);
+      console.log("error sending data", error);
+      clearTimeout(longRequest)
+      setIsSending(false)
+      if (error) {
+        if (error.message == "Session expired. You need to start a new session.") {
+          console.log("session expireddd");
+          // sessionStorage.removeItem("intialize");
+          // sessionStorage.removeItem("initialize_css");
+          // sessionStorage.removeItem("bot_init");
+          // sessionStorage.removeItem("chatchunks");
+          // props.initializeBot();
+          setIsVisible(true)
+          setTimeout(() => {
+            setIsVisible(false)
+            console.log("set timeout called session timout")
+            sessionStorage.removeItem("intialize");
+            sessionStorage.removeItem("initialize_css");
+            sessionStorage.removeItem("bot_init");
+            sessionStorage.removeItem("chatchunks");
+            sessionStorage.removeItem("live");
+            sessionStorage.removeItem("chatchunks");
+            sessionStorage.removeItem("event_message");
+            props.initializeBot();
+          }, 3000)
           return
         }
-        if (response && 'blockedPopupUrl' in response)
-          setBlockedPopupUrl(response.blockedPopupUrl)
-      }
-    }
-    console.log("bot reply", data.messages);
-
-    if (sessionStorage.getItem("ticketId") && sessionStorage.getItem("ticketaccess")) {
-      try {
-
-        let comments = [`User - /n ${message}`];
-
-        let text = ["/n BoT - /n"];
-        for (let i = 0; i < data.messages.length; i++) {
-          if (data.messages[i].type == "text") {
-            // @ts-ignore
-            let plainText = computePlainText(data.messages[i]?.content?.richText);
-            text.push(plainText);
-          }
-        }
-        console.log("final text array", text);
-        let finalText = text.reduce((a, curr) => a + "/n" + curr);
-
-        comments.push(finalText);
-
-        await fetch("https://quadz.arthink.ai/api/v1/tickets/addnote", {
-          method: "POST",
-          // @ts-ignore
-          headers: {
-            "Content-type": "application/json",
-            "accessToken": sessionStorage.getItem("ticketaccess")
+        setHasError(true)
+        props.onNewLogs?.([
+          {
+            description: 'Failed to send the reply',
+            details: error,
+            status: 'error',
           },
-          // body : JSON.stringify( {
-          //   _id : sessionStorage.getItem("ticketId"),
-          //   comment : comments,
-          //   note : false ,
-          //   ticketid : false 
-          // } )
-          body: JSON.stringify({
-            // @ts-ignore
-            ticketid: sessionStorage.getItem("ticketId"),
-            note: comments.join(" ")
-
-          })
-        })
-
-
-
-      } catch (err) {
-        console.log("error in creating comment on ticket", err);
+        ])
       }
-    }
+      if (!data) return
+      if (data.lastMessageNewFormat) {
+        setFormattedMessages([
+          ...formattedMessages(),
+          {
+            inputId: [...chatChunks()].pop()?.input?.id ?? '',
+            formattedMessage: data.lastMessageNewFormat as string,
+          },
+        ])
+      }
+      if (data.logs) props.onNewLogs?.(data.logs)
+      if (data.dynamicTheme) setDynamicTheme(data.dynamicTheme)
+      if (data.input?.id && props.onNewInputBlock) {
+        props.onNewInputBlock({
+          id: data.input.id,
+          groupId: data.input.groupId,
+        })
+      }
+
+      if (data.clientSideActions) {
+        const actionsBeforeFirstBubble = data.clientSideActions.filter((action) =>
+          isNotDefined(action.lastBubbleBlockId)
+        )
+        for (const action of actionsBeforeFirstBubble) {
+          if (
+            'streamOpenAiChatCompletion' in action ||
+            'webhookToExecute' in action
+          )
+            setIsSending(true)
+          const response = await executeClientSideAction({
+            socket: props.socket,
+            clientSideAction: action,
+            context: {
+              apiHost: props.context.apiHost,
+              sessionId: props.initialChatReply.sessionId,
+            },
+            onMessageStream: streamMessage,
+          })
+          if (response && 'replyToSend' in response) {
+            sendMessage(response.replyToSend, response.logs)
+            return
+          }
+          if (response && 'blockedPopupUrl' in response)
+            setBlockedPopupUrl(response.blockedPopupUrl)
+        }
+      }
+      console.log("bot reply", data.messages);
+
+      if (sessionStorage.getItem("ticketId") && sessionStorage.getItem("ticketaccess")) {
+        try {
+
+          let comments = [`User - /n ${message}`];
+
+          let text = ["/n BoT - /n"];
+          for (let i = 0; i < data.messages.length; i++) {
+            if (data.messages[i].type == "text") {
+              // @ts-ignore
+              let plainText = computePlainText(data.messages[i]?.content?.richText);
+              text.push(plainText);
+            }
+          }
+          console.log("final text array", text);
+          let finalText = text.reduce((a, curr) => a + "/n" + curr);
+
+          comments.push(finalText);
+
+          await fetch("https://quadz.arthink.ai/api/v1/tickets/addnote", {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json",
+              "accessToken": sessionStorage.getItem("ticketaccess")
+            },
+            // body : JSON.stringify( {
+            //   _id : sessionStorage.getItem("ticketId"),
+            //   comment : comments,
+            //   note : false ,
+            //   ticketid : false 
+            // } )
+            body: JSON.stringify({
+              // @ts-ignore
+              ticketid: sessionStorage.getItem("ticketId"),
+              note: comments.join(" ")
+
+            })
+          })
+
+
+
+        } catch (err) {
+          console.log("error in creating comment on ticket", err);
+        }
+      }
 
 
 
 
 
-    setChatChunks((displayedChunks) => [
-      ...displayedChunks,
-      {
-        input: data.input,
-        messages: data.messages,
-        clientSideActions: data.clientSideActions,
-      },
-    ])
-
-    console.log("updated chunks",
-      [
-        ...chatChunks(),
+      setChatChunks((displayedChunks) => [
+        ...displayedChunks,
         {
           input: data.input,
           messages: data.messages,
           clientSideActions: data.clientSideActions,
         },
-      ]
-    );
-    if (!data.input && (props.initialChatReply.typebot.settings.general.isAutoRefreshEnabled ?? true)) {
-      setTimeout(() => {
-        console.log("its the end and auto refresh enabled");
-        sessionStorage.removeItem("intialize");
-        sessionStorage.removeItem("initialize_css");
-        sessionStorage.removeItem("bot_init");
-        sessionStorage.removeItem("chatchunks");
-        sessionStorage.removeItem("event_message");
-        props.initializeBot();
-        return
-      }, 2000);
+      ])
+
+      console.log("updated chunks",
+        [
+          ...chatChunks(),
+          {
+            input: data.input,
+            messages: data.messages,
+            clientSideActions: data.clientSideActions,
+          },
+        ]
+      );
+      if (!data.input && (props.initialChatReply.typebot.settings.general.isAutoRefreshEnabled ?? true)) {
+        setTimeout(() => {
+          console.log("its the end and auto refresh enabled");
+          sessionStorage.removeItem("intialize");
+          sessionStorage.removeItem("initialize_css");
+          sessionStorage.removeItem("bot_init");
+          sessionStorage.removeItem("chatchunks");
+          sessionStorage.removeItem("event_message");
+          props.initializeBot();
+          return
+        }, 2000);
 
 
+      }
     }
   }
 
@@ -1855,10 +1866,18 @@ export const ConversationContainer = (props: Props) => {
     }
 
   }
-  const userInputClicked = async () => {
+
+  const userInputClicked = async (abc) => {
     try {
       console.log("user input clicked");
-      let userr = userInput();
+      let userr;
+      if (userInput().trim() == "") {
+        userr = abc
+
+      } else {
+        userr = userInput();
+      }
+      // let userr = userInput();
       setUserInput("");
       let chunks = [...chatChunks()];
       chunks.push(
@@ -1954,8 +1973,102 @@ export const ConversationContainer = (props: Props) => {
             messages: messageResp?.messages,
             clientSideActions: undefined
           })
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+            console.log("entered upper if");
+            let inputs = [];
+            for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
 
-          setChatChunks(chunks);
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "name") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "y1durrr4tq4esgtm64loai7f",
+                  "type": "text",
+                  "label": "Your Name",
+                  "placeholder": "Enter your name",
+                  "answerVariableId": "vdr2ch5r1jegp5hnmx4bs6ud3",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                });
+
+              }
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
+                  "type": "email",
+                  "label": "Your Email",
+                  "placeholder": "Enter your Email",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "a3lxz9phhdpo5eqjmolji3m5",
+                  "type": "phone",
+                  "label": "Your Phone",
+                  "placeholder": "Enter Phone Number",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vocfhc3qkrt3kos7cqynubatf",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+            }
+            // add chunk 
+            chunks.push({
+              messages: [],
+              clientSideActions: undefined,
+              //  input :  {
+              "input": {
+                "id": "rbihqsrvpr12xv7ui2bbph6r",
+                "groupId": "nqxy3upgjfsl2zv3y459o1o1",
+                "outgoingEdgeId": "u0fqch1goo6ce9fsggdi14dw",
+
+                // @ts-ignore
+                "type": "card input",
+                "customInput": true,
+                "options": {
+                  "heading": "heading",
+                  "subHeading": "subheading",
+                  // @ts-ignore
+                  "inputs": inputs
+                }
+              }
+            });
+            console.log("chunkss", chunks);
+            setChatChunks(chunks);
+          } else {
+            setChatChunks(chunks);
+          }
+          // setChatChunks(chunks);
 
           // setUserInput("");
           sessionStorage.removeItem("answer");
@@ -2053,6 +2166,7 @@ export const ConversationContainer = (props: Props) => {
                 "id": "rbihqsrvpr12xv7ui2bbph6r",
                 "groupId": "nqxy3upgjfsl2zv3y459o1o1",
                 "outgoingEdgeId": "u0fqch1goo6ce9fsggdi14dw",
+
                 // @ts-ignore
                 "type": "card input",
                 "customInput": true,
