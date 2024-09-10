@@ -12,9 +12,12 @@ import { defaultTimeFilter, timeFilterValues } from '../api/constants'
 import { parseResultHeader } from '@typebot.io/lib/results'
 import { LogicBlockType } from '@typebot.io/schemas'
 import { convertResultsToTableData } from '../helpers/convertResultsToTableData'
+import { ColumnSettings } from './table/ColumnSettings'
+import { parseColumnOrder } from '../helpers/parseColumnsOrder'
 // import { Frequency } from '@typebot.io/prisma'
 
 export const RemindersTableContainer = () => {
+  const { updateTypebot, isReadOnly } = useTypebot()
   const { typebot, publishedTypebot } = useTypebot()
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<(typeof timeFilterValues)[number]>(defaultTimeFilter)
   const [selectedType, setSelectedType] = useState('EMAIL')
@@ -25,6 +28,7 @@ export const RemindersTableContainer = () => {
   const [isUpdating, setUpdating] = useState<string | null>(null);
   const [updateFormData, setUpdateFormData] = useState({ type: '', frequency: '', emails: [], jobId: '', typebotId: '' });
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   // const [jobId, setJobId] = useState<string | null>(null)
   const { data } = trpc.results.getReminders.useQuery(
     {
@@ -126,6 +130,54 @@ export const RemindersTableContainer = () => {
   // @ts-ignore
   const { data: reminders, refetch } = trpc.results.fetchReminders.useQuery({ typebotId: typebot?.id, });
 
+  const preferences = typebot?.resultsTablePreferences ?? undefined
+
+  const {
+    columnsOrder,
+    columnsVisibility = {},
+    columnsWidth = {},
+  } = {
+    ...preferences,
+    columnsOrder: parseColumnOrder(preferences?.columnsOrder, resultHeader),
+  }
+
+  const changeColumnVisibility = (
+    newColumnVisibility: Record<string, boolean>
+  ) => {
+    if (typeof newColumnVisibility === 'function') return
+    updateTypebot({
+      updates: {
+        resultsTablePreferences: {
+          columnsVisibility: newColumnVisibility,
+          columnsWidth,
+          columnsOrder,
+        },
+      },
+    })
+  }
+
+  const onColumnOrderChange = (
+    newColumnVisibility: Record<string, boolean>
+  ) => {
+    if (typeof newColumnVisibility === 'function') return
+    updateTypebot({
+      updates: {
+        resultsTablePreferences: {
+          columnsVisibility: newColumnVisibility,
+          columnsWidth,
+          columnsOrder,
+        },
+      },
+    })
+  }
+
+  const selectedHeaders = resultHeader.filter(
+    (header) => columnsVisibility[header.id] === true
+  )
+  // @ts-ignore
+
+  console.log("hiddennnnnn header", selectedHeaders)
+
   const addReminder = async (jobId: string) => {
     try {
       const newReminder = await mutation.mutateAsync({
@@ -160,7 +212,7 @@ export const RemindersTableContainer = () => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           frequency: updateFormData.frequency,
-          payload: { emails: updateFormData.emails },
+          payload: { emails: updateFormData.emails, resultHeader: selectedHeaders },
           jobId: updateFormData.jobId,
           typebotId: updateFormData.typebotId
         },
@@ -196,7 +248,7 @@ export const RemindersTableContainer = () => {
         body: JSON.stringify({
           "typebotId": typebotId,
           "type": type,
-          "payload": { payload },
+          "payload": { payload, resultHeader: selectedHeaders },
           "frequency": frequency,
         })
       })
@@ -246,7 +298,7 @@ export const RemindersTableContainer = () => {
         body: JSON.stringify({
           "typebotId": updateFormData.typebotId,
           "type": updateFormData.type,
-          "payload": updateFormData.emails,
+          "payload": { "payload": updateFormData.emails, resultHeader: selectedHeaders },
           "frequency": updateFormData.frequency,
           "jobId": jobId,
         })
@@ -311,7 +363,6 @@ export const RemindersTableContainer = () => {
 
   console.log("reminders", reminders);
 
-
   return (
     <Flex overflowY={'auto'} overflowX={'hidden'} h="100vh" flexDir="column">
       <TypebotHeader />
@@ -329,6 +380,7 @@ export const RemindersTableContainer = () => {
                     <Th>Frequency</Th>
                     {/* <Th>Typebot ID</Th> */}
                     <Th>Emails</Th>
+                    <Th>Result Header</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -374,6 +426,14 @@ export const RemindersTableContainer = () => {
                       ))}
                       <Button color={'white'} _hover={{ bg: 'green.600' }} bg={'green.400'} onClick={handleAddEmail}>Add</Button>
                     </Td>
+
+                    <Td> <ColumnSettings
+                      resultHeader={resultHeader}
+                      columnVisibility={columnsVisibility}
+                      setColumnVisibility={changeColumnVisibility}
+                      columnOrder={columnsOrder}
+                      onColumnOrderChange={onColumnOrderChange}
+                    /></Td>
                   </Tr>
                 </Tbody>
               </Table>
@@ -400,7 +460,9 @@ export const RemindersTableContainer = () => {
                   <Th>Frequency</Th>
                   {/* <Th>Typebot ID</Th> */}
                   <Th>Emails</Th>
+                  <Th>Result Header</Th>
                   <Th>Action</Th>
+
                 </Tr>
               </Thead>
               <Tbody>
@@ -468,6 +530,15 @@ export const RemindersTableContainer = () => {
                       )}
                     </Td>
                     <Td>
+                      <ColumnSettings
+                        resultHeader={resultHeader}
+                        columnVisibility={columnsVisibility}
+                        setColumnVisibility={changeColumnVisibility}
+                        columnOrder={columnsOrder}
+                        onColumnOrderChange={onColumnOrderChange}
+                      />
+                    </Td>
+                    <Td>
                       {isUpdating === reminder.id ? (
                         // <Button mr={2} onClick={() => handleUpdate(reminder.id)}>Save</Button>
                         <Button mr={2} onClick={() => handleUpdateReminderData(reminder.id, reminder.jobId)}>Save</Button>
@@ -476,6 +547,7 @@ export const RemindersTableContainer = () => {
                       )}
                       <Button color={'white'} _hover={{ bg: 'red.700' }} bg={'red.500'} onClick={() => handleDelete(reminder.id, reminder.jobId)}>Delete</Button>
                     </Td>
+
                   </Tr>
                 ))}
               </Tbody>
