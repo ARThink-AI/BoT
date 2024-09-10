@@ -17,7 +17,7 @@ import { parseColumnOrder } from '../helpers/parseColumnsOrder'
 // import { Frequency } from '@typebot.io/prisma'
 
 export const RemindersTableContainer = () => {
-  const { updateTypebot, isReadOnly } = useTypebot()
+  const { updateTypebot } = useTypebot()
   const { typebot, publishedTypebot } = useTypebot()
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<(typeof timeFilterValues)[number]>(defaultTimeFilter)
   const [selectedType, setSelectedType] = useState('EMAIL')
@@ -174,8 +174,9 @@ export const RemindersTableContainer = () => {
   const selectedHeaders = resultHeader.filter(
     (header) => columnsVisibility[header.id] === true
   )
-  // @ts-ignore
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   console.log("hiddennnnnn header", selectedHeaders)
 
   const addReminder = async (jobId: string) => {
@@ -432,6 +433,8 @@ export const RemindersTableContainer = () => {
                       columnVisibility={columnsVisibility}
                       setColumnVisibility={changeColumnVisibility}
                       columnOrder={columnsOrder}
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
                       onColumnOrderChange={onColumnOrderChange}
                     /></Td>
                   </Tr>
@@ -535,6 +538,8 @@ export const RemindersTableContainer = () => {
                         columnVisibility={columnsVisibility}
                         setColumnVisibility={changeColumnVisibility}
                         columnOrder={columnsOrder}
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         onColumnOrderChange={onColumnOrderChange}
                       />
                     </Td>
