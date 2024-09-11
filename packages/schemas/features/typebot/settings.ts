@@ -12,6 +12,8 @@ const generalSettings = z.object({
   isLiveChatEnabled: z.boolean().optional(),
   ticketVariableName: z.string().optional(),
   accessTokenVariableName: z.string().optional(),
+  isBottomNavigationEnabled: z.boolean().optional(),
+  navigationButtons: z.array(z.object({ name: z.string(), prompt: z.string() })).default([]),
   quadzBaseUrl: z.string().optional(),
   isTwilioEnabled: z.boolean().optional(),
   twilioPhoneNumber: z.string().optional(),
@@ -67,6 +69,7 @@ export const defaultSettings = ({
     isVoiceEnabled: false,
     isCustomInputEnabled: false,
     isAutoRefreshEnabled: true,
+    isBottomNavigationEnabled: false,
 
     publicId: '',
   },

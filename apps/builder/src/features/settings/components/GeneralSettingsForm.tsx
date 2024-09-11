@@ -1,13 +1,16 @@
 import {
+  Button,
   FormControl,
   FormLabel,
   HStack,
+  Input,
   Stack,
   Tag,
   Text,
+  Textarea,
 } from '@chakra-ui/react'
 import { GeneralSettings, rememberUserStorages } from '@typebot.io/schemas'
-import React from 'react'
+import React, { useState } from 'react'
 import { isDefined } from '@typebot.io/lib'
 import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 // import { Input, Button } from '@chakra-ui/react'
@@ -29,6 +32,7 @@ export const GeneralSettingsForm = ({
 }: Props) => {
   // const { typebot, updateTypebot } = useTypebot()
   // console.log("ttt", typebot);
+  const [inputField, setInputField] = useState(generalSettings.navigationButtons)
 
   const toggleRememberUser = (isEnabled: boolean) =>
     onGeneralSettingsChange({
@@ -94,6 +98,12 @@ export const GeneralSettingsForm = ({
       isCustomInputEnabled,
     })
 
+  const handleIsBottomNavigationEnabled = (isBottomNavigationEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isBottomNavigationEnabled,
+    })
+
   const handleAutoRefreshInputChange = (isAutoRefreshEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
@@ -107,8 +117,36 @@ export const GeneralSettingsForm = ({
     })
 
 
+  const handleBottomNavigationButtonName = (e) => {
 
 
+  }
+  const handleBottomNavigationButtonPrompt = () => {
+
+  }
+
+
+  const addFields = () => {
+    setInputField([...inputField, ''])
+  }
+
+  const handleRemoveFields = (index) => {
+    const newFields = inputField.filter((_, i) => i !== index);
+    setInputField(newFields);
+  };
+
+  const handleInputChange = (index, event) => {
+    const newFields = [...inputField];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    newFields[index] = event.target.value;
+
+    setInputField(newFields);
+  };
+
+  const handleSave = () => {
+
+  }
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
   //   onGeneralSettingsChange({
   //     ...generalSettings,
@@ -127,7 +165,7 @@ export const GeneralSettingsForm = ({
     })
 
 
-
+  console.log("input fielddd button navigation", inputField)
 
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
@@ -257,13 +295,57 @@ export const GeneralSettingsForm = ({
           </>
         )
       } */}
+      <SwitchWithLabel
+        label="Toggle for bottom navigation"
+        initialValue={generalSettings.isBottomNavigationEnabled ?? false}
+        onCheckChange={handleIsBottomNavigationEnabled}
+        moreInfoContent="Toggle for bottom navigation"
+      />
 
+      {
+        generalSettings.isBottomNavigationEnabled &&
+        (
+          inputField.map((input, index) => {
+            return <>
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+
+                <Input
+                  // onChange={ }
+                  onChange={(event) => handleInputChange(index, event)}
+                  defaultValue={input.name ?? ''}
+                  placeholder="please enter your name "
+
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Prompt</FormLabel>
+              </FormControl>
+              <Textarea
+                // onChange={ }
+                onChange={(event) => handleInputChange(index, event)}
+                defaultValue={input.prompt ?? ''}
+                placeholder="please enter prompt"
+
+              />
+              <Button onClick={() => { handleRemoveFields(index) }}>remove</Button>
+            </>
+          })
+
+        )
+
+
+      }
+      {generalSettings.isBottomNavigationEnabled && (<Button onClick={addFields}>add</Button>
+      )}
       <SwitchWithLabel
         label="Custom Input Enabled on bot start"
         initialValue={generalSettings.isCustomInputEnabled ?? false}
         onCheckChange={handleCustomInputChange}
         moreInfoContent="Toggle for Custom Input"
       />
+
+
       {generalSettings.isCustomInputEnabled && (
         <TextInput
           label="Public Id"
