@@ -2458,9 +2458,345 @@ export const ConversationContainer = (props: Props) => {
   // const closeSnackbar = () => {
   //   setIsVisible(false);
   // };
+  let buttonValue = props.initialChatReply.typebot.settings.general.navigationButtons.map(button => button.name)
+  console.log("navigation button", buttonValue)
+
+  const navigationButtonClicked = async (message) => {
+    try {
+      console.log("user input clicked");
+      let userr;
+      if (userInput().trim() == "") {
+        userr = message
+
+      } else {
+        userr = userInput();
+      }
+      // let userr = userInput();
+      setUserInput("");
+      let chunks = [...chatChunks()];
+      chunks.push(
+        {
+          input: {
+            "id": "ow5y1j9yvsp7jo46qaswc38k",
+            "groupId": "nb24en7liv3s8e959uxtz1h0",
+            "outgoingEdgeId": "flk0r0n1jb746j1ipuh1zqr9",
+            // @ts-ignore
+            "type": "text input",
+            "options": {
+              "labels": {
+                "placeholder": "Ask question",
+                "button": "Send"
+              },
+              "variableId": "vb6co7ry0n84c9tuml9oae2ld",
+              "isLong": false
+            },
+            "prefilledValue": "Hi",
+            "answer": userr
+          },
+          messages: [
+
+          ],
+          clientSideActions: undefined
+        }
+      );
+      setChatChunks(chunks);
+
+      if (sessionId()) {
+        const response = await fetch(`/api/v2/sendMessage`, {
+          method: "POST",
+          // @ts-ignore
+          headers: {
+            "Content-type": "application/json"
+
+
+          },
+          body: JSON.stringify({
+            message: userr,
+            sessionId: sessionId()
+          })
+
+        });
+        const messageResp = await response.json();
+        console.log("message Resp", messageResp);
+        if (messageResp?.message == "Session expired. You need to start a new session.") {
+          console.log("session expired restating...");
+          const response = await fetch("/api/v2/sendMessage", {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json"
+
+            },
+            body: JSON.stringify({
+              startParams: {
+                typebot: props.initialChatReply.typebot.settings.general.publicId
+              }
+            })
+            // body : JSON.stringify( {
+            //   _id : sessionStorage.getItem("ticketId"),
+            //   comment : comments,
+            //   note : false ,
+            //   ticketid : false 
+            // } )
+            // body: JSON.stringify({
+            //   // @ts-ignore
+            //   ticketid: sessionStorage.getItem("ticketId"),
+            //   note: comments.join(" ")
+
+            // })
+          });
+          const sessionResponse = await response.json();
+          // setSessionId(sessionResponse?.sessionId);
+          const responsee = await fetch(`/api/v2/sendMessage`, {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json"
+
+
+            },
+            body: JSON.stringify({
+              message: userr,
+              sessionId: sessionResponse?.sessionId
+            })
+
+          });
+          const messageResp = await responsee.json();
+          let chunks = [...chatChunks()];
+          chunks.push({
+            messages: messageResp?.messages,
+            clientSideActions: undefined
+          })
+          console.log("userinput message response for custominput", messageResp)
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+            console.log("entered upper if");
+            let inputs = [];
+            for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "name") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "y1durrr4tq4esgtm64loai7f",
+                  "type": "text",
+                  "label": "Your Name",
+                  "placeholder": "Enter your name",
+                  "answerVariableId": "vdr2ch5r1jegp5hnmx4bs6ud3",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                });
+
+              }
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
+                  "type": "email",
+                  "label": "Your Email",
+                  "placeholder": "Enter your Email",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "a3lxz9phhdpo5eqjmolji3m5",
+                  "type": "phone",
+                  "label": "Your Phone",
+                  "placeholder": "Enter Phone Number",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vocfhc3qkrt3kos7cqynubatf",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+            }
+            // add chunk 
+            chunks.push({
+              messages: [],
+              clientSideActions: undefined,
+              //  input :  {
+              "input": {
+                "id": "rbihqsrvpr12xv7ui2bbph6r",
+                "groupId": "nqxy3upgjfsl2zv3y459o1o1",
+                "outgoingEdgeId": "u0fqch1goo6ce9fsggdi14dw",
+
+                // @ts-ignore
+                "type": "card input",
+                "customInput": true,
+                "options": {
+                  "heading": "heading",
+                  "subHeading": "subheading",
+                  // @ts-ignore
+                  "inputs": inputs
+                }
+              }
+            });
+            console.log("chunkss", chunks);
+            setChatChunks(chunks);
+          } else {
+            setChatChunks(chunks);
+          }
+          // setChatChunks(chunks);
+
+          // setUserInput("");
+          sessionStorage.removeItem("answer");
+          setSessionId(sessionResponse?.sessionId);
+
+
+        }
+        else {
+          let chunks = [...chatChunks()];
+          chunks.push({
+            messages: messageResp?.messages,
+            clientSideActions: undefined
+          })
+
+          // setChatChunks(chunks);
+
+          // setUserInput("");
+          sessionStorage.removeItem("answer");
+          // follow up code
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+            console.log("entered upper if");
+            let inputs = [];
+            for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "name") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "y1durrr4tq4esgtm64loai7f",
+                  "type": "text",
+                  "label": "Your Name",
+                  "placeholder": "Enter your name",
+                  "answerVariableId": "vdr2ch5r1jegp5hnmx4bs6ud3",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                });
+
+              }
+
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
+                  "type": "email",
+                  "label": "Your Email",
+                  "placeholder": "Enter your Email",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+              if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
+                // console.log("entered name input")
+                inputs.push({
+                  "id": "a3lxz9phhdpo5eqjmolji3m5",
+                  "type": "phone",
+                  "label": "Your Phone",
+                  "placeholder": "Enter Phone Number",
+                  "dynamicDataVariableId": "",
+                  "answerVariableId": "vocfhc3qkrt3kos7cqynubatf",
+                  "required": true,
+                  "buttonType": "Numbers",
+                  "length": 10,
+                  "labels": {
+                    "button": "Send"
+                  },
+                  "customIcon": {
+                    "isEnabled": false
+                  }
+                })
+
+              }
+            }
+            // add chunk 
+            chunks.push({
+              messages: [],
+              clientSideActions: undefined,
+              //  input :  {
+              "input": {
+                "id": "rbihqsrvpr12xv7ui2bbph6r",
+                "groupId": "nqxy3upgjfsl2zv3y459o1o1",
+                "outgoingEdgeId": "u0fqch1goo6ce9fsggdi14dw",
+
+                // @ts-ignore
+                "type": "card input",
+                "customInput": true,
+                "options": {
+                  "heading": "heading",
+                  "subHeading": "subheading",
+                  // @ts-ignore
+                  "inputs": inputs
+                }
+              }
+            });
+            console.log("chunkss", chunks);
+            setChatChunks(chunks);
+          } else {
+            setChatChunks(chunks);
+          }
 
 
 
+        }
+
+
+      } else {
+        sessionStorage.removeItem("answer");
+        // setUserInput("");
+      }
+    } catch (err) {
+      console.log("Error happened inside userInputClicked", err?.message);
+    }
+  }
+
+  const tybp = props.initialChatReply.typebot
+  console.log()
+  let fileUrl = "https://quadz.blob.core.windows.net/demo/provident-parksquare.pdf"
 
   return (
 
@@ -2659,6 +2995,8 @@ export const ConversationContainer = (props: Props) => {
         </div>
 
 
+
+
         <For each={chatChunks()}>
           {(chatChunk, index) => {
             console.log("chat chunk", chatChunk, index);
@@ -2721,6 +3059,26 @@ export const ConversationContainer = (props: Props) => {
           </div>
         }
 
+
+        <div class="bg-blue-500 shadow-lg text-white p-3 rounded-lg flex items-center justify-between lg:w-full max-w-sm fixed bottom-[100px] left-[33%]">
+          <div class="flex items-center space-x-3">
+
+            <div>
+              <p class="font-semibold">brochure</p>
+              <p class="text-sm text-blue-200">
+                2 pages • 66kb • pdf
+              </p>
+            </div>
+          </div>
+          <button>
+            <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 20.3948C15.8667 20.3948 15.7417 20.374 15.625 20.3323C15.5083 20.2907 15.4 20.2198 15.3 20.1198L11.7 16.5198C11.5 16.3198 11.4042 16.0865 11.4125 15.8198C11.4208 15.5532 11.5167 15.3198 11.7 15.1198C11.9 14.9198 12.1375 14.8157 12.4125 14.8073C12.6875 14.799 12.925 14.8948 13.125 15.0948L15 16.9698V9.81982C15 9.53649 15.0958 9.29899 15.2875 9.10732C15.4792 8.91566 15.7167 8.81982 16 8.81982C16.2833 8.81982 16.5208 8.91566 16.7125 9.10732C16.9042 9.29899 17 9.53649 17 9.81982V16.9698L18.875 15.0948C19.075 14.8948 19.3125 14.799 19.5875 14.8073C19.8625 14.8157 20.1 14.9198 20.3 15.1198C20.4833 15.3198 20.5792 15.5532 20.5875 15.8198C20.5958 16.0865 20.5 16.3198 20.3 16.5198L16.7 20.1198C16.6 20.2198 16.4917 20.2907 16.375 20.3323C16.2583 20.374 16.1333 20.3948 16 20.3948ZM10 24.8198C9.45 24.8198 8.97917 24.624 8.5875 24.2323C8.19583 23.8407 8 23.3698 8 22.8198V20.8198C8 20.5365 8.09583 20.299 8.2875 20.1073C8.47917 19.9157 8.71667 19.8198 9 19.8198C9.28333 19.8198 9.52083 19.9157 9.7125 20.1073C9.90417 20.299 10 20.5365 10 20.8198V22.8198H22V20.8198C22 20.5365 22.0958 20.299 22.2875 20.1073C22.4792 19.9157 22.7167 19.8198 23 19.8198C23.2833 19.8198 23.5208 19.9157 23.7125 20.1073C23.9042 20.299 24 20.5365 24 20.8198V22.8198C24 23.3698 23.8042 23.8407 23.4125 24.2323C23.0208 24.624 22.55 24.8198 22 24.8198H10Z" fill="#E8EAED" />
+            </svg>
+          </button>
+
+
+        </div>
+
         <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
           <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
@@ -2768,6 +3126,47 @@ http://www.w3.org/2000/svg"
             </button>
           </div>
         </Show>
+
+
+
+        {/* promt buttons */}
+        {props.initialChatReply.typebot.settings.general.isBottomNavigationEnabled &&
+          <div class='fixed bottom-[90px]  left-[70px] flex'>
+            {/* @ts-ignore */}
+            {Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons) &&
+              props.initialChatReply.typebot.settings.general.navigationButtons.map((button) => {
+                return <div class=''><button onClick={() => { navigationButtonClicked(button.prompt) }} class="mr-2 p-4 bg-[#1A5FFF] text-white	rounded-lg">{button.name}</button> </div>
+
+              })}
+            {/* download pdf */}
+            <div>
+              {/* <div class="">
+                <div class="p-3 max-w-sm h-max bg-[#329DFF] shadow-md rounded-lg">
+                  <div class='flex justify-center items-center'>
+                    <p class="text-sm text-white mb-1">Brochure</p>
+                    <a target='_blank' href={fileUrl} download class="inline-block mt-1">
+                      <button class="">
+                        <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M16 20.3948C15.8667 20.3948 15.7417 20.374 15.625 20.3323C15.5083 20.2907 15.4 20.2198 15.3 20.1198L11.7 16.5198C11.5 16.3198 11.4042 16.0865 11.4125 15.8198C11.4208 15.5532 11.5167 15.3198 11.7 15.1198C11.9 14.9198 12.1375 14.8157 12.4125 14.8073C12.6875 14.799 12.925 14.8948 13.125 15.0948L15 16.9698V9.81982C15 9.53649 15.0958 9.29899 15.2875 9.10732C15.4792 8.91566 15.7167 8.81982 16 8.81982C16.2833 8.81982 16.5208 8.91566 16.7125 9.10732C16.9042 9.29899 17 9.53649 17 9.81982V16.9698L18.875 15.0948C19.075 14.8948 19.3125 14.799 19.5875 14.8073C19.8625 14.8157 20.1 14.9198 20.3 15.1198C20.4833 15.3198 20.5792 15.5532 20.5875 15.8198C20.5958 16.0865 20.5 16.3198 20.3 16.5198L16.7 20.1198C16.6 20.2198 16.4917 20.2907 16.375 20.3323C16.2583 20.374 16.1333 20.3948 16 20.3948ZM10 24.8198C9.45 24.8198 8.97917 24.624 8.5875 24.2323C8.19583 23.8407 8 23.3698 8 22.8198V20.8198C8 20.5365 8.09583 20.299 8.2875 20.1073C8.47917 19.9157 8.71667 19.8198 9 19.8198C9.28333 19.8198 9.52083 19.9157 9.7125 20.1073C9.90417 20.299 10 20.5365 10 20.8198V22.8198H22V20.8198C22 20.5365 22.0958 20.299 22.2875 20.1073C22.4792 19.9157 22.7167 19.8198 23 19.8198C23.2833 19.8198 23.5208 19.9157 23.7125 20.1073C23.9042 20.299 24 20.5365 24 20.8198V22.8198C24 23.3698 23.8042 23.8407 23.4125 24.2323C23.0208 24.624 22.55 24.8198 22 24.8198H10Z" fill="#E8EAED" />
+                        </svg>
+
+                      </button>
+                    </a>
+                  </div>
+
+                  <div class='flex justify-center'>
+                    <p class="text-[12px] text-white mr-2">66kb</p>
+                    <p class="text-[12px] text-white">pdf</p>
+                  </div>
+
+
+                </div>
+              </div> */}
+
+            </div>
+          </div>
+        }
+
 
         {/* twillio calling modal */}
         <div class={`${isOpen() ? 'block' : 'hidden'} fixed z-10 inset-0 overflow-y-auto`}>

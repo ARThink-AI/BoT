@@ -127,26 +127,53 @@ export const GeneralSettingsForm = ({
 
 
   const addFields = () => {
-    setInputField([...inputField, ''])
+    let buttons = [...generalSettings.navigationButtons];
+    buttons.push({ name: "", prompt: "" });
+
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
+
+  }
+
+  const handleUpdateButtonChange = (index, property, value) => {
+    const buttons = [...generalSettings.navigationButtons]
+    buttons[index][property] = value
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
+
   }
 
   const handleRemoveFields = (index) => {
-    const newFields = inputField.filter((_, i) => i !== index);
-    setInputField(newFields);
-  };
+    const buttons = inputField.filter((_, i) => i !== index);
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
 
-  const handleInputChange = (index, event) => {
-    const newFields = [...inputField];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    newFields[index] = event.target.value;
+  }
 
-    setInputField(newFields);
-  };
+  // const handleRemoveFields = (index) => {
+  //   const newFields = inputField.filter((_, i) => i !== index);
+  //   generalSettings.navigationButtons
+  // };
+
+  // const handleInputChange = (index, event) => {
+  //   const newFields = [...inputField];
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   newFields[index] = event.target.value;
+
+  //   setInputField(newFields);
+  // };
 
   const handleSave = () => {
 
   }
+
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
   //   onGeneralSettingsChange({
   //     ...generalSettings,
@@ -305,14 +332,14 @@ export const GeneralSettingsForm = ({
       {
         generalSettings.isBottomNavigationEnabled &&
         (
-          inputField.map((input, index) => {
-            return <>
+          generalSettings.navigationButtons.map((input, index) => {
+            return <div key={index}>
               <FormControl>
                 <FormLabel>Name</FormLabel>
 
                 <Input
-                  // onChange={ }
-                  onChange={(event) => handleInputChange(index, event)}
+                  onChange={(e) => { handleUpdateButtonChange(index, "name", e.target.value) }}
+                  // onChange={(event) => handleInputChange(index, event)}
                   defaultValue={input.name ?? ''}
                   placeholder="please enter your name "
 
@@ -323,20 +350,22 @@ export const GeneralSettingsForm = ({
               </FormControl>
               <Textarea
                 // onChange={ }
-                onChange={(event) => handleInputChange(index, event)}
+                onChange={(e) => { handleUpdateButtonChange(index, "prompt", e.target.value) }}
+                // onChange={(event) => handleInputChange(index, event)}
                 defaultValue={input.prompt ?? ''}
                 placeholder="please enter prompt"
 
               />
-              <Button onClick={() => { handleRemoveFields(index) }}>remove</Button>
-            </>
+              <Button mt={5} bg={"red.400"} _hover={{ bg: "red.600" }} onClick={() => { handleRemoveFields(index) }}>remove</Button>
+            </div>
           })
 
         )
 
 
       }
-      {generalSettings.isBottomNavigationEnabled && (<Button onClick={addFields}>add</Button>
+      {generalSettings.isBottomNavigationEnabled && (
+        <Button bg={"blue.500"} _hover={{ bg: "blue.600" }} onClick={addFields}>add</Button>
       )}
       <SwitchWithLabel
         label="Custom Input Enabled on bot start"
