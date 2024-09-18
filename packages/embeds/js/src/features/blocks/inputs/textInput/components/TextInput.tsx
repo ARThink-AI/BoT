@@ -293,7 +293,7 @@ export const TextInput = (props: Props) => {
     if (!data.isFromTypebot) return
     if (data.command === 'setInputValue') setInputValue(data.value)
   }
-
+  console.log("microphonnnnnnnnnnnnnnn", props.block.options.isVoiceMicEnabled)
   return (
     <div
       class={'flex items-end justify-between pr-2 typebot-input w-full'}
@@ -325,7 +325,7 @@ export const TextInput = (props: Props) => {
       )}
 
       {/* {  isRecording() &&  <TimerComponent  stopRecordingUserVoice={stopRecordingUserVoice} /> } */}
-      {!isRecording() && <button disabled={isRecording()}
+      {!isRecording() && props.block.options.isVoiceMicEnabled && <button disabled={isRecording()}
         onClick={() => startRecordingUserVoice()}
         style={{ cursor: "pointer" }}
       // onMouseDown={startRecordingUserVoice} 

@@ -15,13 +15,14 @@ export const textInputOptionsSchema = textInputOptionsBaseSchema
   .merge(
     z.object({
       isLong: z.boolean(),
-      isWordCloud:  z.boolean().optional()
+      isWordCloud: z.boolean().optional(),
+      isVoiceMicEnabled: z.boolean().optional()
     })
   )
 
 export const defaultTextInputOptions: TextInputOptions = {
   isLong: false,
-  
+
   labels: { button: defaultButtonLabel, placeholder: 'Type your answer...' },
 }
 
@@ -34,3 +35,4 @@ export const textInputSchema = blockBaseSchema.merge(
 
 export type TextInputBlock = z.infer<typeof textInputSchema>
 export type TextInputOptions = z.infer<typeof textInputOptionsSchema>
+
