@@ -146,8 +146,10 @@ export const GeneralSettingsForm = ({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const handleRemoveFields = (index) => {
-    const buttons = [...generalSettings.navigationButtons]
-    buttons.filter((_, i) => i !== index);
+    let buttons = [...generalSettings.navigationButtons]
+    buttons = buttons.filter((_, i) => i !== index);
+    console.log(buttons)
+
     onGeneralSettingsChange({
       ...generalSettings,
       navigationButtons: buttons
