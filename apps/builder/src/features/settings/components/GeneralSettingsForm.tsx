@@ -10,7 +10,7 @@ import {
   Textarea,
 } from '@chakra-ui/react'
 import { GeneralSettings, rememberUserStorages } from '@typebot.io/schemas'
-import React, { useState } from 'react'
+import React from 'react'
 import { isDefined } from '@typebot.io/lib'
 import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 // import { Input, Button } from '@chakra-ui/react'
@@ -32,7 +32,7 @@ export const GeneralSettingsForm = ({
 }: Props) => {
   // const { typebot, updateTypebot } = useTypebot()
   // console.log("ttt", typebot);
-  const [inputField, setInputField] = useState(generalSettings.navigationButtons)
+
 
   const toggleRememberUser = (isEnabled: boolean) =>
     onGeneralSettingsChange({
@@ -117,17 +117,10 @@ export const GeneralSettingsForm = ({
     })
 
 
-  const handleBottomNavigationButtonName = (e) => {
-
-
-  }
-  const handleBottomNavigationButtonPrompt = () => {
-
-  }
 
 
   const addFields = () => {
-    let buttons = [...generalSettings.navigationButtons];
+    const buttons = [...generalSettings.navigationButtons];
     buttons.push({ name: "", prompt: "" });
 
     onGeneralSettingsChange({
@@ -137,8 +130,12 @@ export const GeneralSettingsForm = ({
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleUpdateButtonChange = (index, property, value) => {
     const buttons = [...generalSettings.navigationButtons]
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     buttons[index][property] = value
     onGeneralSettingsChange({
       ...generalSettings,
@@ -146,9 +143,11 @@ export const GeneralSettingsForm = ({
     })
 
   }
-
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const handleRemoveFields = (index) => {
-    const buttons = inputField.filter((_, i) => i !== index);
+    const buttons = [...generalSettings.navigationButtons]
+    buttons.filter((_, i) => i !== index);
     onGeneralSettingsChange({
       ...generalSettings,
       navigationButtons: buttons
@@ -170,9 +169,6 @@ export const GeneralSettingsForm = ({
   //   setInputField(newFields);
   // };
 
-  const handleSave = () => {
-
-  }
 
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
   //   onGeneralSettingsChange({
@@ -192,7 +188,7 @@ export const GeneralSettingsForm = ({
     })
 
 
-  console.log("input fielddd button navigation", inputField)
+  // console.log("input fielddd button navigation", inputField)
 
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']

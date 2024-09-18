@@ -2084,7 +2084,9 @@ export const ConversationContainer = (props: Props) => {
             messages: messageResp?.messages,
             clientSideActions: undefined
           })
-
+          if (chatChunks.length < chunks.length) {
+            setIsDownloadPdfVisible(false)
+          }
           // setChatChunks(chunks);
 
           // setUserInput("");
