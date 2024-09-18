@@ -9,14 +9,20 @@ const generalSettings = z.object({
   isInputPrefillEnabled: z.boolean().optional(),
   isHideQueryParamsEnabled: z.boolean().optional(),
   isVoiceEnabled: z.boolean().optional(),
+  isLiveChatEnabled: z.boolean().optional(),
+  ticketVariableName: z.string().optional(),
+  accessTokenVariableName: z.string().optional(),
+  isBottomNavigationEnabled: z.boolean().optional(),
+  navigationButtons: z.array(z.object({ name: z.string(), prompt: z.string() })).default([]),
+  quadzBaseUrl: z.string().optional(),
   isTwilioEnabled: z.boolean().optional(),
   twilioPhoneNumber: z.string().optional(),
   isAutoRefreshEnabled: z.boolean().optional(),
   sessionTimout: z.string().optional(),
-  hideBranding : z.boolean().optional(),
+  hideBranding: z.boolean().optional(),
   publicId: z.string().optional(),
   isCustomInputEnabled: z.boolean().optional(),
- 
+
   isNewResultOnRefreshEnabled: z.boolean().optional(),
   rememberUser: z
     .object({
@@ -53,6 +59,8 @@ export const defaultSettings = ({
 }: {
   isBrandingEnabled: boolean
 }): Settings => ({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   general: {
     isBrandingEnabled,
     rememberUser: {
@@ -63,6 +71,7 @@ export const defaultSettings = ({
     isVoiceEnabled: false,
     isCustomInputEnabled: false,
     isAutoRefreshEnabled: true,
+    isBottomNavigationEnabled: false,
 
     publicId: '',
   },

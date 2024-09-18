@@ -1,10 +1,13 @@
 import {
+  Button,
   FormControl,
   FormLabel,
   HStack,
+  Input,
   Stack,
   Tag,
   Text,
+  Textarea,
 } from '@chakra-ui/react'
 import { GeneralSettings, rememberUserStorages } from '@typebot.io/schemas'
 import React from 'react'
@@ -29,6 +32,7 @@ export const GeneralSettingsForm = ({
 }: Props) => {
   // const { typebot, updateTypebot } = useTypebot()
   // console.log("ttt", typebot);
+
 
   const toggleRememberUser = (isEnabled: boolean) =>
     onGeneralSettingsChange({
@@ -58,6 +62,30 @@ export const GeneralSettingsForm = ({
       isVoiceEnabled,
     })
 
+  const handleLiveChatChange = (isLiveChatEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isLiveChatEnabled
+    })
+
+  const handleTicketVariableNameChange = (ticketVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      ticketVariableName
+    })
+
+  const handleAccessTokenVariableNameChange = (accessTokenVariableName: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      accessTokenVariableName
+    })
+
+  const handleQuadzBaseUrlChange = (quadzBaseUrl: string) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      quadzBaseUrl
+    })
+
   const handleTwilioChange = (isTwilioEnabled: boolean) =>
     onGeneralSettingsChange({
       ...generalSettings,
@@ -68,6 +96,12 @@ export const GeneralSettingsForm = ({
     onGeneralSettingsChange({
       ...generalSettings,
       isCustomInputEnabled,
+    })
+
+  const handleIsBottomNavigationEnabled = (isBottomNavigationEnabled: boolean) =>
+    onGeneralSettingsChange({
+      ...generalSettings,
+      isBottomNavigationEnabled,
     })
 
   const handleAutoRefreshInputChange = (isAutoRefreshEnabled: boolean) =>
@@ -83,6 +117,59 @@ export const GeneralSettingsForm = ({
     })
 
 
+
+
+  const addFields = () => {
+    const buttons = [...generalSettings.navigationButtons];
+    buttons.push({ name: "", prompt: "" });
+
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
+
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const handleUpdateButtonChange = (index, property, value) => {
+    const buttons = [...generalSettings.navigationButtons]
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    buttons[index][property] = value
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
+
+  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const handleRemoveFields = (index) => {
+    let buttons = [...generalSettings.navigationButtons]
+    buttons = buttons.filter((_, i) => i !== index);
+    console.log(buttons)
+
+    onGeneralSettingsChange({
+      ...generalSettings,
+      navigationButtons: buttons
+    })
+
+  }
+
+  // const handleRemoveFields = (index) => {
+  //   const newFields = inputField.filter((_, i) => i !== index);
+  //   generalSettings.navigationButtons
+  // };
+
+  // const handleInputChange = (index, event) => {
+  //   const newFields = [...inputField];
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   newFields[index] = event.target.value;
+
+  //   setInputField(newFields);
+  // };
 
 
   // const handlePhoneNumberChange = (twilioPhoneNumber: string) =>
@@ -103,7 +190,7 @@ export const GeneralSettingsForm = ({
     })
 
 
-
+  // console.log("input fielddd button navigation", inputField)
 
   const updateRememberUserStorage = (
     storage: NonNullable<GeneralSettings['rememberUser']>['storage']
@@ -143,6 +230,44 @@ export const GeneralSettingsForm = ({
         onCheckChange={handleVoiceChange}
         moreInfoContent="Toggle for voice"
       />
+      <SwitchWithLabel
+        label="Live chat on BoT"
+        initialValue={generalSettings.isLiveChatEnabled ? generalSettings.isLiveChatEnabled : false}
+        onCheckChange={handleLiveChatChange}
+        moreInfoContent="Toggle for live chat"
+      />
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Ticket Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.ticketVariableName ? generalSettings.ticketVariableName : ""}
+            onChange={e => handleTicketVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Access Token  Variable  </Text>
+          <TextInput
+            defaultValue={generalSettings.accessTokenVariableName ? generalSettings.accessTokenVariableName : ""}
+            onChange={e => handleAccessTokenVariableNameChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
+
+      {generalSettings.isLiveChatEnabled && (
+        <>
+          <Text> Quadz Base Url   </Text>
+          <TextInput
+            defaultValue={generalSettings.quadzBaseUrl ? generalSettings.quadzBaseUrl : ""}
+            onChange={e => handleQuadzBaseUrlChange(e)}
+            withVariableButton={false}
+          />
+        </>
+      )}
       <SwitchWithLabel
         label="Twilio Enabled"
         initialValue={generalSettings.isTwilioEnabled ?? false}
@@ -195,13 +320,59 @@ export const GeneralSettingsForm = ({
           </>
         )
       } */}
+      <SwitchWithLabel
+        label="Toggle for bottom navigation"
+        initialValue={generalSettings.isBottomNavigationEnabled ?? false}
+        onCheckChange={handleIsBottomNavigationEnabled}
+        moreInfoContent="Toggle for bottom navigation"
+      />
 
+      {
+        generalSettings.isBottomNavigationEnabled &&
+        (
+          generalSettings.navigationButtons.map((input, index) => {
+            return <div key={index}>
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+
+                <Input
+                  onChange={(e) => { handleUpdateButtonChange(index, "name", e.target.value) }}
+                  // onChange={(event) => handleInputChange(index, event)}
+                  defaultValue={input.name ?? ''}
+                  placeholder="please enter your name "
+
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Prompt</FormLabel>
+              </FormControl>
+              <Textarea
+                // onChange={ }
+                onChange={(e) => { handleUpdateButtonChange(index, "prompt", e.target.value) }}
+                // onChange={(event) => handleInputChange(index, event)}
+                defaultValue={input.prompt ?? ''}
+                placeholder="please enter prompt"
+
+              />
+              <Button mt={5} bg={"red.400"} _hover={{ bg: "red.600" }} onClick={() => { handleRemoveFields(index) }}>remove</Button>
+            </div>
+          })
+
+        )
+
+
+      }
+      {generalSettings.isBottomNavigationEnabled && (
+        <Button bg={"blue.500"} _hover={{ bg: "blue.600" }} onClick={addFields}>add</Button>
+      )}
       <SwitchWithLabel
         label="Custom Input Enabled on bot start"
         initialValue={generalSettings.isCustomInputEnabled ?? false}
         onCheckChange={handleCustomInputChange}
         moreInfoContent="Toggle for Custom Input"
       />
+
+
       {generalSettings.isCustomInputEnabled && (
         <TextInput
           label="Public Id"
@@ -255,3 +426,4 @@ export const GeneralSettingsForm = ({
     </Stack>
   )
 }
+

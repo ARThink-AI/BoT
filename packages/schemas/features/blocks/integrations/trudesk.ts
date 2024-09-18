@@ -39,6 +39,7 @@ const createTicketOptionsSchema = z.object({
   variableId : z.string().optional(),
   variableId1 : z.string().optional(),
   variableId2 : z.string().optional(),
+  variableId3 : z.string().optional(),
   tags : z.array( z.object( {
     id : z.string() ,
     name : z.string() ,

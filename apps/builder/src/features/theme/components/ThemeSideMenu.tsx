@@ -46,10 +46,13 @@ export const ThemeSideMenu = () => {
     })
   }
 
+
   const updateBranding = (isBrandingEnabled: boolean) =>
     typebot &&
     updateTypebot({
       updates: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         settings: { ...typebot.settings, general: { isBrandingEnabled } },
       },
     })

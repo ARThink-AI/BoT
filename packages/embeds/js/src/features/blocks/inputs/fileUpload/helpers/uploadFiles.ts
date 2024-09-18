@@ -19,7 +19,7 @@ export const uploadFiles = async ({
   files,
   onUploadProgress,
 }: UploadFileProps): Promise<UrlList> => {
-  console.log("const api hosts files",apiHost,files);
+  console.log('const api hosts files', apiHost, files)
 
   const urls = []
   let i = 0
@@ -50,21 +50,22 @@ export const uploadFiles = async ({
       //   method: 'POST',
       //   body: formData,
       // })
-      console.log("fileee",file);
-      console.log(file.type);
+      console.log('fileee', file)
+      console.log(file.type)
       const upload = await fetch(data.presignedUrl, {
         method: 'PUT',
-        headers : {
-          "Content-Type":  file.type,
-          "x-ms-blob-type" : "BlockBlob",
-          "Access-Control-Allow-Origin":  "http://localhost:3001"
+        headers: {
+          'Content-Type': file.type,
+          'x-ms-blob-type': 'BlockBlob',
+          'Access-Control-Allow-Origin': 'http://localhost:3001',
         },
         body: file,
       })
 
       if (!upload.ok) continue
 
-      urls.push(data.fileUrl)
+      // urls.push(data.fileUrl)
+      urls.push(data.fileUrl.split('?')[0])
     }
   }
   return urls

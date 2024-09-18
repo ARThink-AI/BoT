@@ -55,8 +55,9 @@ export const resumeTrudeskExecution = ({
     if ( variableId && block.options.task == "Create Ticket" ) {
       const existingVariable = typebot.variables.find(byId(variableId));
       const existingUidVariable = typebot.variables.find( byId(block.options?.variableId1) );
+      const exisitngAccessToken = typebot.variables.find( byId(block.options?.variableId3) );
       // @ts-ignore
-      let newVariables = [ { ...existingVariable , value : response.data.id } , { ...existingUidVariable , value:  response.data.uid } ];
+      let newVariables = [ { ...existingVariable , value : response.data.id } , { ...existingUidVariable , value:  response.data.uid } , { ...exisitngAccessToken, value : response.data.accessToken } ];
       console.log("new variables",newVariables);
       // @ts-ignore
       const newSessionState = updateVariablesInSession(state)(newVariables)
@@ -67,6 +68,7 @@ export const resumeTrudeskExecution = ({
     }
     } else if ( block.options.task == "Create Customer" && block.options?.variableCustomerId ) {
       const existingVariable = typebot.variables.find(byId(block.options?.variableCustomerId));
+
         // @ts-ignore
       let newVariables = [ { ...existingVariable , value : response.data.id  } ]
       // @ts-ignore

@@ -6,11 +6,13 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model Users {
-  id  Int    @id @default(autoincrement())
-  email String
-  password_hash String 
+  id            Int    @id @default(autoincrement())
+  email         String
+  password_hash String
 }
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -189,6 +191,7 @@ model Typebot {
   isArchived              Boolean                   @default(false)
   isClosed                Boolean                   @default(false)
   whatsAppCredentialsId   String?
+  reminders               Reminder[]
 
   @@index([workspaceId])
   @@index([isArchived, createdAt(sort: Desc)])
@@ -331,6 +334,26 @@ model ThemeTemplate {
   workspaceId String
 }
 
+// model Reminder {
+//   id        String @id @default(uuid())
+//   job_id    String
+//   typebotId String
+//   type      String
+//   payload   Json
+// }
+
+model Reminder {
+  id        String       @id @default(cuid())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now()) @updatedAt
+  jobId     String
+  payload   Json
+  typebotId String
+  type      ReminderType
+  frequency Frequency
+  typebot   Typebot      @relation(fields: [typebotId], references: [id], onDelete: Cascade)
+}
+
 enum WorkspaceRole {
   ADMIN
   MEMBER
@@ -356,4 +379,16 @@ enum CollaborationType {
   READ
   WRITE
   FULL_ACCESS
+}
+
+enum ReminderType {
+  EMAIL
+  WHATSAPP
+  TEXT
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
 }

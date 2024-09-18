@@ -19,6 +19,8 @@ export const TextInputSettings = ({ options, onOptionsChange }: Props) => {
     onOptionsChange({ ...options, isLong })
   const handleisWordCloudChange = (isWordCloud: boolean) =>
     onOptionsChange({ ...options, isWordCloud })
+  const handleVoiceMicEnabled = (isVoiceMicEnabled: boolean) =>
+    onOptionsChange({ ...options, isVoiceMicEnabled })
 
   const handleVariableChange = (variable?: Variable) =>
     onOptionsChange({ ...options, variableId: variable?.id })
@@ -34,6 +36,11 @@ export const TextInputSettings = ({ options, onOptionsChange }: Props) => {
         label="Word Cloud Enabled?"
         initialValue={options?.isWordCloud ?? false}
         onCheckChange={handleisWordCloudChange}
+      />
+      <SwitchWithLabel
+        label="Voice enable?"
+        initialValue={options?.isVoiceMicEnabled ?? false}
+        onCheckChange={handleVoiceMicEnabled}
       />
 
       <TextInput

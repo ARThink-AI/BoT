@@ -41,6 +41,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
 
   console.log("bot socket1", props.socket1);
+  console.log("botttttttttttttttttttttttttttttttttttttttttt", props.typebot)
   // console.log("prefiled variables", props.prefilledVariables);
 
 
@@ -70,8 +71,13 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     }
     // @ts-ignore  
+    if (sessionStorage.getItem('live') && JSON.parse(sessionStorage.getItem('live')) == true) {
+      console.log("live chat enable")
+      return
+    }
+    // @ts-ignore  
     if (!Object.hasOwn(prefilledVariables, 'reset') && sessionStorage.getItem("bot_init") && JSON.parse(sessionStorage.getItem("bot_init")) == true) {
-
+      console.log("return without initializing")
       return
     } else {
       // sessionStorage.setItem("bot_init", "true");
@@ -81,6 +87,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     sessionStorage.removeItem("answer");
     sessionStorage.removeItem("live");
     sessionStorage.removeItem("liveChat");
+    // sessionStorage.removeItem("resultId");
 
 
     const typebotIdFromProps =
@@ -125,6 +132,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
         typebotIdFromProps,
         data.resultId
       )
+
+    // sessionStorage.setItem("resultId", data.resultId as string);
 
     setInitialChatReply(data);
     sessionStorage.setItem("intialize", JSON.stringify(data));
@@ -184,6 +193,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
               initializeBot={initializeBot}
               socket={props.socket}
               class={props.class}
+              typebotPublicId={props.typebot}
               initialChatReply={{
                 ...initialChatReply,
                 typebot: {
@@ -247,7 +257,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
 type BotContentProps = {
   initializeBot: any,
-  initialChatReply: InitialChatReply
+  initialChatReply: InitialChatReply,
+  typebotPublicId: any
   context: BotContext
   class?: string
   onNewInputBlock?: (block: { id: string; groupId: string }) => void
@@ -563,6 +574,7 @@ const BotContent = (props: BotContentProps) => {
 
           <ConversationContainer
             // liveAgent={liveAgent()}
+            typebotPublicId={props.typebotPublicId}
             initializeBot={props.initializeBot}
             socket={props.socket}
             context={props.context}
