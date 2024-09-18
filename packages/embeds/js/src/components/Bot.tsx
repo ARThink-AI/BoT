@@ -41,6 +41,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
 
   console.log("bot socket1", props.socket1);
+  console.log("botttttttttttttttttttttttttttttttttttttttttt", props.typebot)
   // console.log("prefiled variables", props.prefilledVariables);
 
 
@@ -192,6 +193,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
               initializeBot={initializeBot}
               socket={props.socket}
               class={props.class}
+              typebotPublicId={props.typebot}
               initialChatReply={{
                 ...initialChatReply,
                 typebot: {
@@ -255,7 +257,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
 type BotContentProps = {
   initializeBot: any,
-  initialChatReply: InitialChatReply
+  initialChatReply: InitialChatReply,
+  typebotPublicId: any
   context: BotContext
   class?: string
   onNewInputBlock?: (block: { id: string; groupId: string }) => void
@@ -571,6 +574,7 @@ const BotContent = (props: BotContentProps) => {
 
           <ConversationContainer
             // liveAgent={liveAgent()}
+            typebotPublicId={props.typebotPublicId}
             initializeBot={props.initializeBot}
             socket={props.socket}
             context={props.context}

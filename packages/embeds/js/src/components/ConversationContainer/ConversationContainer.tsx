@@ -63,6 +63,7 @@ const parseDynamicTheme = (
 
 type Props = {
   initialChatReply: InitialChatReply
+  typebotPublicId: any
   context: BotContext
   onNewInputBlock?: (ids: { id: string; groupId: string }) => void
   onAnswer?: (answer: { message: string; blockId: string }) => void
@@ -338,6 +339,9 @@ export const ConversationContainer = (props: Props) => {
     if (sessionStorage.getItem("answer")) {
       let chunks = [...chatChunks()];
       const input = chunks[chunks.length - 2]?.input;
+      if (chatChunks.length < chunks.length) {
+        setIsDownloadPdfVisible(false)
+      }
 
       if (input) {
         if (input.type === "card input") {
@@ -654,7 +658,7 @@ export const ConversationContainer = (props: Props) => {
     message: string | undefined,
     clientLogs?: SendMessageInput['clientLogs']
   ) => {
-
+    console.log("send message", message)
     if (message?.startsWith("Details are")) {
 
       console.log("entered submitted custom input");
@@ -824,7 +828,6 @@ export const ConversationContainer = (props: Props) => {
           console.log("error in creating comment on ticket", err);
         }
       }
-
 
 
 
@@ -2458,8 +2461,59 @@ export const ConversationContainer = (props: Props) => {
   // const closeSnackbar = () => {
   //   setIsVisible(false);
   // };
-  let buttonValue = props.initialChatReply.typebot.settings.general.navigationButtons.map(button => button.name)
-  console.log("navigation button", buttonValue)
+  const [isDownloadPdfVisible, setIsDownloadPdfVisible] = createSignal(false)
+  const [fileUrl, setFileUrl] = createSignal("")
+  const [fileName, setFileName] = createSignal("")
+  const [fileExtension, setFileExtension] = createSignal("")
+  const [fileSize, setFileSize] = createSignal("")
+
+  //@ts-ignore
+  function getLastNameFromUrl(url) {
+    // Split the URL by "/" to get the last part
+    let parts = url.split('/');
+    // Get the last element which includes the file name
+    let lastPart = parts.pop();
+    // Remove the file extension by splitting at the last dot and taking the first part
+    let lastName = lastPart.split('.').slice(0, -1).join('.');
+    let extension = lastPart.split('.').pop();
+
+    return { lastName, extension };
+    // return lastName;
+  }
+
+  //@ts-ignore
+  async function getFileSize(url) {
+    try {
+      const response = await fetch(url, {
+        method: 'HEAD'
+      });
+
+      if (response.ok) {
+        const contentLength = response.headers.get('Content-Length');
+
+        if (contentLength) {
+          const fileSizeInBytes = parseInt(contentLength, 10);
+          const fileSizeInKB = (fileSizeInBytes / 1024).toFixed(2); // size in KB
+          //@ts-ignore
+          const fileSizeInMB = (fileSizeInKB / 1024).toFixed(2); // size in MB
+
+          console.log(`File size: ${fileSizeInBytes} bytes`);
+          console.log(`File size: ${fileSizeInKB} KB`);
+          console.log(`File size: ${fileSizeInMB} MB`);
+          setFileSize(`${fileSizeInMB} MB`)
+        } else {
+          console.log('Content-Length header is not present.');
+        }
+      } else {
+        console.log('Failed to fetch the URL. Status:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching file size:', error);
+    }
+  }
+
+  console.log("initial sessionId", sessionId())
+  //@ts-ignore
 
   const navigationButtonClicked = async (message) => {
     try {
@@ -2500,6 +2554,7 @@ export const ConversationContainer = (props: Props) => {
         }
       );
       setChatChunks(chunks);
+
 
       if (sessionId()) {
         const response = await fetch(`/api/v2/sendMessage`, {
@@ -2568,6 +2623,16 @@ export const ConversationContainer = (props: Props) => {
             clientSideActions: undefined
           })
           console.log("userinput message response for custominput", messageResp)
+
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
+            console.log("entered download pdf condition")
+            setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
+            setIsDownloadPdfVisible(true)
+          }
+          console.log("type pdf", messageResp?.logs[0])
+
+
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
             console.log("entered upper if");
             let inputs = [];
@@ -2671,6 +2736,31 @@ export const ConversationContainer = (props: Props) => {
 
 
         }
+        else if (messageResp?.message == "Missing startParams") {
+          console.log("else condition entereedddd navbutton")
+          const response = await fetch("/api/v2/sendMessage", {
+            method: "POST",
+            // @ts-ignore
+            headers: {
+              "Content-type": "application/json"
+
+            },
+            body: JSON.stringify({
+              startParams: {
+                typebot: props.initialChatReply.typebot.settings.general.publicId
+              }
+            })
+
+          });
+          const sessionResponse = await response.json();
+
+          console.log("else conditon", messageResp)
+
+          setSessionId(sessionResponse?.sessionId)
+
+          console.log("else condition sessionId", sessionId())
+
+        }
         else {
           let chunks = [...chatChunks()];
           chunks.push({
@@ -2683,6 +2773,21 @@ export const ConversationContainer = (props: Props) => {
           // setUserInput("");
           sessionStorage.removeItem("answer");
           // follow up code
+          if (chatChunks.length < chunks.length) {
+            setIsDownloadPdfVisible(false)
+          }
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
+            console.log("entered download pdf condition")
+            setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
+            setIsDownloadPdfVisible(true)
+            let result = getLastNameFromUrl(fileUrl())
+            setFileName(result.lastName)
+            setFileExtension(result.extension)
+            await getFileSize(fileUrl());
+
+
+          }
 
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
             console.log("entered upper if");
@@ -2790,13 +2895,38 @@ export const ConversationContainer = (props: Props) => {
         // setUserInput("");
       }
     } catch (err) {
-      console.log("Error happened inside userInputClicked", err?.message);
+      console.log("Error happened inside navigation button", err?.message);
     }
   }
 
-  const tybp = props.initialChatReply.typebot
-  console.log()
-  let fileUrl = "https://quadz.blob.core.windows.net/demo/provident-parksquare.pdf"
+
+
+
+  const downloadFile = async () => {
+
+    try {
+      const response = await fetch(fileUrl());
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+
+      a.style.display = 'none';
+      a.href = url;
+      // a.download = `${fileName}${fileExtension}`
+      a.setAttribute('download', `${fileName()}`);
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download file:', error);
+    } finally {
+
+    }
+  };
+
+  console.log("conversationsssssssssss", props)
+
+
 
   return (
 
@@ -2967,7 +3097,7 @@ export const ConversationContainer = (props: Props) => {
       </header >
       }
 
-      <div class='wrapper-container px-3 mt-[5%]'>
+      <div class='wrapper-container px-3 mt-[5%] flex flex-col gap-[6px]'>
 
 
 
@@ -3058,26 +3188,34 @@ export const ConversationContainer = (props: Props) => {
             </div>
           </div>
         }
+        {
+          isDownloadPdfVisible() &&
+          <div class="bg-blue-500 shadow-lg text-white p-3 rounded-lg flex items-center justify-between  lg:w-full max-w-sm fixed lg:bottom-[150px] md:bottom-[220px] left-[33%]">
+            <div class="flex items-center space-x-3">
 
-
-        <div class="bg-blue-500 shadow-lg text-white p-3 rounded-lg flex items-center justify-between lg:w-full max-w-sm fixed bottom-[100px] left-[33%]">
-          <div class="flex items-center space-x-3">
-
-            <div>
-              <p class="font-semibold">brochure</p>
-              <p class="text-sm text-blue-200">
-                2 pages • 66kb • pdf
-              </p>
+              <div>
+                <p class="font-semibold">{fileName()}</p>
+                <p class="text-sm text-blue-200">
+                  {fileSize()} • {fileExtension()}
+                  {/* 2 pages • 66kb • pdf */}
+                  {/* {fileUrl()} */}
+                </p>
+              </div>
             </div>
+            {/* <a href={fileUrl()} target='_blank'> */}
+            <button onclick={downloadFile}>
+              <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 20.3948C15.8667 20.3948 15.7417 20.374 15.625 20.3323C15.5083 20.2907 15.4 20.2198 15.3 20.1198L11.7 16.5198C11.5 16.3198 11.4042 16.0865 11.4125 15.8198C11.4208 15.5532 11.5167 15.3198 11.7 15.1198C11.9 14.9198 12.1375 14.8157 12.4125 14.8073C12.6875 14.799 12.925 14.8948 13.125 15.0948L15 16.9698V9.81982C15 9.53649 15.0958 9.29899 15.2875 9.10732C15.4792 8.91566 15.7167 8.81982 16 8.81982C16.2833 8.81982 16.5208 8.91566 16.7125 9.10732C16.9042 9.29899 17 9.53649 17 9.81982V16.9698L18.875 15.0948C19.075 14.8948 19.3125 14.799 19.5875 14.8073C19.8625 14.8157 20.1 14.9198 20.3 15.1198C20.4833 15.3198 20.5792 15.5532 20.5875 15.8198C20.5958 16.0865 20.5 16.3198 20.3 16.5198L16.7 20.1198C16.6 20.2198 16.4917 20.2907 16.375 20.3323C16.2583 20.374 16.1333 20.3948 16 20.3948ZM10 24.8198C9.45 24.8198 8.97917 24.624 8.5875 24.2323C8.19583 23.8407 8 23.3698 8 22.8198V20.8198C8 20.5365 8.09583 20.299 8.2875 20.1073C8.47917 19.9157 8.71667 19.8198 9 19.8198C9.28333 19.8198 9.52083 19.9157 9.7125 20.1073C9.90417 20.299 10 20.5365 10 20.8198V22.8198H22V20.8198C22 20.5365 22.0958 20.299 22.2875 20.1073C22.4792 19.9157 22.7167 19.8198 23 19.8198C23.2833 19.8198 23.5208 19.9157 23.7125 20.1073C23.9042 20.299 24 20.5365 24 20.8198V22.8198C24 23.3698 23.8042 23.8407 23.4125 24.2323C23.0208 24.624 22.55 24.8198 22 24.8198H10Z" fill="#E8EAED" />
+              </svg>
+            </button>
+            {/* </a> */}
+
+
+
           </div>
-          <button>
-            <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 20.3948C15.8667 20.3948 15.7417 20.374 15.625 20.3323C15.5083 20.2907 15.4 20.2198 15.3 20.1198L11.7 16.5198C11.5 16.3198 11.4042 16.0865 11.4125 15.8198C11.4208 15.5532 11.5167 15.3198 11.7 15.1198C11.9 14.9198 12.1375 14.8157 12.4125 14.8073C12.6875 14.799 12.925 14.8948 13.125 15.0948L15 16.9698V9.81982C15 9.53649 15.0958 9.29899 15.2875 9.10732C15.4792 8.91566 15.7167 8.81982 16 8.81982C16.2833 8.81982 16.5208 8.91566 16.7125 9.10732C16.9042 9.29899 17 9.53649 17 9.81982V16.9698L18.875 15.0948C19.075 14.8948 19.3125 14.799 19.5875 14.8073C19.8625 14.8157 20.1 14.9198 20.3 15.1198C20.4833 15.3198 20.5792 15.5532 20.5875 15.8198C20.5958 16.0865 20.5 16.3198 20.3 16.5198L16.7 20.1198C16.6 20.2198 16.4917 20.2907 16.375 20.3323C16.2583 20.374 16.1333 20.3948 16 20.3948ZM10 24.8198C9.45 24.8198 8.97917 24.624 8.5875 24.2323C8.19583 23.8407 8 23.3698 8 22.8198V20.8198C8 20.5365 8.09583 20.299 8.2875 20.1073C8.47917 19.9157 8.71667 19.8198 9 19.8198C9.28333 19.8198 9.52083 19.9157 9.7125 20.1073C9.90417 20.299 10 20.5365 10 20.8198V22.8198H22V20.8198C22 20.5365 22.0958 20.299 22.2875 20.1073C22.4792 19.9157 22.7167 19.8198 23 19.8198C23.2833 19.8198 23.5208 19.9157 23.7125 20.1073C23.9042 20.299 24 20.5365 24 20.8198V22.8198C24 23.3698 23.8042 23.8407 23.4125 24.2323C23.0208 24.624 22.55 24.8198 22 24.8198H10Z" fill="#E8EAED" />
-            </svg>
-          </button>
+        }
 
 
-        </div>
 
         <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
@@ -3131,11 +3269,11 @@ http://www.w3.org/2000/svg"
 
         {/* promt buttons */}
         {props.initialChatReply.typebot.settings.general.isBottomNavigationEnabled &&
-          <div class='fixed bottom-[90px]  left-[70px] flex'>
+          <div class='fixed bottom-[100px]  left-[30%] flex flex-wrap gap-[2px]'>
             {/* @ts-ignore */}
             {Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons) &&
               props.initialChatReply.typebot.settings.general.navigationButtons.map((button) => {
-                return <div class=''><button onClick={() => { navigationButtonClicked(button.prompt) }} class="mr-2 p-4 bg-[#1A5FFF] text-white	rounded-lg">{button.name}</button> </div>
+                return <div class=''><button class={`${!button.prompt ? 'cursor-not-allowed opacity-50' : ''} `} disabled={!button.prompt} onClick={() => { navigationButtonClicked(button.prompt) }} class="mr-2 p-2 bg-[#1A5FFF] text-white text-xs	rounded-lg">{button.name}</button> </div>
 
               })}
             {/* download pdf */}
