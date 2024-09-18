@@ -1976,6 +1976,18 @@ export const ConversationContainer = (props: Props) => {
             messages: messageResp?.messages,
             clientSideActions: undefined
           })
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
+            console.log("entered download pdf condition")
+            setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
+            setIsDownloadPdfVisible(true)
+            let result = getLastNameFromUrl(fileUrl())
+            setFileName(result.lastName)
+            setFileExtension(result.extension)
+            await getFileSize(fileUrl());
+
+
+          }
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
             console.log("entered upper if");
             let inputs = [];
@@ -2084,14 +2096,24 @@ export const ConversationContainer = (props: Props) => {
             messages: messageResp?.messages,
             clientSideActions: undefined
           })
-          if (chatChunks.length < chunks.length) {
-            setIsDownloadPdfVisible(false)
-          }
+
           // setChatChunks(chunks);
 
           // setUserInput("");
           sessionStorage.removeItem("answer");
           // follow up code
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
+            console.log("entered download pdf condition")
+            setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
+            setIsDownloadPdfVisible(true)
+            let result = getLastNameFromUrl(fileUrl())
+            setFileName(result.lastName)
+            setFileExtension(result.extension)
+            await getFileSize(fileUrl());
+
+
+          }
 
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
             console.log("entered upper if");
