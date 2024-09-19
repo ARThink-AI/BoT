@@ -97,7 +97,7 @@ export async function POST(req: Request) {
 
       switch (timeFilter) {
         case 'DAILY':
-          return startOfDay(now)
+          return startOfDay(subDays(now, 1))
         case 'WEEKLY':
           return subDays(startOfDay(now), 6)
         case 'MONTHLY':
@@ -212,9 +212,9 @@ export async function POST(req: Request) {
         .reduce<string[]>(
           (typebotIds, block) =>
             block.type === LogicBlockType.TYPEBOT_LINK &&
-            isDefined(block.options.typebotId) &&
-            !typebotIds.includes(block.options.typebotId) &&
-            block.options.mergeResults !== false
+              isDefined(block.options.typebotId) &&
+              !typebotIds.includes(block.options.typebotId) &&
+              block.options.mergeResults !== false
               ? [...typebotIds, block.options.typebotId]
               : typebotIds,
           []
