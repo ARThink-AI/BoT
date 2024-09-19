@@ -2071,8 +2071,8 @@ export const ConversationContainer = (props: Props) => {
                 "type": "card input",
                 "customInput": true,
                 "options": {
-                  "heading": "heading",
-                  "subHeading": "subheading",
+                  // "heading": "heading",
+                  // "subHeading": "subheading",
                   // @ts-ignore
                   "inputs": inputs
                 }
@@ -2102,6 +2102,10 @@ export const ConversationContainer = (props: Props) => {
           // setUserInput("");
           sessionStorage.removeItem("answer");
           // follow up code
+          if (chatChunks.length < chunks.length) {
+            setIsDownloadPdfVisible(false)
+          }
+
 
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
             console.log("entered download pdf condition")
@@ -2198,8 +2202,8 @@ export const ConversationContainer = (props: Props) => {
                 "type": "card input",
                 "customInput": true,
                 "options": {
-                  "heading": "heading",
-                  "subHeading": "subheading",
+                  // "heading": "heading",
+                  // "subHeading": "subheading",
                   // @ts-ignore
                   "inputs": inputs
                 }
@@ -2740,8 +2744,8 @@ export const ConversationContainer = (props: Props) => {
                 "type": "card input",
                 "customInput": true,
                 "options": {
-                  "heading": "heading",
-                  "subHeading": "subheading",
+                  // "heading": "heading",
+                  // "subHeading": "subheading",
                   // @ts-ignore
                   "inputs": inputs
                 }
@@ -2896,8 +2900,8 @@ export const ConversationContainer = (props: Props) => {
                 "type": "card input",
                 "customInput": true,
                 "options": {
-                  "heading": "heading",
-                  "subHeading": "subheading",
+                  // "heading": "heading",
+                  // "subHeading": "subheading",
                   // @ts-ignore
                   "inputs": inputs
                 }
@@ -3243,12 +3247,12 @@ export const ConversationContainer = (props: Props) => {
 
         <Show when={props.initialChatReply.typebot.settings.general.isCustomInputEnabled}>
 
-          <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width:45%;">
-            <div class="container lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
+          <div style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);" class="w-[90%] border-2 rounded-full overflow-hidden">
+            <div class="container w-full lg:w-full bg-white flex justify-center gap-2 mx-auto shadow-lg p-2 ">
 
               <input placeholder='Ask' onKeyDown={handleSubmitOnEnter} class="w-full rounded-md text-[#364652] p-1 outline-none" type="text" value={userInput()} onInput={(e) => setUserInput(e?.target?.value)} />
               <div class='flex justify-center items-center gap-[5px]'>
-                {!isRecording() && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
+                {!isRecording() && (props.initialChatReply.typebot.settings.general?.isVoiceEnabled ?? false) && <button onClick={() => startRecordingUserVoice()} class='h-[25px] w-[25px]' style="cursor: pointer;"><img src="https://quadz.blob.core.windows.net/demo1/mic.svg" class='h-[25px] w-[25px]' /></button>}
                 {isRecording() && (
 
                   <button class='h-[40px] w-[40px]' onClick={stopRecordingUserVoice} style={{ cursor: "pointer" }} ><img src="https://quadz.blob.core.windows.net/demo1/mic.gif" class='h-[40px] w-[40px]' />  </button>
@@ -3293,7 +3297,7 @@ http://www.w3.org/2000/svg"
 
         {/* promt buttons */}
         {props.initialChatReply.typebot.settings.general.isBottomNavigationEnabled &&
-          <div class='fixed bottom-[100px]  left-[30%] flex flex-wrap gap-[2px]'>
+          <div class='fixed bottom-[100px]  left-[10%] flex flex-wrap gap-[2px]'>
             {/* @ts-ignore */}
             {Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons) &&
               props.initialChatReply.typebot.settings.general.navigationButtons.map((button) => {

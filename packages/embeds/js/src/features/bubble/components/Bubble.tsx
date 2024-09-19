@@ -258,7 +258,8 @@ export const Bubble = (props: BubbleProps) => {
           'z-index': 42424242,
         }}
         class={
-          'fixed rounded-lg w-full sm:w-[400px] max-h-[604px]' +
+          // 'fixed rounded-lg w-full sm:w-[400px] max-h-[604px]' +
+          'fixed rounded-lg w-full sm:w-[600px] max-h-[704px]' +
           (isBotOpened() ? ' opacity-1' : ' opacity-0 pointer-events-none') +
           (props.theme?.button?.size === 'large'
             ? ' bottom-24'

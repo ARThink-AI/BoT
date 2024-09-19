@@ -676,8 +676,8 @@ export const CardInput = (props: any) => {
     <>
       {props.block && props.block.customInput === true ?
 
-        <div class="mx-auto">
-          <div class="p-6 mt-[3%] lg:w-[350px] min-h-[250px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
+        <div class="mr-[auto] relative">
+          <div class="p-6 mt-[3%] lg:w-[250px] min-h-[250px] bg-[#f7f8ff] font-sans sm-w-full rounded-md shadow-lg shadow-black-50">
             <div class="flex flex-col h-full gap-2">
               <div id="headings">
                 <p class="sticky top-0 bg-[#f7f8ff] text-xl">{props.block.options.heading}</p>
@@ -893,26 +893,26 @@ export const CardInput = (props: any) => {
                       );
                     case "text":
                       return (
-                        <>
-                          <label class='text-[18px]' for="">{input.label}</label>
+                        <div class='flex flex-col'>
+                          <label class='text-[14px]' for="">{input.label}</label>
                           <input
                             type={input.type}
                             placeholder={input.placeholder}
-                            class={`border p-2 rounded-md w-full mb-2`}
+                            class={`border p-2 rounded-md w-[70%] mb-2`}
                             value={input?.values ? input?.values : ""}
                             onChange={(e) => handleInputChange(e, i())}
                             required={input.required}
                           />
-                        </>
+                        </div>
                       );
                     case "email":
                       return (
-                        <>
-                          <label class='text-[18px]' for="">{input.label}</label>
+                        <div class='flex flex-col'>
+                          <label class='text-[14px]' for="">{input.label}</label>
                           <input
                             type={input.type}
                             placeholder={input.placeholder}
-                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
+                            class={`border p-2 rounded-md w-[70%] mb-2 ${input.type === 'email' && !emailValid() ? 'border-red-500' : ''}`}
                             value={input?.values ? input?.values : ""}
                             onChange={(e) => handleInputChange(e, i())}
                             required={input.required}
@@ -920,16 +920,16 @@ export const CardInput = (props: any) => {
                           {input.type === 'email' && !emailValid() && (
                             <p class="text-red-500 text-sm">Please enter a valid email address.</p>
                           )}
-                        </>
+                        </div>
                       );
                     case "phone":
                       return (
-                        <>
-                          <label class='text-[18px]' for="">{input.label}</label>
+                        <div class='flex flex-col'>
+                          <label class='text-[14px]' for="">{input.label}</label>
                           <input
                             type={input.type}
                             placeholder={input.placeholder}
-                            class={`border p-2 rounded-md w-full mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
+                            class={`border p-2 rounded-md w-[70%] mb-2 ${input.type === 'phone' && !phoneValidation() ? 'border-red-500' : ''}`}
                             value={input?.values ? input?.values : ""}
                             onChange={(e) => handleInputChange(e, i())}
                             required={input.required}
@@ -937,7 +937,7 @@ export const CardInput = (props: any) => {
                           {input.type === 'phone' && !phoneValidation() && (
                             <p class="text-red-500 text-sm">Please enter a valid 10 digit phone number.</p>
                           )}
-                        </>
+                        </div>
                       );
                     case "dropdown":
                       return (
@@ -1037,7 +1037,7 @@ export const CardInput = (props: any) => {
 
 
               </div>
-              <div id="buttons" class="flex justify-end mb-2 gap-2">
+              <div id="buttons" class="flex justify-end mb-2 gap-2 absolute bottom-[50px] right-[20px]">
                 {/* onClick={() => {
             // props.onSubmit({ label: "Submitted", value: JSON.stringify({ "vcdphidsm5nqdeiarvl11dj5g": "Dropdown1", "vj7dviiwtnnday3u8codhdzgc": "checkbox1" }) })
             let ans = {};
@@ -1054,7 +1054,7 @@ export const CardInput = (props: any) => {
                     <div style={{ "font-size": "8px" }} > Listening... </div>
                   </div>
                 )}
-                <button onClick={handleSubmit} class={`rounded-full w-[95px] h-[40px] bg-[#0077CC] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
+                <button onClick={handleSubmit} class={`rounded-full w-[55px] h-[30px] bg-[#0077CC] text-[12px] text-white mt-2 ${isAnyRequiredFieldEmpty() ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isAnyRequiredFieldEmpty()}>
                   Submit
                 </button>
               </div>
