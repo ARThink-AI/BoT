@@ -1,7 +1,7 @@
 
 
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Flex, Table, Thead, Tbody, Tr, Th, Td, Box, Input, Select, Button, Text, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { trpc } from '@/lib/trpc'
@@ -14,6 +14,7 @@ import { LogicBlockType } from '@typebot.io/schemas'
 import { convertResultsToTableData } from '../helpers/convertResultsToTableData'
 import { ColumnSettings } from './table/ColumnSettings'
 import { parseColumnOrder } from '../helpers/parseColumnsOrder'
+import { ReminderColumnSettings } from './table/ReminderColumnSettings'
 // import { Frequency } from '@typebot.io/prisma'
 
 export const RemindersTableContainer = () => {
@@ -26,8 +27,32 @@ export const RemindersTableContainer = () => {
   const [duplicateEmail, setDuplicateEmail] = useState<boolean>(false);
   // const [isEditing, setIsEditing] = useState(true);
   const [isUpdating, setUpdating] = useState<string | null>(null);
-  const [updateFormData, setUpdateFormData] = useState({ type: '', frequency: '', emails: [], jobId: '', typebotId: '' });
+  const [reminderId, setreminderId] = useState("")
+  const [updatedColumnSetting, setUpdatedColumnSetting] = useState({
+    remcolumnsOrder: [],
+    remcolumnsWidth: {},
+    remcolumnsVisibility: {}
+  })
+  const [updateFormData, setUpdateFormData] = useState({ type: '', frequency: '', emails: [], jobId: '', typebotId: '', columnState: updatedColumnSetting });
   const { isOpen, onOpen, onClose } = useDisclosure()
+  console.log('updatedColumnSetting', updatedColumnSetting)
+  const [columnState, setColumnState] = useState({
+    remcolumnsOrder: [],
+    remcolumnsWidth: {},
+    remcolumnsVisibility: {}
+  });
+
+  useEffect(() => {
+    const storedVisibility = localStorage.getItem(`reminder_${reminderId}`);
+    const storedOrder = localStorage.getItem(`reminder_order${reminderId}`);
+    if (storedVisibility) {
+      setUpdatedColumnSetting(prev => ({
+        ...prev,
+        remcolumnsVisibility: JSON.parse(storedVisibility),
+        remcolumnsOrder: JSON.parse(storedOrder)
+      }));
+    }
+  }, []); //
 
   // const [jobId, setJobId] = useState<string | null>(null)
   const { data } = trpc.results.getReminders.useQuery(
@@ -145,47 +170,100 @@ export const RemindersTableContainer = () => {
     newColumnVisibility: Record<string, boolean>
   ) => {
     if (typeof newColumnVisibility === 'function') return
-    updateTypebot({
-      updates: {
-        resultsTablePreferences: {
-          columnsVisibility: newColumnVisibility,
-          columnsWidth,
-          columnsOrder,
-        },
-      },
+    // updateTypebot({
+    //   updates: {
+    //     resultsTablePreferences: {
+    //       columnsVisibility: newColumnVisibility,
+    //       columnsWidth,
+    //       columnsOrder,
+    //     },
+    //   },
+    // })
+
+
+
+    setColumnState({
+      remcolumnsVisibility: { ...columnsVisibility, ...newColumnVisibility },
+      remcolumnsWidth: columnsWidth,
+      // @ts-ignore
+      remcolumnsOrder: columnsOrder,
     })
   }
 
-  const onColumnOrderChange = (
+  const changeColumnVisibilityForUpdate = (
     newColumnVisibility: Record<string, boolean>
   ) => {
     if (typeof newColumnVisibility === 'function') return
-    updateTypebot({
-      updates: {
-        resultsTablePreferences: {
-          columnsVisibility: newColumnVisibility,
-          columnsWidth,
-          columnsOrder,
-        },
-      },
+    setUpdatedColumnSetting({
+      remcolumnsVisibility: { ...columnsVisibility, ...newColumnVisibility },
+      remcolumnsWidth: columnsWidth,
+      // @ts-ignore
+      remcolumnsOrder: columnsOrder,
     })
+    console.log('updatedColumnSetting--', updatedColumnSetting)
   }
 
+  console.log("columnState 1", columnState)
+  // console.log("columnState 2", newColumnVisibility)
+
+  // setColumnState({
+  //   remcolumnsVisibility: columnsVisibility,
+  //   remcolumnsWidth: columnsWidth,
+  //   // @ts-ignore
+  //   remcolumnsOrder: columnsOrder,
+  // })
+
+  // const onColumnOrderChange = (
+  //   newColumnVisibility: Record<string, boolean>
+  // ) => {
+  //   if (typeof newColumnVisibility === 'function') return
+  //   // updateTypebot({
+  //   //   updates: {
+  //   //     resultsTablePreferences: {
+  //   //       columnsVisibility: newColumnVisibility,
+  //   //       columnsWidth,
+  //   //       columnsOrder,
+  //   //     },
+  //   //   },
+  //   // })
+  //   setColumnState({
+  //     remcolumnsVisibility: { ...columnsVisibility, ...newColumnVisibility },
+  //     remcolumnsWidth: columnsWidth,
+  //     // @ts-ignore
+  //     remcolumnsOrder: columnsOrder,
+  //   })
+  // }
+  const onColumnOrderChange = (newColumnOrder: string[]) => {
+    if (typeof newColumnOrder === 'function') return
+    setColumnState((prev: any) => ({
+      ...prev,
+      remcolumnsOrder: newColumnOrder
+    }));
+  }
+
+  const onUpadteColumnOrderChange = (newColumnOrder: string[]) => {
+    if (typeof newColumnOrder === 'function') return
+    setUpdatedColumnSetting((prev: any) => ({
+      ...prev,
+      remcolumnsOrder: newColumnOrder
+    }));
+  }
   const selectedHeaders = resultHeader.filter(
-    (header) => columnsVisibility[header.id] === true
+    // @ts-ignore
+    (header) => columnState.remcolumnsVisibility[header.id] === true
   )
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   console.log("hiddennnnnn header", selectedHeaders)
 
-  const addReminder = async (jobId: string) => {
+  const addReminder = async (jobId: string, columnState: object) => {
     try {
       const newReminder = await mutation.mutateAsync({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         jobId: jobId,
-        payload: { 'emails': emails },
+        payload: { 'emails': emails, 'columnState': columnState },
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         typebotId: typebot?.id,
@@ -213,7 +291,7 @@ export const RemindersTableContainer = () => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           frequency: updateFormData.frequency,
-          payload: { emails: updateFormData.emails, resultHeader: selectedHeaders },
+          payload: { emails: updateFormData.emails, resultHeader: selectedHeaders, 'columnState': updatedColumnSetting },
           jobId: updateFormData.jobId,
           typebotId: updateFormData.typebotId
         },
@@ -238,7 +316,7 @@ export const RemindersTableContainer = () => {
     }
   };
 
-  const scheduledJob = async (typebotId: string, type: string, payload: JSON, frequency: string) => {
+  const scheduledJob = async (typebotId: string, type: string, payload: JSON, frequency: string, columnState: object) => {
     try {
       const url = 'https://scheduler.arthink.ai/schedule_job'
       const res = await fetch(url, {
@@ -256,7 +334,7 @@ export const RemindersTableContainer = () => {
       const response = await res.json()
       if (response) {
         // setJobId(response.jobId)
-        setTimeout(() => { addReminder(response.jobId) }, 1000)
+        setTimeout(() => { addReminder(response.jobId, columnState) }, 1000)
 
       }
       console.log("response of scheduled job", response)
@@ -323,16 +401,37 @@ export const RemindersTableContainer = () => {
     setSelectedTimeFilter(defaultTimeFilter);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter)
+    scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter, columnState)
     onClose()
     // window.location.reload()
   };
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
+
   const handleDelete = async (id, jobId) => {
-    // deleteReminder(id);
-    cancelJob(id, jobId)
+    try {
+      // Log to verify the key exists
+      console.log(`Trying to remove reminder_${id}`);
+
+      // Remove the item
+      localStorage.removeItem(`reminder_${id}`);
+      localStorage.removeItem(`reminder_order${reminderId}`)
+      console.log(`Item removed: reminder_${id}`);
+
+      // Ensure cancelJob works correctly
+      await cancelJob(id, jobId);
+    } catch (error) {
+      console.error('Error in handleDelete:', error);
+    }
   };
+
+
+  // const handleDelete = async (id, jobId) => {
+  //   // deleteReminder(id);
+
+  //    localStorage.removeItem(`reminder_${id}`)
+  //   cancelJob(id, jobId)
+  // };
 
   const handleUpdateReminderData = async (id: string, jobId: string) => {
     // handleUpdate(id)
@@ -351,12 +450,14 @@ export const RemindersTableContainer = () => {
   // @ts-ignore
   const handleUpdateReminder = (reminder) => {
     setUpdating(reminder.id);
+    setreminderId(reminder?.id)
     setUpdateFormData({
       type: reminder.type,
       frequency: reminder.frequency,
       emails: reminder.payload.emails,
       jobId: reminder.jobId, // Include jobId in the form data
-      typebotId: reminder.typebotId // Include typebotId in the form data
+      typebotId: reminder.typebotId, // Include typebotId in the form data
+      updatedColumnSettings: updatedColumnSetting
     });
   };
 
@@ -427,15 +528,15 @@ export const RemindersTableContainer = () => {
                       ))}
                       <Button color={'white'} _hover={{ bg: 'green.600' }} bg={'green.400'} onClick={handleAddEmail}>Add</Button>
                     </Td>
-
-                    <Td> <ColumnSettings
+                    <Td> <ReminderColumnSettings
                       resultHeader={resultHeader}
-                      columnVisibility={columnsVisibility}
+                      columnVisibility={columnState?.remcolumnsVisibility}
                       setColumnVisibility={changeColumnVisibility}
-                      columnOrder={columnsOrder}
+                      columnOrder={columnState?.remcolumnsOrder}
                       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                       // @ts-ignore
                       onColumnOrderChange={onColumnOrderChange}
+                    // @ts-ignore
                     /></Td>
                   </Tr>
                 </Tbody>
@@ -469,8 +570,15 @@ export const RemindersTableContainer = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {reminders && reminders.map((reminder) => (
-                  <Tr key={reminder.id}>
+                {reminders && reminders.map((reminder) => {
+                  // const existingVisibility = JSON.parse(localStorage.getItem("reminder")) || {};
+                  // existingVisibility[`reminder_${reminder.id}`] = reminder.payload.columnState.remcolumnsVisibility;
+                  // localStorage.setItem("reminder", JSON.stringify(existingVisibility));
+                  // localStorage.setItem("reminder", JSON.stringify(existingVisibility));
+
+                  localStorage.setItem(`reminder_${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsVisibility));
+                  localStorage.setItem(`reminder_order${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsOrder));
+                  return <Tr key={reminder.id}>
                     <Td>{new Date(reminder.createdAt).toLocaleDateString()}</Td>
                     <Td>
                       {isUpdating === reminder.id ? (
@@ -533,14 +641,15 @@ export const RemindersTableContainer = () => {
                       )}
                     </Td>
                     <Td>
-                      <ColumnSettings
+                      <ReminderColumnSettings
                         resultHeader={resultHeader}
-                        columnVisibility={columnsVisibility}
-                        setColumnVisibility={changeColumnVisibility}
-                        columnOrder={columnsOrder}
+                        columnVisibility={isUpdating !== reminder?.id ? reminder.payload.columnState.remcolumnsVisibility : updatedColumnSetting.remcolumnsVisibility}
+                        setColumnVisibility={changeColumnVisibilityForUpdate}
+                        columnOrder={isUpdating !== reminder?.id ? reminder.payload.columnState.remcolumnsOrder : updatedColumnSetting.remcolumnsOrder}
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
-                        onColumnOrderChange={onColumnOrderChange}
+                        onColumnOrderChange={onUpadteColumnOrderChange}
+                        disableEyeIcon={isUpdating !== reminder?.id}
                       />
                     </Td>
                     <Td>
@@ -554,7 +663,7 @@ export const RemindersTableContainer = () => {
                     </Td>
 
                   </Tr>
-                ))}
+                })}
               </Tbody>
             </Table>}
         </Box>
@@ -562,7 +671,3 @@ export const RemindersTableContainer = () => {
     </Flex>
   )
 }
-
-
-
-
