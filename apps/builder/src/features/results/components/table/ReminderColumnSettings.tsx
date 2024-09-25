@@ -24,133 +24,6 @@ import { useState } from 'react'
 import { CSS } from '@dnd-kit/utilities'
 import { HeaderIcon } from '../HeaderIcon'
 
-// type Props = {
-//   resultHeader: ResultHeaderCell[]
-//   columnVisibility: { [key: string]: boolean }
-//   columnOrder: string[]
-//   onColumnOrderChange: (columnOrder: string[]) => void
-//   setColumnVisibility: (columnVisibility: { [key: string]: boolean }) => void
-//   disableEyeIcon?: boolean
-// }
-
-// export const ReminderColumnSettings = ({
-//   resultHeader,
-//   columnVisibility,
-//   setColumnVisibility,
-//   columnOrder,
-//   onColumnOrderChange,
-//   disableEyeIcon,
-// }: Props) => {
-//   const sensors = useSensors(
-//     useSensor(PointerSensor),
-//     useSensor(KeyboardSensor, {
-//       coordinateGetter: sortableKeyboardCoordinates,
-//     })
-//   )
-//   const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null)
-
-//   const onEyeClick = (id: string) => () => {
-//     columnVisibility[id] === false
-//       ? setColumnVisibility({ ...columnVisibility, [id]: true })
-//       : setColumnVisibility({ ...columnVisibility, [id]: false })
-//   }
-//   const sortedHeader = resultHeader.sort(
-//     (a, b) => columnOrder.indexOf(a.id) - columnOrder.indexOf(b.id)
-//   )
-//   const hiddenHeaders = resultHeader.filter(
-//     (header) => columnVisibility[header.id] === false
-//   )
-
-//   const handleDragStart = (event: DragStartEvent) => {
-//     const { active } = event
-//     setDraggingColumnId(active.id as string)
-//   }
-
-//   const handleDragEnd = (event: DragEndEvent) => {
-//     const { active, over } = event
-
-//     if (active.id !== over?.id) {
-//       const oldIndex = columnOrder.indexOf(active.id as string)
-//       const newIndex = columnOrder.indexOf(over?.id as string)
-//       if (newIndex === -1 || oldIndex === -1) return
-//       const newColumnOrder = arrayMove(columnOrder, oldIndex, newIndex)
-//       onColumnOrderChange(newColumnOrder)
-//     }
-//   }
-
-//   return (
-//     <Stack>
-//       <Text fontWeight="semibold" fontSize="sm">
-//         {/* Shown in table: */}
-//       </Text>
-//         <SortableContext
-//           items={columnOrder}
-//           strategy={verticalListSortingStrategy}
-//         >
-//           {sortedHeader.map((header) => (
-//             <SortableColumns
-//               key={header.id}
-//               header={header}
-//               onEyeClick={onEyeClick}
-//               hiddenHeaders={hiddenHeaders}
-//               disableEyeIcon={disableEyeIcon}
-//             />
-//           ))}
-//         </SortableContext>
-//     </Stack>
-//   )
-// }
-
-// const SortableColumns = ({
-//   header,
-//   hiddenHeaders,
-//   onEyeClick,
-//   disableEyeIcon,
-// }: {
-//   header: ResultHeaderCell
-//   hiddenHeaders: ResultHeaderCell[]
-//   onEyeClick: (key: string) => () => void
-//   disableEyeIcon?: boolean
-// }) => {
-//   const {
-//     attributes,
-//     listeners,
-//     setNodeRef,
-//     transform,
-//     transition,
-//     isDragging,
-//   } = useSortable({ id: header.id })
-
-//   const style = {
-//     transform: CSS.Transform.toString(transform),
-//     transition,
-//   }
-
-//   const isHidden = hiddenHeaders.some(
-//     (hiddenHeader) => hiddenHeader.id === header.id
-//   )
-
-//   return (
-//     <Flex
-//       justify="space-between"
-//        ref={setNodeRef}
-//        style={style}
-//        opacity={ isHidden ? 0.5 : 1}
-//  >
-//     <Text noOfLines={1}>{header.label}</Text>
-//     {!disableEyeIcon && (
-//      <IconButton
-//         icon={isHidden ? <EyeOffIcon /> : <EyeIcon />}
-//         size="sm"
-//         aria-label={'Hide column'}
-//         onClick={onEyeClick(header.id)}
-//       />
-//     )}
-//     </Flex>
-//   )
-// }
-
-
 type Props = {
   resultHeader: ResultHeaderCell[]
   columnVisibility: { [key: string]: boolean }
@@ -207,9 +80,9 @@ export const ReminderColumnSettings = ({
 
   return (
     <Stack>
-      <Text fontWeight="semibold" fontSize="sm">
+      {/* <Text fontWeight="semibold" fontSize="sm">
         Shown in table:
-      </Text>
+      </Text> */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

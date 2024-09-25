@@ -52,7 +52,7 @@ export const RemindersTableContainer = () => {
         remcolumnsOrder: JSON.parse(storedOrder)
       }));
     }
-  }, []); //
+  }, [reminderId]); //
 
   // const [jobId, setJobId] = useState<string | null>(null)
   const { data } = trpc.results.getReminders.useQuery(
