@@ -27,6 +27,7 @@ export const RemindersTableContainer = () => {
   const [duplicateEmail, setDuplicateEmail] = useState<boolean>(false);
   // const [isEditing, setIsEditing] = useState(true);
   const [isUpdating, setUpdating] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [reminderId, setreminderId] = useState("")
   const [updatedColumnSetting, setUpdatedColumnSetting] = useState({
     remcolumnsOrder: [],
@@ -392,6 +393,20 @@ export const RemindersTableContainer = () => {
     }
   }
 
+  const handleClose = () => {
+    setColumnState({
+      remcolumnsVisibility: {},
+      remcolumnsWidth: {},
+      remcolumnsOrder: [],
+    });
+    setUpdatedColumnSetting({
+      remcolumnsVisibility: {},
+      remcolumnsWidth: {},
+      remcolumnsOrder: [],
+    });
+    onClose();
+  }
+
   // console.log("job iddddddd", jobId)
   const handleSave = async () => {
     // setIsEditing(false);
@@ -402,7 +417,8 @@ export const RemindersTableContainer = () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter, columnState)
-    onClose()
+    handleClose()
+    // onClose()
     // window.location.reload()
   };
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -412,10 +428,10 @@ export const RemindersTableContainer = () => {
     try {
       // Log to verify the key exists
       console.log(`Trying to remove reminder_${id}`);
-
+      setIsDeleting(id)
       // Remove the item
       localStorage.removeItem(`reminder_${id}`);
-      localStorage.removeItem(`reminder_order${reminderId}`)
+      localStorage.removeItem(`reminder_order${id}`)
       console.log(`Item removed: reminder_${id}`);
 
       // Ensure cancelJob works correctly
@@ -426,12 +442,32 @@ export const RemindersTableContainer = () => {
   };
 
 
+  useEffect(() => {
+    setColumnState({
+      remcolumnsVisibility: columnsVisibility,
+      remcolumnsWidth: columnsWidth,
+      // @ts-ignore
+      remcolumnsOrder: columnsOrder,
+    })
+  }, [])
+
+
   // const handleDelete = async (id, jobId) => {
   //   // deleteReminder(id);
 
   //    localStorage.removeItem(`reminder_${id}`)
   //   cancelJob(id, jobId)
   // };
+
+  const handleOpen = () =>{
+    setColumnState({
+      remcolumnsVisibility: columnsVisibility,
+      remcolumnsWidth: columnsWidth,
+      // @ts-ignore
+      remcolumnsOrder: columnsOrder,
+    })
+    onOpen()
+  }
 
   const handleUpdateReminderData = async (id: string, jobId: string) => {
     // handleUpdate(id)
@@ -460,10 +496,6 @@ export const RemindersTableContainer = () => {
       updatedColumnSettings: updatedColumnSetting
     });
   };
-
-
-
-  console.log("reminders", reminders);
 
   return (
     <Flex overflowY={'auto'} overflowX={'hidden'} h="100vh" flexDir="column">
@@ -544,14 +576,14 @@ export const RemindersTableContainer = () => {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme='blue' mr={3} onClick={onClose}>
+              <Button colorScheme='blue' mr={3} onClick={handleClose}>
                 Close
               </Button>
               <Button onClick={handleSave} variant='ghost'>Save</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
-        <Button color={'white'} _hover={{ bg: 'blue.700' }} bg={'blue.500'} onClick={onOpen}>Add Reminder</Button>
+        <Button color={'white'} _hover={{ bg: 'blue.700' }} bg={'blue.500'} onClick={handleOpen}>Add Reminder</Button>
 
 
         <Box overflowX="auto" maxW="100%">
@@ -575,9 +607,12 @@ export const RemindersTableContainer = () => {
                   // existingVisibility[`reminder_${reminder.id}`] = reminder.payload.columnState.remcolumnsVisibility;
                   // localStorage.setItem("reminder", JSON.stringify(existingVisibility));
                   // localStorage.setItem("reminder", JSON.stringify(existingVisibility));
+                  if (isDeleting !== reminder.id) {
+                    localStorage.setItem(`reminder_${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsVisibility));
+                    localStorage.setItem(`reminder_order${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsOrder));
+                  }
 
-                  localStorage.setItem(`reminder_${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsVisibility));
-                  localStorage.setItem(`reminder_order${reminder.id}`, JSON.stringify(reminder.payload.columnState.remcolumnsOrder));
+
                   return <Tr key={reminder.id}>
                     <Td>{new Date(reminder.createdAt).toLocaleDateString()}</Td>
                     <Td>
