@@ -184,24 +184,24 @@ export const RemindersTableContainer = () => {
 
 
 
-    setColumnState({
-      remcolumnsVisibility: { ...columnsVisibility, ...newColumnVisibility },
-      remcolumnsWidth: columnsWidth,
+    setColumnState((prev) =>({
+      remcolumnsVisibility: { ...prev.remcolumnsVisibility, ...newColumnVisibility },
+      remcolumnsWidth: prev.remcolumnsWidth,
       // @ts-ignore
-      remcolumnsOrder: columnsOrder,
-    })
+      remcolumnsOrder: prev.remcolumnsOrder,
+    }))
   }
 
   const changeColumnVisibilityForUpdate = (
     newColumnVisibility: Record<string, boolean>
   ) => {
     if (typeof newColumnVisibility === 'function') return
-    setUpdatedColumnSetting({
-      remcolumnsVisibility: { ...columnsVisibility, ...newColumnVisibility },
-      remcolumnsWidth: columnsWidth,
+    setUpdatedColumnSetting((prev)=>({
+      remcolumnsVisibility: { ...prev.remcolumnsVisibility, ...newColumnVisibility },
+      remcolumnsWidth: prev.remcolumnsWidth,
       // @ts-ignore
-      remcolumnsOrder: columnsOrder,
-    })
+      remcolumnsOrder: prev.remcolumnsOrder,
+    }))
     console.log('updatedColumnSetting--', updatedColumnSetting)
   }
 
