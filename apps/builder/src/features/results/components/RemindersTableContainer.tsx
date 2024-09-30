@@ -34,6 +34,7 @@ export const RemindersTableContainer = () => {
     remcolumnsWidth: {},
     remcolumnsVisibility: {}
   })
+  const [isUpdatingBtn, setIsUpdatingBtn] = useState(false);
   const [updateFormData, setUpdateFormData] = useState({ type: '', frequency: '', emails: [], jobId: '', typebotId: '', columnState: updatedColumnSetting });
   const { isOpen, onOpen, onClose } = useDisclosure()
   console.log('updatedColumnSetting', updatedColumnSetting)
@@ -249,10 +250,18 @@ export const RemindersTableContainer = () => {
       remcolumnsOrder: newColumnOrder
     }));
   }
-  const selectedHeaders = resultHeader.filter(
-    // @ts-ignore
-    (header) => columnState.remcolumnsVisibility[header.id] === true
-  )
+
+  const selectedHeaders = isUpdatingBtn 
+  ? resultHeader.filter(
+      // @ts-ignore
+      (header) => updatedColumnSetting.remcolumnsVisibility[header.id] === true
+    )
+  : resultHeader.filter(
+      // @ts-ignore
+      (header) => columnState.remcolumnsVisibility[header.id] === true
+    );
+
+
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -417,8 +426,8 @@ export const RemindersTableContainer = () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     scheduledJob(typebot?.id, selectedType, emails, selectedTimeFilter, columnState)
-    handleClose()
-    // onClose()
+    // handleClose()
+    onClose()
     // window.location.reload()
   };
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -429,6 +438,7 @@ export const RemindersTableContainer = () => {
       // Log to verify the key exists
       console.log(`Trying to remove reminder_${id}`);
       setIsDeleting(id)
+      setIsUpdatingBtn(false)
       // Remove the item
       localStorage.removeItem(`reminder_${id}`);
       localStorage.removeItem(`reminder_order${id}`)
@@ -459,7 +469,7 @@ export const RemindersTableContainer = () => {
   //   cancelJob(id, jobId)
   // };
 
-  const handleOpen = () =>{
+  const handleOpen = () => {
     setColumnState({
       remcolumnsVisibility: columnsVisibility,
       remcolumnsWidth: columnsWidth,
@@ -472,6 +482,7 @@ export const RemindersTableContainer = () => {
   const handleUpdateReminderData = async (id: string, jobId: string) => {
     // handleUpdate(id)
     updateJob(id, jobId)
+    setIsUpdatingBtn(false)
   }
 
   // const handleUpdateReminder = (reminder) => {
@@ -495,6 +506,7 @@ export const RemindersTableContainer = () => {
       typebotId: reminder.typebotId, // Include typebotId in the form data
       updatedColumnSettings: updatedColumnSetting
     });
+    setIsUpdatingBtn(true);
   };
 
   return (
