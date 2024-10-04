@@ -339,9 +339,10 @@ export const ConversationContainer = (props: Props) => {
     if (sessionStorage.getItem("answer")) {
       let chunks = [...chatChunks()];
       const input = chunks[chunks.length - 2]?.input;
-      if (chatChunks.length < chunks.length) {
-        setIsDownloadPdfVisible(false)
-      }
+      // if (chatChunks.length < chunks.length) {
+      //   setTimeout(() => { setIsDownloadPdfVisible(false) }, 4000)
+
+      // }
 
       if (input) {
         if (input.type === "card input") {
@@ -364,7 +365,7 @@ export const ConversationContainer = (props: Props) => {
   onMount(() => {
     ; (async () => {
       if (props.initialChatReply.typebot.settings.general.isCustomInputEnabled) {
-        const response = await fetch("/api/v2/sendMessage", {
+        const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
           method: "POST",
           // @ts-ignore
           headers: {
@@ -654,19 +655,52 @@ export const ConversationContainer = (props: Props) => {
 
   }
 
+
+
   const sendMessage = async (
     message: string | undefined,
     clientLogs?: SendMessageInput['clientLogs']
   ) => {
     console.log("send message", message)
-    if (message?.startsWith("Details are")) {
+    if (message?.includes("are:")) {
+      sessionStorage.setItem("contactusMessage", JSON.stringify(message))
+      setIsContactButtonClicked(true)
+      sessionStorage.setItem("isContactButtonClicked", JSON.stringify(isContactButtonClicked()))
+      if (buttonStates()[0]?.isMatched == true) {
+        console.log('inside session')
 
+
+        return (sessionStorage.setItem("buttonStates", JSON.stringify(buttonStates())))
+      }
+      // setIsDownloadPdfVisible(true)
       console.log("entered submitted custom input");
       let chunks = [...chatChunks()];
       chunks.pop();
       setChatChunks(chunks);
       userInputClicked(message);
-    } else {
+    } else if (message?.includes("are :")) {
+      sessionStorage.setItem("contactusMessage", JSON.stringify(message))
+      console.log('entered downlaod condition')
+
+      setIsDownloadPdfVisible(true)
+      setTimeout(() => {
+        setIsDownloadPdfVisible(false)
+      }, 6000)
+      setIsDownloadButtonClicked(true)
+      sessionStorage.setItem("isDownloadButtonClicked", JSON.stringify(isDownloadButtonClicked()))
+      if (downloadButtonState()[0]?.isMatched == true) {
+
+
+
+        return (sessionStorage.setItem("downloadButtonState", JSON.stringify(downloadButtonState())))
+      }
+      console.log("entered submitted custom input");
+      let chunks = [...chatChunks()];
+      chunks.pop();
+      setChatChunks(chunks);
+      userInputClicked(message);
+    }
+    else {
 
       console.log("live value", live());
       if (live()) {
@@ -1358,7 +1392,7 @@ export const ConversationContainer = (props: Props) => {
   //     setChatChunks(chunks);
 
   //     if (sessionId()) {
-  //       const response = await fetch(`/api/v2/sendMessage`, {
+  //       const response = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
   //         method: "POST",
   //         // @ts-ignore
   //         headers: {
@@ -1376,7 +1410,7 @@ export const ConversationContainer = (props: Props) => {
   //       console.log("message Resp", messageResp);
   //       if (messageResp?.message == "Session expired. You need to start a new session.") {
   //         console.log("session expired restating...");
-  //         const response = await fetch("/api/v2/sendMessage", {
+  //         const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
   //           method: "POST",
   //           // @ts-ignore
   //           headers: {
@@ -1403,7 +1437,7 @@ export const ConversationContainer = (props: Props) => {
   //         });
   //         const sessionResponse = await response.json();
   //         // setSessionId(sessionResponse?.sessionId);
-  //         const responsee = await fetch(`/api/v2/sendMessage`, {
+  //         const responsee = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
   //           method: "POST",
   //           // @ts-ignore
   //           headers: {
@@ -1910,8 +1944,16 @@ export const ConversationContainer = (props: Props) => {
       );
       setChatChunks(chunks);
 
+
+      const states = Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons)
+        ? props.initialChatReply.typebot.settings.general.navigationButtons
+          .filter(button => button.name.toLowerCase().includes("contact") || button.name.toLowerCase().includes("support"))
+          .map(button => ({ name: button.prompt, isMatched: button.prompt === userr }))
+        : [];
+      setButtonStates(states);
+
       if (sessionId()) {
-        const response = await fetch(`/api/v2/sendMessage`, {
+        const response = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
           method: "POST",
           // @ts-ignore
           headers: {
@@ -1929,7 +1971,7 @@ export const ConversationContainer = (props: Props) => {
         console.log("message Resp", messageResp);
         if (messageResp?.message == "Session expired. You need to start a new session.") {
           console.log("session expired restating...");
-          const response = await fetch("/api/v2/sendMessage", {
+          const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
             method: "POST",
             // @ts-ignore
             headers: {
@@ -1956,7 +1998,7 @@ export const ConversationContainer = (props: Props) => {
           });
           const sessionResponse = await response.json();
           // setSessionId(sessionResponse?.sessionId);
-          const responsee = await fetch(`/api/v2/sendMessage`, {
+          const responsee = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
             method: "POST",
             // @ts-ignore
             headers: {
@@ -1980,7 +2022,7 @@ export const ConversationContainer = (props: Props) => {
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
             console.log("entered download pdf condition")
             setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
-            setIsDownloadPdfVisible(true)
+            // setIsDownloadPdfVisible(true)
             let result = getLastNameFromUrl(fileUrl())
             setFileName(result.lastName)
             setFileExtension(result.extension)
@@ -1988,7 +2030,54 @@ export const ConversationContainer = (props: Props) => {
 
 
           }
-          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+
+          console.log("does condition meet", userr)
+          if (isDownloadButtonClicked() && downloadButtonState()[0].name == userr || isContactButtonClicked() && downloadButtonState()[0].name == userr) {
+            setIsDownloadPdfVisible(true)
+          }
+          let messageResponse = JSON.parse(sessionStorage.getItem("contactusMessage"))
+          if (isContactButtonClicked() && buttonStates()[0].name == userr || isDownloadButtonClicked() && buttonStates()[0].name == userr) {
+            console.log("condition for contact us enteredddddddd")
+
+
+            chunks.pop();
+
+
+            chunks.push(
+              {
+                // @ts-ignore
+                //removed lastinput
+                input: '',
+                messages: [
+                  {
+                    id: "unhxagqgd46929s701gnz5z8",
+                    // @ts-ignore
+                    type: "text",
+                    content: {
+                      richText: [
+                        {
+                          "type": "variable",
+                          "children": [
+                            {
+                              "type": "p",
+                              "children": [
+                                {
+                                  "text": messageResponse
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                clientSideActions: undefined
+              }
+            );
+            // setChatChunks(chunks);
+          }
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" && isDownloadButtonClicked() == false && !messageResponse || messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0 && isContactButtonClicked() == false && !messageResponse) {
             console.log("entered upper if");
             let inputs = [];
             for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
@@ -2014,27 +2103,27 @@ export const ConversationContainer = (props: Props) => {
 
               }
 
-              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
-                // console.log("entered name input")
-                inputs.push({
-                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
-                  "type": "email",
-                  "label": "Your Email",
-                  "placeholder": "Enter your Email",
-                  "dynamicDataVariableId": "",
-                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
-                  "required": true,
-                  "buttonType": "Numbers",
-                  "length": 10,
-                  "labels": {
-                    "button": "Send"
-                  },
-                  "customIcon": {
-                    "isEnabled": false
-                  }
-                })
+              // if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+              //   // console.log("entered name input")
+              //   inputs.push({
+              //     "id": "suvcvxlzle3zx7hlqyh4u6jb",
+              //     "type": "email",
+              //     "label": "Your Email",
+              //     "placeholder": "Enter your Email",
+              //     "dynamicDataVariableId": "",
+              //     "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+              //     "required": true,
+              //     "buttonType": "Numbers",
+              //     "length": 10,
+              //     "labels": {
+              //       "button": "Send"
+              //     },
+              //     "customIcon": {
+              //       "isEnabled": false
+              //     }
+              //   })
 
-              }
+              // }
               if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
                 // console.log("entered name input")
                 inputs.push({
@@ -2102,15 +2191,60 @@ export const ConversationContainer = (props: Props) => {
           // setUserInput("");
           sessionStorage.removeItem("answer");
           // follow up code
-          if (chatChunks.length < chunks.length) {
+          setTimeout(() => {
             setIsDownloadPdfVisible(false)
+          }, 6000)
+          console.log("does condition meet", userr)
+          if (isDownloadButtonClicked() && userr.includes("brochure") || isContactButtonClicked() && downloadButtonState()[0].name == userr) {
+            setIsDownloadPdfVisible(true)
           }
+          let messageResponse = JSON.parse(sessionStorage.getItem("contactusMessage"))
+          if (isContactButtonClicked() && buttonStates()[0].name == userr || isDownloadButtonClicked() && buttonStates()[0].name == userr) {
+            console.log("condition for contact us enteredddddddd")
 
+
+            chunks.pop();
+
+
+            chunks.push(
+              {
+                // @ts-ignore
+                //removed lastinput
+                input: '',
+                messages: [
+                  {
+                    id: "unhxagqgd46929s701gnz5z8",
+                    // @ts-ignore
+                    type: "text",
+                    content: {
+                      richText: [
+                        {
+                          "type": "variable",
+                          "children": [
+                            {
+                              "type": "p",
+                              "children": [
+                                {
+                                  "text": messageResponse
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                clientSideActions: undefined
+              }
+            );
+            // setChatChunks(chunks);
+          }
 
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
             console.log("entered download pdf condition")
             setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
-            setIsDownloadPdfVisible(true)
+            // setIsDownloadPdfVisible(true)
             let result = getLastNameFromUrl(fileUrl())
             setFileName(result.lastName)
             setFileExtension(result.extension)
@@ -2119,7 +2253,7 @@ export const ConversationContainer = (props: Props) => {
 
           }
 
-          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" && isDownloadButtonClicked() == false && !messageResponse || messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0 && isContactButtonClicked() == false && !messageResponse) {
             console.log("entered upper if");
             let inputs = [];
             for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
@@ -2145,27 +2279,27 @@ export const ConversationContainer = (props: Props) => {
 
               }
 
-              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
-                // console.log("entered name input")
-                inputs.push({
-                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
-                  "type": "email",
-                  "label": "Your Email",
-                  "placeholder": "Enter your Email",
-                  "dynamicDataVariableId": "",
-                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
-                  "required": true,
-                  "buttonType": "Numbers",
-                  "length": 10,
-                  "labels": {
-                    "button": "Send"
-                  },
-                  "customIcon": {
-                    "isEnabled": false
-                  }
-                })
+              // if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+              //   // console.log("entered name input")
+              //   inputs.push({
+              //     "id": "suvcvxlzle3zx7hlqyh4u6jb",
+              //     "type": "email",
+              //     "label": "Your Email",
+              //     "placeholder": "Enter your Email",
+              //     "dynamicDataVariableId": "",
+              //     "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+              //     "required": true,
+              //     "buttonType": "Numbers",
+              //     "length": 10,
+              //     "labels": {
+              //       "button": "Send"
+              //     },
+              //     "customIcon": {
+              //       "isEnabled": false
+              //     }
+              //   })
 
-              }
+              // }
               if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
                 // console.log("entered name input")
                 inputs.push({
@@ -2495,6 +2629,7 @@ export const ConversationContainer = (props: Props) => {
   const [fileExtension, setFileExtension] = createSignal("")
   const [fileSize, setFileSize] = createSignal("")
 
+
   //@ts-ignore
   function getLastNameFromUrl(url) {
     // Split the URL by "/" to get the last part
@@ -2542,8 +2677,63 @@ export const ConversationContainer = (props: Props) => {
 
   console.log("initial sessionId", sessionId())
   //@ts-ignore
+  const [buttonStates, setButtonStates] = createSignal(sessionStorage.getItem("buttonStates") ? JSON.parse(sessionStorage.getItem("buttonStates")) : {
+    name: "",
+    isMatched: false,
 
-  const navigationButtonClicked = async (message) => {
+  });
+  const [downloadButtonState, setDownloadButtonState] = createSignal(sessionStorage.getItem("downloadButtonState") ? JSON.parse(sessionStorage.getItem("downloadButtonState")) : {
+    name: "",
+    isMatched: false,
+
+  });
+
+  // const isButtonMatched = (button: any) => {
+  //   const currentButtonState = buttonStates()[0];
+  //   const storedButtonStates = sessionStorage.getItem("buttonStates")
+  //     ? JSON.parse(sessionStorage.getItem("buttonStates"))
+  //     : [];
+
+  //   return currentButtonState?.name === button.name
+  //     ? storedButtonStates[0]?.isMatched
+  //     : false;
+  // };
+  // console.log("buttonstststsstststst", buttonStates())
+  const [isContactButtonClicked, setIsContactButtonClicked] = createSignal(sessionStorage.getItem("isContactButtonClicked") ? JSON.parse(sessionStorage.getItem("isContactButtonClicked")) : false)
+  const [isDownloadButtonClicked, setIsDownloadButtonClicked] = createSignal(sessionStorage.getItem("isDownloadButtonClicked") ? JSON.parse(sessionStorage.getItem("isDownloadButtonClicked")) : false)
+  console.log("clicke download button--", isDownloadButtonClicked())
+  const navigationButtonClicked = async (message: any) => {
+
+    // const states = Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons) && props.initialChatReply.typebot.settings.general.navigationButtons.map((button) => {
+
+    //   if (button.name.toLowerCase().startsWith("contact") || button.name.toLowerCase().startsWith("support")) {
+    //     return { name: button.name, isMatched: button.prompt === message, prompt: button.prompt };
+    //   }
+    //   // Compare button.prompt with message and return true/false
+
+    // }).filter(item => item != undefined);
+    const states = Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons)
+      ? props.initialChatReply.typebot.settings.general.navigationButtons
+        .filter(button => button.name.toLowerCase().includes("contact") || button.name.toLowerCase().includes("support"))
+        .map(button => ({ name: button.prompt, isMatched: button.prompt === message }))
+      : [];
+    setButtonStates(states);
+
+    const downloadState = Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons)
+      ? props.initialChatReply.typebot.settings.general.navigationButtons
+        .filter(button => button.name.toLowerCase().startsWith("brochure") || button.prompt.toLowerCase().includes("brochure"))
+        .map(button => ({ name: button.prompt, isMatched: button.prompt === message }))
+      : [];
+
+    setDownloadButtonState(downloadState)
+
+    // console.log('test1---', Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons))
+    console.log('test1--- 1', states)
+
+    // sessionStorage.setItem("isContactButtonClicked", JSON.stringify(isContactButtonClicked()));
+    // console.log('buttonStates--', states)
+
+    console.log("navigationButtonClicked", downloadButtonState())
     try {
       console.log("user input clicked");
       let userr;
@@ -2585,7 +2775,7 @@ export const ConversationContainer = (props: Props) => {
 
 
       if (sessionId()) {
-        const response = await fetch(`/api/v2/sendMessage`, {
+        const response = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
           method: "POST",
           // @ts-ignore
           headers: {
@@ -2603,7 +2793,7 @@ export const ConversationContainer = (props: Props) => {
         console.log("message Resp", messageResp);
         if (messageResp?.message == "Session expired. You need to start a new session.") {
           console.log("session expired restating...");
-          const response = await fetch("/api/v2/sendMessage", {
+          const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
             method: "POST",
             // @ts-ignore
             headers: {
@@ -2628,9 +2818,11 @@ export const ConversationContainer = (props: Props) => {
 
             // })
           });
+
+
           const sessionResponse = await response.json();
           // setSessionId(sessionResponse?.sessionId);
-          const responsee = await fetch(`/api/v2/sendMessage`, {
+          const responsee = await fetch(`https://viewer.arthink.ai/api/v2/sendMessage`, {
             method: "POST",
             // @ts-ignore
             headers: {
@@ -2656,13 +2848,60 @@ export const ConversationContainer = (props: Props) => {
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
             console.log("entered download pdf condition")
             setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
-            setIsDownloadPdfVisible(true)
+            // setIsDownloadPdfVisible(true)
           }
           console.log("type pdf", messageResp?.logs[0])
+          console.log("does condition meet", isContactButtonClicked() == false)
+          if (isDownloadButtonClicked() && downloadButtonState()[0].name == message || isContactButtonClicked() && downloadButtonState()[0].name == message) {
+            setIsDownloadPdfVisible(true)
+          }
+          let messageResponse = JSON.parse(sessionStorage.getItem("contactusMessage"))
+          if (isContactButtonClicked() && buttonStates()[0].name == message || isDownloadButtonClicked() && buttonStates()[0].name == message) {
+            console.log("condition for contact us enteredddddddd")
 
 
-          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+            chunks.pop();
+
+
+            chunks.push(
+              {
+                // @ts-ignore
+                //removed lastinput
+                input: '',
+                messages: [
+                  {
+                    id: "unhxagqgd46929s701gnz5z8",
+                    // @ts-ignore
+                    type: "text",
+                    content: {
+                      richText: [
+                        {
+                          "type": "variable",
+                          "children": [
+                            {
+                              "type": "p",
+                              "children": [
+                                {
+                                  "text": messageResponse
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                clientSideActions: undefined
+              }
+            );
+            // setChatChunks(chunks);
+          }
+
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" && isDownloadButtonClicked() == false && !messageResponse || messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0 && isContactButtonClicked() == false && !messageResponse) {
             console.log("entered upper if");
+
             let inputs = [];
             for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
 
@@ -2687,27 +2926,27 @@ export const ConversationContainer = (props: Props) => {
 
               }
 
-              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
-                // console.log("entered name input")
-                inputs.push({
-                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
-                  "type": "email",
-                  "label": "Your Email",
-                  "placeholder": "Enter your Email",
-                  "dynamicDataVariableId": "",
-                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
-                  "required": true,
-                  "buttonType": "Numbers",
-                  "length": 10,
-                  "labels": {
-                    "button": "Send"
-                  },
-                  "customIcon": {
-                    "isEnabled": false
-                  }
-                })
+              // if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+              //   // console.log("entered name input")
+              //   inputs.push({
+              //     "id": "suvcvxlzle3zx7hlqyh4u6jb",
+              //     "type": "email",
+              //     "label": "Your Email",
+              //     "placeholder": "Enter your Email",
+              //     "dynamicDataVariableId": "",
+              //     "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+              //     "required": true,
+              //     "buttonType": "Numbers",
+              //     "length": 10,
+              //     "labels": {
+              //       "button": "Send"
+              //     },
+              //     "customIcon": {
+              //       "isEnabled": false
+              //     }
+              //   })
 
-              }
+              // }
               if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
                 // console.log("entered name input")
                 inputs.push({
@@ -2743,6 +2982,7 @@ export const ConversationContainer = (props: Props) => {
                 // @ts-ignore
                 "type": "card input",
                 "customInput": true,
+                isDownloadPdfClicked: messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" ? true : false,
                 "options": {
                   // "heading": "heading",
                   // "subHeading": "subheading",
@@ -2766,7 +3006,7 @@ export const ConversationContainer = (props: Props) => {
         }
         else if (messageResp?.message == "Missing startParams") {
           console.log("else condition entereedddd navbutton")
-          const response = await fetch("/api/v2/sendMessage", {
+          const response = await fetch("https://viewer.arthink.ai/api/v2/sendMessage", {
             method: "POST",
             // @ts-ignore
             headers: {
@@ -2791,6 +3031,7 @@ export const ConversationContainer = (props: Props) => {
         }
         else {
           let chunks = [...chatChunks()];
+
           chunks.push({
             messages: messageResp?.messages,
             clientSideActions: undefined
@@ -2801,14 +3042,17 @@ export const ConversationContainer = (props: Props) => {
           // setUserInput("");
           sessionStorage.removeItem("answer");
           // follow up code
-          if (chatChunks.length < chunks.length) {
+
+
+          setTimeout(() => {
             setIsDownloadPdfVisible(false)
-          }
+          }, 6000)
+
 
           if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument") {
             console.log("entered download pdf condition")
             setFileUrl(messageResp.logs[0]?.details?.response.brochure_url)
-            setIsDownloadPdfVisible(true)
+            // setIsDownloadPdfVisible(true)
             let result = getLastNameFromUrl(fileUrl())
             setFileName(result.lastName)
             setFileExtension(result.extension)
@@ -2816,9 +3060,56 @@ export const ConversationContainer = (props: Props) => {
 
 
           }
+          console.log("does condition meet", isContactButtonClicked() == false)
+          if (isDownloadButtonClicked() && downloadButtonState()[0].name == message || isContactButtonClicked() && downloadButtonState()[0].name == message) {
+            setIsDownloadPdfVisible(true)
+          }
+          let messageResponse = JSON.parse(sessionStorage.getItem("contactusMessage"))
+          if (isContactButtonClicked() && buttonStates()[0].name == message || isDownloadButtonClicked() && buttonStates()[0].name == message) {
+            console.log("condition for contact us enteredddddddd")
 
-          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0) {
+
+            chunks.pop();
+
+
+            chunks.push(
+              {
+                // @ts-ignore
+                //removed lastinput
+                input: '',
+                messages: [
+                  {
+                    id: "unhxagqgd46929s701gnz5z8",
+                    // @ts-ignore
+                    type: "text",
+                    content: {
+                      richText: [
+                        {
+                          "type": "variable",
+                          "children": [
+                            {
+                              "type": "p",
+                              "children": [
+                                {
+                                  "text": messageResponse
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                clientSideActions: undefined
+              }
+            );
+            // setChatChunks(chunks);
+          }
+
+          if (messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" && isDownloadButtonClicked() == false && !messageResponse || messageResp?.logs && messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response && messageResp.logs[0]?.details?.response?.follow_up_required && messageResp.logs[0]?.details?.response?.fields && messageResp.logs[0]?.details?.response?.fields.length > 0 && isContactButtonClicked() == false && !messageResponse) {
             console.log("entered upper if");
+
             let inputs = [];
             for (let i = 0; i < messageResp.logs[0]?.details?.response?.fields.length; i++) {
 
@@ -2843,27 +3134,27 @@ export const ConversationContainer = (props: Props) => {
 
               }
 
-              if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
-                // console.log("entered name input")
-                inputs.push({
-                  "id": "suvcvxlzle3zx7hlqyh4u6jb",
-                  "type": "email",
-                  "label": "Your Email",
-                  "placeholder": "Enter your Email",
-                  "dynamicDataVariableId": "",
-                  "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
-                  "required": true,
-                  "buttonType": "Numbers",
-                  "length": 10,
-                  "labels": {
-                    "button": "Send"
-                  },
-                  "customIcon": {
-                    "isEnabled": false
-                  }
-                })
+              // if (messageResp.logs[0]?.details?.response?.fields[i] == "email") {
+              //   // console.log("entered name input")
+              //   inputs.push({
+              //     "id": "suvcvxlzle3zx7hlqyh4u6jb",
+              //     "type": "email",
+              //     "label": "Your Email",
+              //     "placeholder": "Enter your Email",
+              //     "dynamicDataVariableId": "",
+              //     "answerVariableId": "vnvtlj4k8n5seqco4qkt0906b",
+              //     "required": true,
+              //     "buttonType": "Numbers",
+              //     "length": 10,
+              //     "labels": {
+              //       "button": "Send"
+              //     },
+              //     "customIcon": {
+              //       "isEnabled": false
+              //     }
+              //   })
 
-              }
+              // }
               if (messageResp.logs[0]?.details?.response?.fields[i] == "phoneNumber") {
                 // console.log("entered name input")
                 inputs.push({
@@ -2899,6 +3190,7 @@ export const ConversationContainer = (props: Props) => {
                 // @ts-ignore
                 "type": "card input",
                 "customInput": true,
+                isDownloadPdfClicked: messageResp?.logs?.length > 0 && messageResp.logs[0]?.details?.response.type == "showDocument" ? true : false,
                 "options": {
                   // "heading": "heading",
                   // "subHeading": "subheading",
@@ -2908,6 +3200,7 @@ export const ConversationContainer = (props: Props) => {
               }
             });
             console.log("chunkss", chunks);
+
             setChatChunks(chunks);
           } else {
             setChatChunks(chunks);
@@ -3301,7 +3594,9 @@ http://www.w3.org/2000/svg"
             {/* @ts-ignore */}
             {Array.isArray(props.initialChatReply.typebot.settings.general.navigationButtons) &&
               props.initialChatReply.typebot.settings.general.navigationButtons.map((button) => {
-                return <div class=''><button class={`${!button.prompt ? 'cursor-not-allowed opacity-50' : ''} `} disabled={!button.prompt} onClick={() => { navigationButtonClicked(button.prompt) }} class="mr-2 p-2 bg-[#1A5FFF] text-white text-xs	rounded-lg">{button.name}</button> </div>
+                // const isMatched = isButtonMatched(button);
+                // const isDisabled = buttonStates()[0]?.name === button.name && isContactButtonClicked();
+                return <div class=''><button class={` mr-2 p-2 bg-[#1A5FFF] text-white text-xs	rounded-lg`} onClick={() => { navigationButtonClicked(button.prompt) }} >{button.name}</button> </div>
 
               })}
             {/* download pdf */}
@@ -3371,5 +3666,5 @@ http://www.w3.org/2000/svg"
 }
 
 const BottomSpacer = () => {
-  return <div class="w-full h-32 flex-shrink-0" />
+  return <div class="w-full h-32 flex-shrink-0 mt-[2.5%]" />
 }
