@@ -33,6 +33,7 @@ import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { useScopedI18n } from '@/locales'
 import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { WorkspaceRole } from '@typebot.io/prisma'
+import ToggleSwitch from './ToggleSwitch'
 
 export const TypebotHeader = () => {
 
@@ -86,6 +87,12 @@ export const TypebotHeader = () => {
       ? onOpen()
       : window.open('https://docs.typebot.io', '_blank')
   }
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleToggle = () => {
+    setIsChecked((prev) => !prev);
+  };
+
   console.log(handleHelpClick);
   return (
     <Flex
@@ -143,7 +150,9 @@ export const TypebotHeader = () => {
             >
               {scopedT('shareButton.label')}
             </Button>
+
           </>
+
         )}
 
 
@@ -179,6 +188,7 @@ export const TypebotHeader = () => {
         align="center"
         spacing="6"
       >
+
         <HStack alignItems="center" spacing={3}>
           <IconButton
             as={Link}
@@ -265,6 +275,7 @@ export const TypebotHeader = () => {
       </HStack>
 
       <HStack right="40px" pos="absolute" display={['none', 'flex']}>
+        <ToggleSwitch isChecked={isChecked} handleToggle={handleToggle} />
         <CollaborationMenuButton isLoading={isNotDefined(typebot)} />
         {router.pathname.includes('/edit') && isNotDefined(rightPanel) && (
           <Button

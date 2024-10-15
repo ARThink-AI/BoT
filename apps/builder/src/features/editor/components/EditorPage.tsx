@@ -1,5 +1,5 @@
 import { Seo } from '@/components/Seo'
-import { Flex, Spinner, useColorModeValue } from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel, Spinner, Switch, useColorModeValue } from '@chakra-ui/react'
 import {
   EditorProvider,
   useEditor,
@@ -15,9 +15,18 @@ import { Graph } from '@/features/graph/components/Graph'
 import { GraphDndProvider } from '@/features/graph/providers/GraphDndProvider'
 import { GraphProvider } from '@/features/graph/providers/GraphProvider'
 import { GroupsCoordinatesProvider } from '@/features/graph/providers/GroupsCoordinateProvider'
+import { useState } from 'react'
+import ToggleSwitch from './ToggleSwitch'
+import CustomInputAI from './CustomInput'
 
 export const EditorPage = () => {
   const { typebot, isReadOnly } = useTypebot()
+  // const [isChecked, setIsChecked] = useState(false);
+
+  // const handleToggle = () => {
+  //   setIsChecked((prev) => !prev);
+  // };
+
 
   return (
     <EditorProvider>
@@ -40,6 +49,12 @@ export const EditorPage = () => {
           {typebot ? (
             <GraphDndProvider>
               {!isReadOnly && <BlocksSideBar />}
+              {/* <div style={{ position: "absolute", right: "50px", bottom: "100px", zIndex: '99999' }}>
+                <ToggleSwitch isChecked={isChecked} handleToggle={handleToggle} />
+              </div> */}
+              <div style={{ width: "100%", position: "absolute", right: "15%", bottom: "50px", zIndex: '99999' }}>
+                <CustomInputAI isChecked={true} />
+              </div>
               <GraphProvider isReadOnly={isReadOnly}>
                 <GroupsCoordinatesProvider groups={typebot.groups}>
                   <Graph flex="1" typebot={typebot} key={typebot.id} />
