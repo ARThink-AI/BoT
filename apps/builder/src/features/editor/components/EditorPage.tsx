@@ -19,15 +19,22 @@ import { useState } from 'react'
 import ToggleSwitch from './ToggleSwitch'
 import CustomInputAI from './CustomInput'
 
+
 export const EditorPage = () => {
   const { typebot, isReadOnly } = useTypebot()
-  // const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const [threadId, setThreadId] = useState('')
 
-  // const handleToggle = () => {
-  //   setIsChecked((prev) => !prev);
-  // };
+  const handleToggle = async () => {
+    setIsChecked((prev) => !prev);
+    const response = await fetch("http://localhost:5000/start_conversation", {
+      method: "POST"
+    }).then(res => res.json())
+    setThreadId(response.thread_id)
 
+  };
 
+  console.log("response from toggle", threadId)
   return (
     <EditorProvider>
       <Seo title={typebot?.name ? `${typebot.name} | Editor` : 'Editor'} />
@@ -49,12 +56,13 @@ export const EditorPage = () => {
           {typebot ? (
             <GraphDndProvider>
               {!isReadOnly && <BlocksSideBar />}
-              {/* <div style={{ position: "absolute", right: "50px", bottom: "100px", zIndex: '99999' }}>
+              <div style={{ position: "absolute", right: "100px", top: "20px", zIndex: '99999' }}>
                 <ToggleSwitch isChecked={isChecked} handleToggle={handleToggle} />
-              </div> */}
-              <div style={{ width: "100%", position: "absolute", right: "15%", bottom: "50px", zIndex: '99999' }}>
-                <CustomInputAI isChecked={true} />
               </div>
+              {/* style={{ width: "100%", position: "absolute", left: "5%", bottom: "25px", zIndex: '99999' }} */}
+              <Flex w={{ lg: '100%' }} pos={'absolute'} left={{ lg: '5%', md: '50%' }} bottom={'25px'} zIndex={9999}>
+                <CustomInputAI isChecked={isChecked} threadId={threadId} />
+              </Flex>
               <GraphProvider isReadOnly={isReadOnly}>
                 <GroupsCoordinatesProvider groups={typebot.groups}>
                   <Graph flex="1" typebot={typebot} key={typebot.id} />

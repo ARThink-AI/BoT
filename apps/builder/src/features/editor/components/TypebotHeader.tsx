@@ -275,7 +275,7 @@ export const TypebotHeader = () => {
       </HStack>
 
       <HStack right="40px" pos="absolute" display={['none', 'flex']}>
-        <ToggleSwitch isChecked={isChecked} handleToggle={handleToggle} />
+        {/* <ToggleSwitch isChecked={isChecked} handleToggle={handleToggle} /> */}
         <CollaborationMenuButton isLoading={isNotDefined(typebot)} />
         {router.pathname.includes('/edit') && isNotDefined(rightPanel) && (
           <Button
